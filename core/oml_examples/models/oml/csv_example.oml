@@ -1,0 +1,40 @@
+name: csv_example
+rule : csv_example/*
+---
+occur_time  =  Time::now() ;
+year  = take();
+sid   = digit(10);
+
+
+quart   = match  read(month) {
+    in ( digit(1) , digit(3) )    => chars(Q1);
+    in ( digit(4) , digit(6) )    => chars(Q2);
+    in ( digit(7) , digit(9) )    => chars(Q3);
+    in ( digit(10) , digit(12) )  => chars(Q4);
+    _ => chars(Q5);
+};
+
+month = take();
+
+level  = match  ( read(city) , read(count) ) {
+   ( chars(cs) , in ( digit(81) ,  digit(200) ) )    => chars(GOOD);
+   ( chars(cs) , in ( digit(0) ,   digit(80) )  )   => chars(BAD);
+   ( chars(bj) , in ( digit(101) , digit(200) ) )   => chars(GOOD);
+   ( chars(bj) , in ( digit(0) ,   digit(100) ) )   => chars(BAD);
+    _ => chars(NOR);
+};
+
+vender = match  read(product)  {
+    chars(warp)   =>   chars(warp-rd)
+    !chars(warp)   =>  chars(other)
+};
+
+severity: chars =  match take(option:[severity]) {
+    digit(0) => chars(未知);
+    digit(1) => chars(信息);
+    digit(2) => chars(低危);
+    digit(3) => chars(高危(漏洞));
+};
+math_score = select math  from example_score where id = read(sid) ;
+
+*  = take() ;

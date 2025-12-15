@@ -1,0 +1,14 @@
+## v2 源配置（仅保留文件源最小可用示例）
+
+[[sources]]
+key = "file_1"                 # 源标识
+enable = true                   # 启用
+connect = "file_src"     # 引用 connectors/source.d 中的连接器 id
+# 如需覆盖连接器默认参数，可在此处指定；默认路径指向 data/in_dat
+params = { base = "./data/in_dat", file = "gen.dat", encode = "text" }
+
+[[sources]]
+key = "file_2"                 # 第二个文件源（禁用示例）
+enable = false
+connect = "file_src"
+params = { base = "./data/in_dat", file = "gen2.dat", encode = "text" }

@@ -1,0 +1,5 @@
+package csv_example {
+   rule name_1 {
+       (symbol(csv),digit:year\-,digit:month,chars:product,chars:city,digit:count,digit:severity)\,
+    }
+}

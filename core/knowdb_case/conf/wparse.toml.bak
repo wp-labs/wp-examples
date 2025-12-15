@@ -1,0 +1,44 @@
+version = "1.0"
+robust = "normal"
+
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+sources = "./models/sources"
+sinks = "./models/sinks"
+
+[performance]
+rate_limit_rps = 10000
+parse_workers = 2
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+#level = "debug,ctrl=info,launch=info,source=info,sink=info,stat=info,runtime=warn,oml=warn,wpl=warn,klib=warn,orion_error=error,orion_sens=warn"
+level = "debug"
+output = "File"
+
+[log_conf.file]
+path = "./data/logs"
+
+[stat]
+window_sec = 60
+
+[[stat.pick]]
+key = "pick_stat"
+target = "*"
+fields = []
+top_n = 20
+
+[[stat.parse]]
+key = "parse_stat"
+target = "*"
+fields = []
+top_n = 20
+
+[[stat.sink]]
+key = "sink_stat"
+target = "*"
+fields = []
+top_n = 20

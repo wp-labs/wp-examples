@@ -1,0 +1,19 @@
+package /pipe_demo {
+   #[copy_raw(name : "_origin")]
+   rule fmt_from_quote {
+        // Input like: "{ \"a\": 1, \"b\": \"foo\" }"
+        // 1) strip outer quotes and unescape inner quotes
+        // 2) parse JSON at root into fields
+        |unquote/unescape|(json(_@_origin))
+   }
+
+   #[copy_raw(name : "_origin")]
+    rule fmt_from_base64 {
+        // Input like: base64("{ \"a\": 2, \"b\": \"bar\" }")
+        // 1) base64 decode
+        // 2) strip outer quotes and unescape inner quotes
+        // 3) parse JSON into fields
+        |decode/base64|unquote/unescape|(json(_@_origin))
+    }
+}
+

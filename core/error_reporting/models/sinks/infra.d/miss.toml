@@ -1,0 +1,12 @@
+version = "2.0"
+
+[sink_group]
+name = "miss"
+oml = []
+[[sink_group.sinks]]
+connect = "file_raw_sink"
+params = {  file = "miss.dat" }
+[sink_group.sinks.expect]
+# 该组为异常统计，采用范围期望而非比例
+ratio = 7.00
+tol   = 0.01

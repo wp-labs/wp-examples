@@ -1,0 +1,17 @@
+name : skyeye_stat
+rule : skyeye_stat/*
+---
+vendor      = chars(wparse) ;
+v_ip        = ip(127.0.0.1) ;
+recv_time   = Time::now() ;
+cust_tag    = fmt("[{pos_sn}-{sip}]", @pos_sn, @sip ) ;
+
+value  = object {
+  process,memory_free : float =  take() ;
+  cpu_free,cpu_used_by_one_min, cpu_used_by_fifty_min : float =  take() ;
+  disk_free,disk_used,disk_used_by_one_min, disk_used_by_fify_min : float =  take() ;
+} ;
+
+time_all  = collect  take( keys : [ *time* ] ) ;
+
+raw_msg  =  pipe take() | base64_en ;

@@ -1,0 +1,17 @@
+[[sources]]
+key = "demo_file"
+enable = true
+connect = "file_src"
+tags = []
+
+[sources.params]
+encode = "text"
+
+[[sources]]
+key = "demo_syslog"
+enable = false
+connect = "syslog_udp_src"
+tags = []
+
+[sources.params]
+addr = "127.0.0.1"

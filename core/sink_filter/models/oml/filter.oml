@@ -1,0 +1,13 @@
+name: /oml/sh_test
+rule : /shh/test_rule16
+---
+access_ip : ip    = read(); 
+dat_type : chars  = read(); 
+pos_sn : chars    = read(option:\[serial_num\]); 
+attacker_ip : ip  = read(); 
+serial_num: chars = read(); 
+http_req_uri : chars = read(); 
+logtype: chars    = read(option:\[dat_type\]); 
+alert_src: chars  = chars(68); 
+test: chars       = chars(test16);
+

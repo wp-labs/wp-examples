@@ -1,0 +1,19 @@
+name : skyeye_stat
+rule : skyeye_stat/*
+---
+src_key     : chars =  take() ;
+recv_time   : time  = Time::now() ;
+pos_sn      : chars =  take() ;
+updatetime  : time  =  take() ;
+sip         : chars =  take() ;
+log_type    : chars =  take() ;
+cust_tag    : chars = fmt("[{pos_sn}-{sip}]", @pos_sn, @sip ) ;
+
+value  : obj = object {
+  process,memory_free : float =  take() ;
+  cpu_free,cpu_used_by_one_min, cpu_used_by_fifty_min : float =  take() ;
+  disk_free,disk_used,disk_used_by_one_min, disk_used_by_fify_min : float =  take() ;
+} ;
+
+time_all : array = collect  take( keys : [ *time* ] ) ;
+raw_msg : chars =  pipe take() | base64_en ;

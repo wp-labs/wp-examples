@@ -1,0 +1,20 @@
+version = "1.0"
+
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+sources = "./models/sources"
+sinks = "./models/sinks"
+
+[performance]
+parse_workers = 2
+rate_limit_rps = 0
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+level = "warn,ctrl=info,launch=info,klib=info"
+output = "File"
+[log_conf.file]
+path = "./data/logs"

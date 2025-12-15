@@ -1,0 +1,6 @@
+name : /oml/example/simple
+
+rule :
+    /example/simple*
+---
+* : auto = take() ;

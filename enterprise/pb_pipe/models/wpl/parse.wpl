@@ -1,0 +1,6 @@
+package /ent/pb {
+
+   rule skyeye {
+        | decode/hex | qax/skyeye | (json(_@*,digit@message_type,chars@message_desc))
+   }
+}

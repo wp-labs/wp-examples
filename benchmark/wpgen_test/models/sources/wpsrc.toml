@@ -1,0 +1,12 @@
+[[sources]]
+enable =  true
+key = "syslog_1"
+connect = "tcp_src"
+params = { prefer_newline = true , port =19001}
+
+
+[[sources]]
+enable =  false
+key = "syslog_2"
+connect = "tcp_src"
+params = {  prefer_newline = true , port = 19002}

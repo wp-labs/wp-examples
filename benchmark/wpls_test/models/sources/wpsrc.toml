@@ -1,0 +1,6 @@
+# 主要文件数据源（启用）
+[[sources]]
+key = "file_main"
+connect = "file_src"
+enable = true
+tags = ["type:file", "purpose:benchmark"]

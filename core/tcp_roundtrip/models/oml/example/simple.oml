@@ -1,0 +1,8 @@
+name : /oml/example/simple 
+
+rule :
+    /example/simple*
+---
+recv_time  = take() ;
+*  = take() ;
+       

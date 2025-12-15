@@ -1,0 +1,19 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/simple"
+oml = ["/oml/example/s*"]
+[[sink_group.sinks]]
+name = "dat"
+connect = "file_proto_sink"
+params = {  file = "simple.dat" }
+
+[[sink_group.sinks]]
+name = "json"
+connect = "file_json_sink"
+params = {  file = "simple.json" }
+
+[[sink_group.sinks]]
+name = "kv"
+connect = "file_kv_sink"
+params = { file = "simple.kv" }
