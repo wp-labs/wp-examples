@@ -14,9 +14,9 @@ WarpParse 日志解析引擎的示例项目，展示如何使用 WarpParse进行
 
 当前只支持 Linux/macOS 
 ### 下载 wp-example
-1. 下载压缩包 [wp-example.zip](https://github.com/wp-labs/wp-examples/archive/refs/heads/main.zip)
+1. 方法一：下载压缩包 [wp-example.zip](https://github.com/wp-labs/wp-examples/archive/refs/heads/main.zip)
 
-2. 通过git 
+2. 方法二：通过git 
 ```
 git clone https://github.com/wp-labs/wp-examples.git
 ```
@@ -26,8 +26,7 @@ git clone https://github.com/wp-labs/wp-examples.git
 * 在此 [下载](https://github.com/wp-labs/warp-parse/releases) 选择最新的平台版本，
 * 解压，并拷贝到 /usr/local/bin 目录
 
-## 运行环境设置 
-### mac 
+#### mac 
 * 许可wparse,wpgen,wproj 的运行
 
 ### 运行示例
