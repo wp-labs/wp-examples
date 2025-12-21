@@ -1,8 +1,8 @@
 version = "1.0"
 
 [models]
-wpl = "./models/wpl"
-oml = "./models/oml"
+wpl = "../models/wpl"
+oml = "../models/oml"
 sources = "./models/sources"
 sinks = "./models/sinks"
 

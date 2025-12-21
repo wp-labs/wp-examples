@@ -1,71 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 加载公共函数库（统一到 usecase/script）
+# 加载 benchmark 公共函数库
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
-COMMON_LIB="${COMMON_LIB:-$(cd "$SCRIPT_DIR/../../script" && pwd)/common.sh}"
-if [ ! -f "$COMMON_LIB" ]; then
-  COMMON_LIB="$(cd "$SCRIPT_DIR/.." && pwd)/common.sh"
+BENCHMARK_LIB="$(cd "$SCRIPT_DIR/.." && pwd)/benchmark_common.sh"
+source "$BENCHMARK_LIB"
+
+# 显示用法（包含 -f 选项）
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  benchmark_usage "$0" "-f"
+  exit 0
 fi
-source "$COMMON_LIB"
 
-usage() {
-  cat <<'USAGE'
-Usage: ./run.sh [-w worker_cnt] [profile]
-  -w worker_cnt   指定 wparse worker 数；默认依次运行 2/4/6
-  profile         可选，默认 release
-USAGE
-}
+# 解析参数（支持 -m 和 -f）
+benchmark_parse_args "$@"
 
-WORKER_ARG=""
-while getopts ":w:h" opt; do
-  case "$opt" in
-    w) WORKER_ARG="$OPTARG" ;;
-    h)
-      usage
-      exit 0
-      ;;
-    *)
-      usage >&2
-      exit 2
-      ;;
-  esac
-done
-shift $((OPTIND-1))
+# 初始化环境
+benchmark_init_env
 
-# 初始化与构建：基准测试默认使用 release
-init_script_dir
-parse_profile "${1:-release}"
-build_and_setup_path
-verify_commands wparse wpgen wproj
+# 验证 WPL 路径
+benchmark_validate_wpl_path "$WPL_DIR"
 
-rm -rf  data/logs
-
-#rm -rf  ./ldm ;
-#wpcfg ldm  benchmark ;
-#wpcfg ldm benchmark --sink null
-
-STAT_SEC=20
-
+# 初始化配置
 wproj check
 wproj data clean
-wpgen data clean
 
-echo "1> gen  1KM sample data"
-wpgen sample -n 5000000  -s 300000 --stat 10 --print_stat
+# 设置数据规模
+benchmark_set_line_cnt
 
-if [ -n "$WORKER_ARG" ]; then
-  WORKER_LIST=("$WORKER_ARG")
-else
-  WORKER_LIST=(2 4 6)
-fi
+# 检查数据文件（使用单个配置 "gen"）
+benchmark_check_data_files "gen"
 
-for idx in "${!WORKER_LIST[@]}"; do
-  cnt="${WORKER_LIST[$idx]}"
-  echo "2> start ${cnt} thread work "
-  wparse batch --stat "$STAT_SEC" -w "$cnt" --print_stat
-  if [ "$idx" -lt $((${#WORKER_LIST[@]} - 1)) ]; then
-    wproj data clean
-  fi
-done
+# 条件生成数据
+benchmark_conditional_data_gen "$WPL_PATH" "$SPEED_MAX" "$LINE_CNT" "wpgen.toml"
+
+# 执行 batch 模式测试
+benchmark_run_batch "$WPL_PATH"

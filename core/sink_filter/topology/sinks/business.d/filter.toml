@@ -15,7 +15,7 @@ tol   = 0.01
 [[sink_group.sinks]]
 name = "safe"
 connect = "file_proto_sink"
-filter = "./models/sinks/business.d/filter.conf"
+filter = "./topology/sinks/business.d/filter.conf"
 params = {  file = "sink_filter_safe.dat" }
 [sink_group.sinks.expect]
 ratio = 0.5

@@ -5,8 +5,8 @@ robust = "normal"
 wpl = "./models/wpl"
 oml = "./models/oml"
 [topology]
-sources = "./models/sources"
-sinks = "./models/sinks"
+sources = "./topology/sources"
+sinks = "./topology/sinks"
 
 [performance]
 parse_workers = 2

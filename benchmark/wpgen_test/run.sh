@@ -43,17 +43,16 @@ if [ -n "$WORKER_ARG" ]; then
   echo "[INFO] -w 参数对当前脚本无效（仅生成数据），已忽略。" >&2
 fi
 
-wproj conf init
 wproj data clean
 wpgen data clean
 
 LINE_CNT=8000000
 SPEED_MAX=2000000
 echo "gen $SPEED_MAX"
-wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p  --wpl ./models/wpl/nginx
+wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p  --wpl ../models/wpl/nginx
 
 
-wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p  --wpl ./models/wpl/benchmark
+wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p  --wpl ../models/wpl/benchmark
 
 
 
@@ -61,4 +60,4 @@ wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p  --wpl ./models/wpl/benchm
 LINE_CNT=6000
 SPEED_MAX=1000
 echo "gen $SPEED_MAX"
-wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p --wpl ./models/wpl/nginx
+wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p --wpl ../models/wpl/nginx
