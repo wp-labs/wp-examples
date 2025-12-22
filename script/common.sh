@@ -49,6 +49,7 @@ clean_runtime_dirs() {
 # 设置 PATH，优先检查 $HOME/bin 下的可执行文件
 # 无参数，使用全局变量 PROFILE
 build_and_setup_path() {
+
   # 检查 $HOME/bin 目录是否存在且包含所需的可执行文件
   if [ -d "$HOME/bin" ]; then
     export PATH="$HOME/bin:$PATH"
