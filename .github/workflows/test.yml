@@ -1,0 +1,88 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Core Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout wp-examples
+        uses: actions/checkout@v4
+
+      - name: Get latest release version
+        id: release
+        run: |
+          LATEST_URL=$(curl -s -I https://github.com/wp-labs/warp-parse/releases/latest | grep -i location | awk '{print $2}' | tr -d '\r')
+          VERSION=$(basename "$LATEST_URL")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Latest version: $VERSION"
+
+      - name: Download wparse tools
+        run: |
+          VERSION="${{ steps.release.outputs.version }}"
+          wget "https://github.com/wp-labs/warp-parse/releases/download/${VERSION}/wparse-linux-x86_64.tar.gz" -O wparse.tar.gz
+          tar -xzf wparse.tar.gz
+          chmod +x wparse wpgen wproj
+
+      - name: Add tools to PATH
+        run: echo "$GITHUB_WORKSPACE" >> $GITHUB_PATH
+
+      - name: Verify tools
+        run: |
+          command -v wparse
+          command -v wpgen
+          command -v wproj
+          wparse --version || true
+
+      - name: Run all core tests
+        run: |
+          cd core
+          bash run_all.sh
+
+  test-macos:
+    name: Run Core Tests (macOS)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout wp-examples
+        uses: actions/checkout@v4
+
+      - name: Get latest release version
+        id: release
+        run: |
+          LATEST_URL=$(curl -s -I https://github.com/wp-labs/warp-parse/releases/latest | grep -i location | awk '{print $2}' | tr -d '\r')
+          VERSION=$(basename "$LATEST_URL")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Latest version: $VERSION"
+
+      - name: Download wparse tools
+        run: |
+          VERSION="${{ steps.release.outputs.version }}"
+          curl -L "https://github.com/wp-labs/warp-parse/releases/download/${VERSION}/wparse-darwin-x86_64.tar.gz" -o wparse.tar.gz
+          tar -xzf wparse.tar.gz
+          chmod +x wparse wpgen wproj
+
+      - name: Add tools to PATH
+        run: echo "$GITHUB_WORKSPACE" >> $GITHUB_PATH
+
+      - name: Verify tools
+        run: |
+          command -v wparse
+          command -v wpgen
+          command -v wproj
+          wparse --version || true
+
+      - name: Run all core tests
+        run: |
+          cd core
+          bash run_all.sh
