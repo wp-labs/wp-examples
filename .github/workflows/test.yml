@@ -30,7 +30,7 @@ jobs:
       - name: Download wparse tools
         run: |
           VERSION="${{ steps.release.outputs.version }}"
-          wget "https://github.com/wp-labs/warp-parse/releases/download/${VERSION}/wparse-linux-x86_64.tar.gz" -O wparse.tar.gz
+          wget "https://github.com/wp-labs/warp-parse/releases/download/${VERSION}/warp-parse-${VERSION}-x86_64-unknown-linux-gnu.tar.gz" -O wparse.tar.gz
           tar -xzf wparse.tar.gz
           chmod +x wparse wpgen wproj
 
@@ -68,7 +68,7 @@ jobs:
       - name: Download wparse tools
         run: |
           VERSION="${{ steps.release.outputs.version }}"
-          curl -L "https://github.com/wp-labs/warp-parse/releases/download/${VERSION}/wparse-darwin-x86_64.tar.gz" -o wparse.tar.gz
+          curl -L "https://github.com/wp-labs/warp-parse/releases/download/${VERSION}/warp-parse-${VERSION}-aarch64-apple-darwin.tar.gz" -o wparse.tar.gz
           tar -xzf wparse.tar.gz
           chmod +x wparse wpgen wproj
 
