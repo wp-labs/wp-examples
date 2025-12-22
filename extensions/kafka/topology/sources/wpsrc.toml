@@ -1,0 +1,15 @@
+# 主要文件数据源（启用）
+[[sources]]
+enable = true
+key = "kafka_input"
+connect = "kafka_src"
+#tags = ["type:file", "purpose:benchmark"]
+params = {  topic = "wp.testcase.events.raw"  }
+
+
+[[sources]]
+enable = true
+key = "kafka_output_tap"
+connect = "kafka_src"
+#tags = ["type:file", "purpose:benchmark"]
+params = {  topic = "wp.testcase.events.parsed"  }

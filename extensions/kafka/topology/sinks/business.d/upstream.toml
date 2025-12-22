@@ -1,0 +1,14 @@
+version = "2.0"
+
+[sink_group]
+name = "/upstream/"
+oml = ["/oml/upstream"]
+
+[[sink_group.sinks]]
+name = "proto"
+connect = "file_json_sink"
+[sink_group.sinks.params]
+file = "upstream.dat"
+[sink_group.sinks.expect]
+ratio = 0.50
+tol   = 0.01

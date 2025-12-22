@@ -1,0 +1,6 @@
+name : /oml/upstream
+
+rule :
+    /upstream/*
+---
+*  = take() ;

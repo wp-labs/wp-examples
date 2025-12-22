@@ -1,0 +1,10 @@
+name : /oml/example
+
+rule :
+    /example/*
+---
+recv_time  = take() ;
+occur_time = Time::now() ;
+from_ip    = take(option:[from-ip]) ;
+src_ip     = take(option:[src-ip,sip,source-ip] );
+*  = take() ;
