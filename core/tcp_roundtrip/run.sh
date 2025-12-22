@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/run_common.sh"
+# Enter script directory
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# 初始化与构建：基准测试默认使用 release，且在复现问题时保留已有 conf
-core_usecase_bootstrap "${1:-debug}" skip_clean wparse wpgen wproj
+# Verify commands exist
+for cmd in wparse wpgen wproj lsof; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "Error: Command '$cmd' not found in PATH"
+    exit 1
+  fi
+done
 
 wproj check
 wproj data clean
@@ -17,18 +23,24 @@ fi
 
 echo "2> start work (no print_stat)"
 wparse deamon --stat 5 -w 8 &
-wait_for_pid_file ./.run/wparse.pid || true
-sleep 3;
+# Wait for PID file with simple loop
+for i in {1..50}; do
+  if test -f "./.run/wparse.pid"; then
+    break
+  fi
+  sleep 0.1
+done
+sleep 3
 
 LINE_CNT=10000
 SPEED_MAX=5000
-echo "1> gen  sample data"
-wpgen sample  -n $LINE_CNT -s $SPEED_MAX --stat 10
+echo "1> gen sample data"
+wpgen sample -n "$LINE_CNT" -s "$SPEED_MAX" --stat 10
 
 
-sleep 3;
-cat ./.run/wparse.pid  | xargs kill || true
+sleep 3
+cat ./.run/wparse.pid | xargs kill || true
 
-sleep 3;
-wproj  data stat
-wproj  data validate --input-cnt $LINE_CNT
+sleep 3
+wproj data stat
+wproj data validate --input-cnt "$LINE_CNT"

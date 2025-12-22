@@ -1,29 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/run_common.sh"
-
-# 初始化与构建：基准测试默认使用 release，且在复现问题时保留已有 conf
-core_usecase_bootstrap "${1:-debug}" skip_clean wparse wpgen wproj
+# 进入脚本所在目录
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 wproj check
 wproj data clean
 
-
 echo "start work (no print_stat)"
 wparse deamon --stat 5 -w 8 &
-wait_for_pid_file ./.run/wparse.pid || true
-sleep 3;
+# 等待 PID 文件出现
+for i in {1..50}; do
+    test -f ./.run/wparse.pid && break
+    sleep 0.1
+done
+sleep 3
 
 LINE_CNT=10000
 SPEED_MAX=5000
 echo "1> gen  sample data"
 wpgen sample  -n $LINE_CNT -s $SPEED_MAX --stat 10
 
+sleep 3
+if [ -f ./.run/wparse.pid ]; then
+    kill $(cat ./.run/wparse.pid) || true
+fi
+sleep 3
 
-sleep 3;
-cat ./.run/wparse.pid  | xargs kill || true
-
-sleep 3;
-wproj  data stat
-wproj  data validate
+wproj data stat
+wproj data validate

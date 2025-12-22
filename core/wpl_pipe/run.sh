@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/run_common.sh"
+# Enter script directory
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+# Verify commands exist
+for cmd in wparse wpgen wproj; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "Error: Command '$cmd' not found in PATH"
+    exit 1
+  fi
+done
 
 # Tunables
 LINE_CNT=${LINE_CNT:-1000}
 STAT_SEC=${STAT_SEC:-2}
 
-# 初始化环境（保留 conf 便于复用 wpl pipeline）
-core_usecase_bootstrap "${1:-debug}" keep_conf wparse wpgen wproj
-
-# Prepare conf and data
+# Prepare configuration and data
 wproj check || true
 wproj data clean || true
 wpgen data clean || true
@@ -21,7 +27,7 @@ test -s "./data/in_dat/gen.dat" || { echo "missing ./data/in_dat/gen.dat"; exit 
 
 echo "2> parse in batch"
 if ! wparse batch --stat "$STAT_SEC" -S 1 -p -n "$LINE_CNT"; then
-  echo "wparse work failed. check ./data/logs/wparse.log and ./data/logs/wparse.stdout (if exists).";
+  echo "wparse work failed. check ./data/logs/wparse.log and ./data/logs/wparse.stdout (if exists)."
   exit 1
 fi
 
