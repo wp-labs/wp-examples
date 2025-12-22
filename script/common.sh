@@ -49,6 +49,11 @@ clean_runtime_dirs() {
 # 设置 PATH，优先检查 $HOME/bin 下的可执行文件
 # 无参数，使用全局变量 PROFILE
 build_and_setup_path() {
+  # 如果 wparse 已经可以直接调用，则跳过 PATH 设置
+  if command -v wparse >/dev/null 2>&1; then
+    echo "wparse already available at $(command -v wparse)"
+    return 0
+  fi
 
   # 检查 $HOME/bin 目录是否存在且包含所需的可执行文件
   if [ -d "$HOME/bin" ]; then
