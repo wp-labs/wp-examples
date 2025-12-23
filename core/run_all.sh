@@ -24,21 +24,14 @@ for arg in "$@"; do
   esac
 done
 
-PROFILE=${PROFILE:-${PROFILE_ARG:-debug}}
-case "$PROFILE" in
-  debug|release) ;;
-  *) echo "invalid PROFILE: $PROFILE (expect debug|release)"; exit 2;;
-esac
 
 # Init env and build once
 init_script_dir
-parse_profile "$PROFILE"
 build_and_setup_path
 verify_commands wparse wpgen wproj || true
 
 # Ensure subcases reuse the compiled binaries (no rebuild)
 export SKIP_BUILD=1
-export PROFILE
 
 # Discover all case scripts
 # Collect case scripts (compatible with older macOS bash without mapfile)
@@ -74,7 +67,7 @@ for case_sh in "${ORDERED[@]}"; do
   case_dir="$(dirname "$case_sh")"
   case_name="${case_dir#./}"
   echo
-  echo "====> [$TOTAL/$TOTAL_CASES] 开始执行: $case_name (PROFILE=$PROFILE)"
+  echo "====> [$TOTAL/$TOTAL_CASES] 开始执行: $case_name"
   echo "      用例目录: $case_dir"
 
   # Run case and capture exit code (treat non-zero as failure)
@@ -83,9 +76,9 @@ for case_sh in "${ORDERED[@]}"; do
     set -e
     cd "$case_dir"
     if [ -x "./run.sh" ]; then
-      ./run.sh "$PROFILE"
+      ./run.sh
     else
-      bash ./run.sh "$PROFILE"
+      bash ./run.sh
     fi
   )
   rc=$?
