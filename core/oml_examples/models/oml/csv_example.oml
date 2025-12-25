@@ -1,7 +1,7 @@
 name: csv_example
 rule : csv_example/*
 ---
-occur_time  =  Time::now() ;
+occur_time  =  Now::time() ;
 year  = take();
 sid   = digit(10);
 

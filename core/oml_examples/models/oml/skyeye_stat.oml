@@ -3,7 +3,7 @@ rule : skyeye_stat/*
 ---
 vendor      = chars(wparse) ;
 v_ip        = ip(127.0.0.1) ;
-recv_time   = Time::now() ;
+recv_time   = Now::time() ;
 cust_tag    = fmt("[{pos_sn}-{sip}]", @pos_sn, @sip ) ;
 
 value  = object {
@@ -14,4 +14,4 @@ value  = object {
 
 time_all  = collect  take( keys : [ *time* ] ) ;
 
-raw_msg  =  pipe take() | base64_en ;
+raw_msg  =  pipe take() | base64_encode ;

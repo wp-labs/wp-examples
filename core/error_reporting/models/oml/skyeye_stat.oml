@@ -2,7 +2,7 @@ name : skyeye_stat
 rule : skyeye_stat/*
 ---
 src_key     : chars =  take() ;
-recv_time   : time  = Time::now() ;
+recv_time   : time  = Now::time() ;
 pos_sn      : chars =  take() ;
 updatetime  : time  =  take() ;
 sip         : chars =  take() ;
@@ -16,4 +16,4 @@ value  : obj = object {
 } ;
 
 time_all : array = collect  take( keys : [ *time* ] ) ;
-raw_msg : chars =  pipe take() | base64_en ;
+raw_msg : chars =  pipe take() | base64_encode;

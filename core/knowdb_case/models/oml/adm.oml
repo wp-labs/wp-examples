@@ -1,9 +1,9 @@
 name : /oml/example/simple
 rule : /example/*
 ---
-recv_time  : time =   Time::now();
+recv_time  : time =   Now::time();
 occur_time : time =  take(option:[time]) ;
 src_ip     : ip   =  take(option:[src-ip,sip,source-ip] );
-src_ip_int : digit = read(src_ip) | to_ip4_int ;
+src_ip_int : digit = read(src_ip) | ip4_to_int ;
 from_zone: chars = select zone from zone_data
             where  start_ip_int < read(src_ip_int) and  end_ip_int >= read(src_ip_int) ;
