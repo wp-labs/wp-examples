@@ -1,7 +1,13 @@
-# 主要文件数据源（启用）
 [[sources]]
-key = "file_main"
 enable = true
-tags = ["type:file", "purpose:benchmark"]
-connect = "file_src"
-params = {  file = "gen.dat"  }
+key = "tcp_1"
+connect = "tcp_src"
+tags = ["type:tcp", "purpose:benchmark"]
+params = { prefer_newline = true, port = 19001 }
+
+[[sources]]
+enable = false
+key = "tcp_2"
+connect = "tcp_src"
+tags = ["type:tcp", "purpose:benchmark"]
+params = { prefer_newline = true, port = 19002 }
