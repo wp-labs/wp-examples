@@ -1,38 +1,50 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 加载 benchmark 公共函数库
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BENCHMARK_LIB="$(cd "$SCRIPT_DIR/.." && pwd)/benchmark_common.sh"
-source "$BENCHMARK_LIB"
+# 进入脚本所在目录
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# 显示用法（包含 -f 选项）
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
-  benchmark_usage "$0" "-f"
-  exit 0
-fi
+# 默认参数
+SPEED_MAX="${1:-0}"
+WORKER_CNT="6"
+LINE_CNT=20000000
 
-# 解析参数（支持 -m 和 -f）
-benchmark_parse_args "$@"
+# 验证命令存在
+for cmd in wparse wpgen wproj; do
+    if ! command -v "$cmd" >/dev/null; then
+        echo "Error: $cmd not found in PATH"
+        exit 1
+    fi
+done
 
-# 初始化环境
-benchmark_init_env
-
-# 验证 WPL 路径
-benchmark_validate_wpl_path "$WPL_DIR"
 
 # 初始化配置
 wproj check
 wproj data clean
+wpgen data clean
 
-# 设置数据规模
-benchmark_set_line_cnt
+echo "LINE_CNT=$LINE_CNT, SPEED_MAX=$SPEED_MAX"
 
-# 检查数据文件（使用单个配置 "gen"）
-benchmark_check_data_files "gen"
+# 启动 daemon
+echo "Starting daemon mode"
+wparse daemon  --stat 1 -w "$WORKER_CNT" -p &
 
-# 条件生成数据
-benchmark_conditional_data_gen "$WPL_PATH" "$SPEED_MAX" "$LINE_CNT" "wpgen.toml"
+# 等待 PID 文件出现
+for i in {1..50}; do
+    test -f ./.run/wparse.pid && break
+    sleep 0.1
+done
+sleep 1
 
-# 执行 batch 模式测试
-benchmark_run_batch "$WPL_PATH"
+# 生成数据
+echo "Generating sample data"
+wpgen sample -n "$LINE_CNT" -s "$SPEED_MAX" --stat 2
+
+# 停止 daemon
+if [ -f ./.run/wparse.pid ]; then
+    cat ./.run/wparse.pid | xargs kill || true
+fi
+sleep 1
+
+# 显示统计
+wproj data stat
