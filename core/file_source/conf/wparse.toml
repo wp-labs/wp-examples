@@ -16,7 +16,7 @@ parse_workers = 2
 path = "./data/rescue"
 
 [log_conf]
-level = "warn,ctrl=info,launch=info,source=info,sink=info,stat=info,runtime=warn,oml=warn,wpl=warn,klib=warn,orion_error=error,orion_sens=warn"
+level = "warn,ctrl=info,data=debug"
 output = "File"
 
 [log_conf.file]

@@ -12,3 +12,4 @@ requ_uri   : chars = take(option: [chars]) ;
 requ_status : digit = take()  { _ : digit(404) } ;
 resp_len    : digit   =  take() { _ : digit(2048) } ;
 src_city    : chars   =  take() { _ : chars(changsha) } ;
+wpsrc* : auto = take() ;
