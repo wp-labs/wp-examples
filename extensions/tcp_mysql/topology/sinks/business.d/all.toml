@@ -1,0 +1,11 @@
+version = "2.0"
+
+[sink_group]
+name = "all"
+rule = ["/*"]
+parallel = 8
+[[sink_group.sinks]]
+name = "main"
+connect = "mysql_sink"
+params = { columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent","wp_event_id"] }
+
