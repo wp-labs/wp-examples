@@ -1,0 +1,10 @@
+[[connectors]]
+id = "mysql_src"
+type = "mysql"
+allow_override = ["endpoint", "username", "password","database","table"]
+[connectors.params]
+endpoint = "localhost:3306"
+username = "root"
+password = "123456"
+database = "wparse"
+table = "table_example"
