@@ -1,4 +1,4 @@
-# getting_started 说明
+# getting_started 
 
 本用例用于“快速初始化 + 基准验证”。包含最小的源文件、基础的 sinks 组（default/miss/residue/intercept/error/monitor）以及示例业务路由（如有）。
 

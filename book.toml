@@ -1,0 +1,15 @@
+[book]
+title = "Warp Parse Documentation"
+authors = ["Warp Parse Team"]
+language = "zh-CN"
+multilingual = false
+src = "./"
+
+[build]
+# 输出到 docs/book，便于 GitHub Pages 或本地预览
+build-dir = "book"
+
+[output.html]
+default-theme = "ayu"
+git-repository-url = "https://github.com/wp-labs/warp-parse"
+git-repository-icon = "fa-github"

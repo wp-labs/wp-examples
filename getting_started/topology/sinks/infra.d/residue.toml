@@ -4,7 +4,7 @@ version = "2.0"
 name = "residue"
 
 [[sink_group.sinks]]
-connect = "file_raw_sink"
+connect = "file_json_sink"
 
 [sink_group.sinks.params]
 file = "residue.dat"
