@@ -6,7 +6,7 @@ data
 .*
 .report
 out
-core/getting_started/conf
+getting_started/conf
 gen*.dat
 *.gz
 record.md
