@@ -1,0 +1,8 @@
+[[connectors]]
+id = "victorialogs_sink"
+type = "victorialogs"
+allow_override = ["endpoint", "insert_path", "flush_interval_secs", "create_time_field"]
+[connectors.params]
+endpoint = "http://127.0.0.1:9428"
+insert_path = "/insert/jsonline"
+flush_interval_secs = 3

@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS {table} (
+    id    INTEGER PRIMARY KEY,
+    value TEXT NOT NULL
+);

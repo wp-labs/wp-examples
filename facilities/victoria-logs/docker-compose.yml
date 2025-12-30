@@ -1,0 +1,15 @@
+services:
+  victorialogs:
+    image: victoriametrics/victoria-logs:latest
+    container_name: victorialogs
+    command:
+      - -retentionPeriod=400d
+    ports:
+      - "9428:9428"
+      - "9899:9899"
+    volumes:
+      - victorialogs_data:/victorialogs-data
+    restart: unless-stopped
+
+volumes:
+  victorialogs_data:
