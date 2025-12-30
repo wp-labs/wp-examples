@@ -1,8 +1,8 @@
 version: "3"
 services:
   kafka:
-    image: bitnami/kafka:latest
-    #image: dysec-docker-stable.corp.dy-sec.com/bitnami/kafka:latest-arm
+    # image: bitnami/kafka:latest
+    image: dysec-docker-stable.corp.dy-sec.com/bitnami/kafka:latest-arm
     ports:
       - "9092:9092"
     environment:
@@ -16,7 +16,7 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://0.0.0.0:9092
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_MESSAGE_MAX_BYTES=10485760

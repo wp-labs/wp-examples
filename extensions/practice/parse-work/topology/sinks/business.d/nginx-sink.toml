@@ -1,0 +1,33 @@
+version = "2.0"
+
+[sink_group]
+name = "file_01"
+rule = ["/nginx/*"]
+
+# file
+[[sink_group.sinks]]
+connect = "file_json_sink"
+params = { file = "nginx.dat" }
+
+[sink_group.sinks.expect]
+ratio = 0.50
+tol   = 0.02
+
+# Kafka
+[[sink_group.sinks]]
+connect = "kafka_sink"
+name = "generator_output"
+params= { topic = "wp.output.event" ,brokers = "localhost:9092" }
+
+# vlog
+[[sink_group.sinks]]
+name = "victorialogs_output"
+connect = "victorialogs_sink"
+params = { endpoint = "http://localhost:9428", insert_path = "/insert/jsonline", flush_interval_secs = 3}
+
+# [[sink_group.sinks]]
+# name = "kafka_out"
+# connect = "kafka_sink"
+# [sink_group.sinks.params]
+# topic= "wp.output.event"
+# brokers = "localhost:9092"

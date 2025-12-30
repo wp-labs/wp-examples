@@ -1,0 +1,20 @@
+version = "1.0"
+
+[generator]
+mode = "sample"
+count = 10000000000000000
+speed = 20
+parallel = 1
+
+[output]
+connect = "file_raw_sink"
+
+[output.params]
+base = "../fluent-bit/test-logs"
+file = "nginx.log"
+
+[logging]
+level = ""
+module_levels = []
+output = ""
+file_path = "./data/logs"

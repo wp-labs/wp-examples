@@ -1,0 +1,22 @@
+version = "2.0"
+
+[sink_group]
+name = "doris"
+oml = ["example1"]
+[[sink_group.sinks]]
+name = "file_proto_sink"
+connect = "file_proto_sink"
+[sink_group.sinks.params]
+file = "events.parsed.prototext"
+[sink_group.sinks.expect]
+ratio = 0.50
+tol   = 0.01
+
+[[sink_group.sinks]]
+name = "doris_stream_load"
+connect = "doris_sink"
+[sink_group.sinks.params]
+endpoint = "mysql://localhost:9030?charset=utf8mb4&connect_timeout=10"
+database = "wp_test"
+table = "events_parsed"
+# mapping = ["src_ip", "occur_time", "from_ip", "src_ip"]
