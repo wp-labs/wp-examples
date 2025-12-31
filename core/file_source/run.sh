@@ -6,7 +6,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # 可调参数：生成/采集规模与统计间隔
 LINE_CNT=${LINE_CNT:-3000}
-STAT_SEC=${STAT_SEC:-3}
+STAT_SEC=${STAT_SEC:-1}
 
 
 # 验证必要的命令存在
