@@ -3,7 +3,7 @@
 enable = true
 key = "kafka_input"
 connect = "kafka_src"
-#tags = ["type:file", "purpose:benchmark"]
+tags = ["src_type:kafka_raw" ]
 params = {  topic = "wp.testcase.events.raw"  }
 
 
@@ -11,5 +11,5 @@ params = {  topic = "wp.testcase.events.raw"  }
 enable = true
 key = "kafka_output_tap"
 connect = "kafka_src"
-#tags = ["type:file", "purpose:benchmark"]
+tags = ["src_type:kafka_parsed" ]
 params = {  topic = "wp.testcase.events.parsed"  }
