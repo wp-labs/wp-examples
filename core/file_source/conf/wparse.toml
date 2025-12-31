@@ -9,7 +9,7 @@ sources = "./topology/sources"
 sinks = "./topology/sinks"
 
 [performance]
-rate_limit_rps = 10000
+rate_limit_rps = 1000
 parse_workers = 2
 
 [rescue]
@@ -23,21 +23,17 @@ output = "File"
 path = "./data/logs/"
 
 [stat]
-window_sec = 60
 [[stat.pick]]
 key = "pick_stat"
 target = "*"
-fields = []
-top_n = 20
+fields = ["wp_src_key"]
 
 [[stat.parse]]
 key = "parse_stat"
 target = "*"
-fields = []
-top_n = 20
+fields = ["wp_src_key"]
 
 [[stat.sink]]
 key = "sink_stat"
 target = "*"
-fields = []
-top_n = 20
+fields = ["wp_src_key"]
