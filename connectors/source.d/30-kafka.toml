@@ -1,7 +1,7 @@
 [[connectors]]
 id = "kafka_src"
 type = "kafka"
-allow_override = ["topic", "group_id", "config","instances"]
+allow_override = ["topic", "group_id", "config","instances","brokers"]
 [connectors.params]
 brokers = "localhost:9092"
 topic   = ["access_log"]

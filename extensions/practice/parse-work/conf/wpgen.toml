@@ -1,0 +1,34 @@
+version = "1.0"
+
+[generator]
+mode = "sample"
+count = 1
+speed = 1000
+parallel = 2
+
+# [output]
+# connect = "file_raw_sink"
+
+# [output.params]
+# base = "data/in_dat"
+# file = "gen.dat"
+
+
+# [output]
+# # 仅当存在 connect 时，其他 output 字段和旧式 [output.*] 子块将被忽略
+# name = "gen_out"
+# connect = "tcp_sink"
+# params = { port= 19002 }
+
+[output]
+# 仅当存在 connect 时，其他 output 字段和旧式 [output.*] 子块将被忽略
+connect = "kafka_sink"
+name = "generator_output"
+# 覆写允许的参数（参考 connectors/sink.d 中对应连接器 allow_override）
+params= { topic = "wp.input.event" ,brokers = "localhost:9092" }
+
+[logging]
+level = ""
+module_levels = []
+output = ""
+file_path = "./data/logs"

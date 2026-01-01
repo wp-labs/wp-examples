@@ -1,0 +1,27 @@
+package /nginx {
+
+   rule nginx {
+        (ip:sip,_^2,chars:timestamp<[,]>,http/request",chars:status,chars:size,chars:referer",http/agent",_")
+        
+   }
+
+  rule flb_nginx {
+       (
+       	json(
+       		time_timestamp@date,
+       		chars@log| (
+       			ip:sip,
+       			_^2,
+       			time:timestamp<[,]>,
+       			_\",
+       			chars\\\",
+       			http/status,
+       			digit,
+       			_\",
+       			chars\\\",
+       			_\",
+       			chars\\\",
+       			_,
+       		)))
+  }
+}

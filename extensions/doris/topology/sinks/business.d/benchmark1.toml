@@ -1,0 +1,12 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/benchmark1"
+oml = ["example3"]
+[[sink_group.sinks]]
+connect = "file_kv_sink"
+params = { file = "benchmark_kv1.dat" }
+
+[sink_group.sinks.expect]
+ratio = 0.50
+tol   = 0.02
