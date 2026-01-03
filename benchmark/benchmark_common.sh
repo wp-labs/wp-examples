@@ -25,7 +25,7 @@ benchmark_usage() {
 benchmark_parse_args() {
   MEDIUM_MODE=0
   FORCE_REGEN=0
-  WPL_DIR="nginx"
+  WPL_DIR=""
   SPEED_MAX="0"
   WORKER_CNT=""
   CUSTOM_LINE_CNT=""
@@ -133,6 +133,11 @@ benchmark_validate_wpl_path() {
     script_dir="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)"
   else
     script_dir="$(cd "$(dirname "${0}")" && pwd)"
+  fi
+
+  # 特殊处理：mix 使用 wpl 根目录
+  if [ "$wpl_dir" = "mix" ]; then
+    wpl_dir=""
   fi
 
   # 始终基于脚本所在目录计算相对路径

@@ -6,7 +6,7 @@ oml = "../../models/oml"
 
 [topology]
 sources = "../sources"
-sinks = "../../../sinks/parse_to_blackhole"
+sinks = "../../sinks/parse_to_blackhole"
 
 [performance]
 parse_workers = 6

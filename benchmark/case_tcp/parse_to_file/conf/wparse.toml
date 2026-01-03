@@ -5,7 +5,7 @@ wpl = "../../models/wpl"
 oml = "../../models/oml"
 [topology]
 sources = "../sources"
-sinks = "../../../sinks/parse_to_file"
+sinks = "../../sinks/parse_to_file"
 
 [performance]
 parse_workers = 2
