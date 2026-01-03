@@ -1,4 +1,4 @@
-name : sysmon
+name : /oml/sysmon
 rule : /sysmon/*
 ---
 * : auto = take() ;

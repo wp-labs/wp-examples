@@ -1,4 +1,0 @@
-name : benchmark
-rule : /benchmark/*
----
-* : auto = take() ;

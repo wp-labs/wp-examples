@@ -1,4 +1,4 @@
-name : benchmark
+name : /oml/benchmark
 rule : /benchmark/*
 ---
 * : auto = take() ;

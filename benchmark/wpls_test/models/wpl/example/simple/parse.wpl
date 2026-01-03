@@ -1,5 +1,0 @@
-package /example/simple {
-   rule nginx {
-        (ip:sip,_^2,time/clf<[,]>,http/request",http/status,digit,chars",http/agent",_")
-   }
-}

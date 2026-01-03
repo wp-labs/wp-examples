@@ -1,4 +1,14 @@
-name : nginx
+name : /oml/nginx
 rule : /nginx/*
 ---
+size : digit = take(size);
+status : digit = take(status);
+str_status = match read(option:[status]) {
+    digit(500) => chars(Internal Server Error);
+    digit(404) => chars(Not Found);
+};
+match_chars = match read(option:[wp_src_ip]) {
+    ip(127.0.0.1) => chars(localhost);
+    !ip(127.0.0.1) => chars(attack_ip);
+};
 * : auto = take() ;

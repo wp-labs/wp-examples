@@ -1,0 +1,19 @@
+name : /oml/aws
+rule : /aws/*
+---
+sent_bytes:digit = take(sent_bytes) ;
+target_status_code:digit = take(target_status_code) ;
+elb_status_code:digit = take(elb_status_code) ;
+extends : obj = object {
+    ssl_cipher = read(ssl_cipher);
+    ssl_protocol = read(ssl_protocol);
+};
+match_chars = match read(option:[wp_src_ip]) {
+    ip(127.0.0.1) => chars(localhost);
+    !ip(127.0.0.1) => chars(attack_ip);
+};
+str_elb_status = match read(option:[elb_status_code]) {
+    digit(200) => chars(ok);
+    digit(404) => chars(error);
+};
+* : auto = read();
