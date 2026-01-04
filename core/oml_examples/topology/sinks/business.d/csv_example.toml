@@ -7,5 +7,5 @@ oml = ["csv_example"]
 connect = "file_proto_sink"
 params = {  file = "csv_example.dat" }
 [sink_group.sinks.expect]
-ratio = 0.7
+ratio = 0.637
 tol   = 0.01

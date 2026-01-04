@@ -1,0 +1,5 @@
+package full_type {
+    rule case {
+        (ip:sip,chars:simple_chars,digit:simple_port,ip:simple_ip,chars:select_one,chars:match_chars,time:timestamp_zone,json(chars@msg: json_msg),chars:empty_chars,base64|(chars:base64),array/chars:array_str,chars:path,chars:url,array:obj,chars:one,chars:two,chars:three,chars:four,digit:num_range,chars:extend1,chars:extend2,chars:html,chars:str)
+    }
+}

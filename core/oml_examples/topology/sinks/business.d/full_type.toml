@@ -1,11 +1,11 @@
 version = "2.0"
 
 [sink_group]
-name = "/sink/work_case"
-oml = ["work_case"]
+name = "/sink/full_type"
+oml = ["full_type"]
 [[sink_group.sinks]]
 connect = "file_json_sink"
-params = {  file = "work_case.json" }
+params = {  file = "full_type.json" }
 
 [sink_group.sinks.expect]
 ratio = 0.091

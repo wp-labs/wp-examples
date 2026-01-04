@@ -1,0 +1,97 @@
+name :full_type
+rule :full_type/case*
+---
+//直接赋值
+direct_chars = chars(13);
+direct_digit = digit(13);
+
+//简单取值 类型
+simple_chars = read(simple_chars);
+simple_port: digit = read(simple_chars);
+simple_ip: ip = read(simple_ip);
+ip_ip4_to_int = pipe read(simple_ip) | ip4_to_int;
+
+//html
+html_unescape = pipe read(html) | html_unescape;
+html_escape = pipe read(html) | html_escape;
+str_escape = pipe read(str) | str_escape;
+//str_unescape = pipe read(str) | str_unescape;
+to_str= pipe read(str) | to_str;
+
+//选择取值 按顺序
+select_chars = read(option:[select_one, select_two]);
+
+//匹配赋值
+match_chars = match read(option:[match_chars]) {
+    chars(left) => chars(1);
+    chars(middle) => chars(2);
+    chars(right) => chars(3);
+};
+
+//方法
+//完整时间
+time= Now::time();
+//日期
+date= pipe @collect_time_tmp | Time::to_ts_ms;
+//完整时间和上面相同
+time_same = pipe @collect_time_tmp | Time::to_ts_ms;
+//时间
+hour = pipe @collect_time_tmp | Time::to_ts_ms;
+//修改时区 要求入参为time格式
+timestamp_zone = pipe read(timestamp_zone) | Time::to_ts_zone(0,ms);
+//时间转时间戳
+timestamp1 = pipe read(timestamp_zone) | Time::to_ts_ms;
+//取前面输出的变量,时间转时间戳
+timestamp2 = pipe @time | Time::to_ts_us;
+timestamp3= pipe @time | Time::to_ts;
+timestamp4= pipe @time | Time::to_ts_ms;
+timestamp5= pipe @time | Time::to_ts_zone(0, ms);
+timestamp6= pipe @time | Time::to_ts_zone(0, us);
+timestamp7= pipe @time | Time::to_ts_zone(0, ss);
+
+//json 转义
+json_escape_en = pipe read(json_escape) | json_escape;
+//json 反转义
+json_escape = pipe @json_escape_en | json_unescape;
+
+//为空判断
+empty_chars = pipe read(empty_chars) | skip_empty;
+
+//base64
+//解密
+base64_de = pipe read(base64) | base64_decode(Utf8);
+//加密
+base64_en=pipe read(base64) | base64_encode;
+
+//数组取值
+array_get = pipe read(array_str) | nth(0);
+//数组转 json
+array_str = pipe read(array_str) | to_json;
+
+//文件格式取值
+name = pipe read(path) | path(name);
+path = pipe read(path) | path(path);
+
+//url 取值
+domain = pipe read(url) | url(domain);
+host = pipe read(url) | url(host);
+uri = pipe read(url) | url(uri);
+path = pipe read(url) | url(path);
+params = pipe read(url) | url(params);
+
+//对象取值
+obj = pipe read(obj) | nth(0) | get(one/two);
+
+//字符拼接
+splice = fmt("{one}:{two}|{three}:{four}",read(one), read(two), read(three), read(four));
+
+//范围判断  支持 ip
+num_range = match read(option:[num_range]) {
+    in ( digit(0), digit(1000) ) => read(num_range);
+    _ => digit(0);
+};
+
+//json 聚合
+extends = object {
+    extend1, extend2 = read();
+};
