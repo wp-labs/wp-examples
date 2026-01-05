@@ -1,0 +1,26 @@
+name : /oml/apt
+rule : /apt/*
+---
+count:digit = take(Count) ;
+severity:digit = take(SeverityHeader) ;
+match_chars = match read(option:[wp_src_ip]) {
+    ip(127.0.0.1) => chars(localhost); 
+    !ip(127.0.0.1) => chars(attack_ip); 
+};
+num_range = match read(option:[count]) {
+    in ( digit(0), digit(1000) ) => read(count) ;
+    _ => digit(0) ;
+};
+src_system_log_type = match read(option:[type]) {
+    chars(l) => chars(日志信息);
+    chars(s) => chars(安全日志信息);
+};
+extends_ip : obj = object {
+    DstIp = read(DstIp);
+    SrcIp = read(SrcIp);
+};
+extends_info : obj = object {
+    hostname = read(Hostname);
+    source_type = read(wp_src_key)
+};
+* : auto = read();
