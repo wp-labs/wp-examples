@@ -32,11 +32,11 @@
 - 启动docker相关组件：`docker compose up -d`
 
 - 进入wparse工作目录:`cd parse-work`
-- 启动wparse：`wparse daemon --stat 2 -p`
+- 启动wparse：`nohup wparse daemon > data/logs/wparse-info.log 2>&1 &`
 - 启动发送相关工具：
-    - `wpgen sample -c wpgen-kafka.toml --stat 2 -p`
-    - `wpgen sample -c wpgen-tcp.toml --stat 2 -p`
-    - `wpgen sample -c wpgen-file.toml --stat 2 -p`
+  - `nohup wpgen sample -c wpgen-kafka.toml --stat 2 -p > data/logs/wpgen-kafka.log 2>&1 &`
+  - `nohup wpgen sample -c wpgen-tcp.toml --stat 2 -p > data/logs/wpgen-tcp.log 2>&1 &`
+  - `nohup wpgen sample -c wpgen-file.toml --stat 2 -p > data/logs/wpgen-file.log 2>&1 &`
 
 
 ### 方式二 一键化启动脚本
