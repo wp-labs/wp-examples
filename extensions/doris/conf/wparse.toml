@@ -17,7 +17,8 @@ rate_limit_rps = 500000
 path = "./data/rescue"
 
 [log_conf]
-level = "warn,ctrl=info,dfx=info"
+level = "debug,ctrl=debug,data=trace"
+# level = "warn,ctrl=info,dfx=info"
 output = "File"
 [log_conf.file]
 path = "./data/logs/"
