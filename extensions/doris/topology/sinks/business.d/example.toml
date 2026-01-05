@@ -2,7 +2,7 @@ version = "2.0"
 
 [sink_group]
 name = "doris"
-oml = ["example1"]
+oml = ["example2"]
 [[sink_group.sinks]]
 name = "file_proto_sink"
 connect = "file_proto_sink"
@@ -19,4 +19,6 @@ connect = "doris_sink"
 endpoint = "mysql://localhost:9030?charset=utf8mb4&connect_timeout=10"
 database = "wp_test"
 table = "events_parsed"
+user = "root"
+password = ""
 # mapping = ["src_ip", "occur_time", "from_ip", "src_ip"]
