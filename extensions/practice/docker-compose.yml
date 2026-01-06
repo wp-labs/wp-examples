@@ -2,149 +2,154 @@ services:
 # http://host.docker.internal:8080/system-obs/alert/alert-message
 
 
-  fluent-bit:
-    image: fluent/fluent-bit:4.0.3
-    container_name: fluent-bit
-    restart: unless-stopped
-    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.yml"]
-    volumes:
-      # 测试的日志
-      - ./fluent-bit/test-logs:/test-logs:ro
-      # Mount configuration file
-      - ./fluent-bit/fluent-bit.yml:/fluent-bit/etc/fluent-bit.yml:ro
-    privileged: true
-    pid: host
-    ports:
-      - "2020:2020"  # Fluent Bit HTTP server for health checks
-      - "5170:5170"
-    networks:
-      - app-network
-      
-  kafka:
-    container_name: kafka
-    image: apache/kafka:4.1.1
-    # image: dysec-docker-stable.corp.dy-sec.com/bitnami/kafka:latest-arm
-    ports:
-      - "9092:9092"
-    # volumes:
-    #   - "kafka_data:/bitnami"
-    environment:
-      # KRaft 必须
-      KAFKA_NODE_ID: 0
-      KAFKA_PROCESS_ROLES: controller,broker
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
-
-      # 监听器
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://106.55.164.250:9092
-
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-
-      # 可选参数
-      KAFKA_MESSAGE_MAX_BYTES: 10485760
-      KAFKA_MAX_REQUEST_SIZE: 10485760
-      KAFKA_FETCH_MESSAGE_MAX_BYTES: 10485760
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    #volumes:
-    #  - ./tmp/kafka:/bitnami/kafka/data
-    networks:
-      - app-network
-
-  kafka-exporter:
-    container_name: kafka-exporter
-    image: danielqsj/kafka-exporter:v1.9.0
-    command: ["--kafka.server=kafka:9092"]
-    restart: on-failure
-    depends_on:
-      kafka:
-        condition: service_healthy
-    ports:
-      - 9308:9308  
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:9308/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    networks:
-      - app-network   
-
-  victoria-metrics:
-    container_name: victoria-metrics
-    image: victoriametrics/victoria-metrics:1.95.1
-    ports:
-      - "8428:8428"
-    volumes:
-      # 数据存储目录，按需开启
-      # - /data/metrics:/storage:rw
-      - ./victoria-metrics/scrape.yml:/scrapeconfig/scrape.yml:ro  # 挂载 scrape 配置
-    command:
-      - --envflag.enable
-      - --envflag.prefix=VM_
-      - --httpListenAddr=:8428
-      - --loggerFormat=json
-      - --promscrape.config=/scrapeconfig/scrape.yml
-      - --retentionPeriod=15d
-      - --storageDataPath=/storage
-    environment:
-      - TZ=Asia/Shanghai
-    networks:
-      - app-network
-    # 可选：添加健康检查（模拟 livenessProbe）
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8428/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  victoria-logs:
-    container_name: victoria-logs
-    image: victoriametrics/victoria-logs:1.95.1
-    ports:
-      - "9428:9428"
-    # 数据存储目录,按需开启
-    # volumes:
-    #   - /data/logs:/storage:rw
-    command:
-      - --envflag.enable
-      - --envflag.prefix=VM_
-      - --http.shutdownDelay=15s
-      - --httpListenAddr=:9428
-      - --loggerFormat=json
-      - --retentionPeriod=15d
-      - --storageDataPath=/storage
-    environment:
-      - TZ=Asia/Shanghai
-    networks:
-      - app-network
-    # 可选：添加健康检查（模拟 livenessProbe）
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:9428/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  # wp-monitor:
-  #   container_name: wp-monitor
-  #   image: dysec-docker-alpha.corp.dy-sec.com/wp-monitor:1.0-alpha.6
+  # fluent-bit:
+  #   image: fluent/fluent-bit:4.0.3
+  #   container_name: fluent-bit
+  #   restart: unless-stopped
+  #   command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.yml"]
+  #   volumes:
+  #     # 测试的日志
+  #     - ./fluent-bit/test-logs:/test-logs:ro
+  #     # Mount configuration file
+  #     - ./fluent-bit/fluent-bit.yml:/fluent-bit/etc/fluent-bit.yml:ro
+  #   privileged: true
+  #   pid: host
   #   ports:
-  #     - "25816:25816"
+  #     - "2020:2020"  # Fluent Bit HTTP server for health checks
+  #     - "5170:5170"
   #   networks:
   #     - app-network
+      
+  # kafka:
+  #   container_name: kafka
+  #   image: apache/kafka:4.1.1
+  #   # image: dysec-docker-stable.corp.dy-sec.com/bitnami/kafka:latest-arm
+  #   ports:
+  #     - "9092:9092"
+  #   # volumes:
+  #   #   - "kafka_data:/bitnami"
+  #   environment:
+  #     # KRaft 必须
+  #     KAFKA_NODE_ID: 0
+  #     KAFKA_PROCESS_ROLES: controller,broker
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+
+  #     # 监听器
+  #     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://106.55.164.250:9092
+
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+  #     # 可选参数
+  #     KAFKA_MESSAGE_MAX_BYTES: 10485760
+  #     KAFKA_MAX_REQUEST_SIZE: 10485760
+  #     KAFKA_FETCH_MESSAGE_MAX_BYTES: 10485760
   #   healthcheck:
-  #     test: ["CMD-SHELL", "ps -aux | grep /app/wp_monitor -q"]
+  #     test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
+  #   #volumes:
+  #   #  - ./tmp/kafka:/bitnami/kafka/data
+  #   networks:
+  #     - app-network
+
+  # kafka-exporter:
+  #   container_name: kafka-exporter
+  #   image: danielqsj/kafka-exporter:v1.9.0
+  #   command: ["--kafka.server=kafka:9092"]
+  #   restart: on-failure
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+  #   ports:
+  #     - 9308:9308  
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:9308/health"]
   #     interval: 30s
   #     timeout: 10s
   #     retries: 3
   #     start_period: 30s
+  #   networks:
+  #     - app-network   
+
+  # victoria-metrics:
+  #   container_name: victoria-metrics
+  #   image: victoriametrics/victoria-metrics:1.95.1
+  #   ports:
+  #     - "8428:8428"
+  #   volumes:
+  #     # 数据存储目录，按需开启
+  #     # - /data/metrics:/storage:rw
+  #     - ./victoria-metrics/scrape.yml:/scrapeconfig/scrape.yml:ro  # 挂载 scrape 配置
+  #   command:
+  #     - --envflag.enable
+  #     - --envflag.prefix=VM_
+  #     - --httpListenAddr=:8428
+  #     - --loggerFormat=json
+  #     - --promscrape.config=/scrapeconfig/scrape.yml
+  #     - --retentionPeriod=15d
+  #     - --storageDataPath=/storage
+  #   environment:
+  #     - TZ=Asia/Shanghai
+  #   networks:
+  #     - app-network
+  #   # 可选：添加健康检查（模拟 livenessProbe）
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8428/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 30s
+
+  # victoria-logs:
+  #   container_name: victoria-logs
+  #   image: victoriametrics/victoria-logs:1.95.1
+  #   ports:
+  #     - "9428:9428"
+  #   # 数据存储目录,按需开启
+  #   # volumes:
+  #   #   - /data/logs:/storage:rw
+  #   command:
+  #     - --envflag.enable
+  #     - --envflag.prefix=VM_
+  #     - --http.shutdownDelay=15s
+  #     - --httpListenAddr=:9428
+  #     - --loggerFormat=json
+  #     - --retentionPeriod=15d
+  #     - --storageDataPath=/storage
+  #   environment:
+  #     - TZ=Asia/Shanghai
+  #   networks:
+  #     - app-network
+  #   # 可选：添加健康检查（模拟 livenessProbe）
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:9428/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 30s
+
+  wp-monitor:
+    container_name: wp-monitor
+    image: dysec-docker-alpha.corp.dy-sec.com/wp-monitor:1.0-alpha.8
+    ports:
+      - "25816:25816"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "ps -aux | grep /app/wp_monitor -q"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      # 挂载配置文件目录
+      - ./config:/app/config
+      # 挂载日志目录（可读写）
+      - ./log:/app/log
 
 networks:
   app-network:

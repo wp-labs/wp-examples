@@ -7,3 +7,8 @@ name = "monitor"
 name = "monitor_output"
 connect = "file_proto_sink"
 params = {  file = "monitor.dat" }
+
+
+[[sink_group.sinks]]
+name = "victoriametrics"
+connect = "victoriametrics_sink"
