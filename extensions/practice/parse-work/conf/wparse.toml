@@ -27,11 +27,14 @@ path = "./data/logs"
 [[stat.pick]]
 key = "pick_stat"
 target = "*"
+fields = ["wpl_tag","wp_src_key"]
 
 [[stat.parse]]
 key = "parse_stat"
 target = "*"
+fields = ["wpl_tag", "wp_src_key"]
 
 [[stat.sink]]
 key = "sink_stat"
 target = "*"
+fields = ["wpl_tag","wp_src_key", "sink_category"]

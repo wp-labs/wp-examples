@@ -25,6 +25,6 @@ pipeline:
 
     - name: tcp
       match: "*"
-      host: host.docker.internal
+      host: 172.18.0.1
       port: 19002
       format: json_lines

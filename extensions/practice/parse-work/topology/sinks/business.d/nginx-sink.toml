@@ -7,7 +7,9 @@ rule = ["/nginx/*"]
 # file
 [[sink_group.sinks]]
 connect = "file_json_sink"
+name = "file_sink"
 params = { file = "nginx.dat" }
+tags = ["sink_category:business"]
 
 [sink_group.sinks.expect]
 ratio = 0.50
@@ -16,14 +18,16 @@ tol   = 0.02
 # Kafka
 [[sink_group.sinks]]
 connect = "kafka_sink"
-name = "generator_output"
+name = "kafka_generator_output"
 params= { topic = "wp.output.event" ,brokers = "localhost:9092" }
+tags = ["sink_category:business"]
 
 # vlog
 [[sink_group.sinks]]
 name = "victorialogs_output"
 connect = "victorialogs_sink"
 params = { endpoint = "http://localhost:9428", insert_path = "/insert/jsonline", flush_interval_secs = 3}
+tags = ["sink_category:business"]
 
 # [[sink_group.sinks]]
 # name = "kafka_out"

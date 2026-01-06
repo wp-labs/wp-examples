@@ -19,38 +19,30 @@ services:
       - "5170:5170"
     networks:
       - app-network
-      
+
   kafka:
     container_name: kafka
     image: apache/kafka:4.1.1
-    # image: dysec-docker-stable.corp.dy-sec.com/bitnami/kafka:latest-arm
     ports:
       - "9092:9092"
-    # volumes:
-    #   - "kafka_data:/bitnami"
     environment:
-      # KRaft 必须
-      KAFKA_NODE_ID: 0
-      KAFKA_PROCESS_ROLES: controller,broker
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
-
-      # 监听器
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://106.55.164.250:9092
-
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-
-      # 可选参数
-      KAFKA_MESSAGE_MAX_BYTES: 10485760
-      KAFKA_MAX_REQUEST_SIZE: 10485760
-      KAFKA_FETCH_MESSAGE_MAX_BYTES: 10485760
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
     healthcheck:
-      test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
       interval: 10s
-      timeout: 5s
-      retries: 10
+      timeout: 10s
+      retries: 3
     #volumes:
     #  - ./tmp/kafka:/bitnami/kafka/data
     networks:
@@ -77,12 +69,12 @@ services:
 
   victoria-metrics:
     container_name: victoria-metrics
-    image: victoriametrics/victoria-metrics:1.95.1
+    image: victoriametrics/victoria-metrics:v1.133.0
     ports:
       - "8428:8428"
     volumes:
       # 数据存储目录，按需开启
-      # - /data/metrics:/storage:rw
+      - metrics_data:/storage
       - ./victoria-metrics/scrape.yml:/scrapeconfig/scrape.yml:ro  # 挂载 scrape 配置
     command:
       - --envflag.enable
@@ -106,12 +98,12 @@ services:
 
   victoria-logs:
     container_name: victoria-logs
-    image: victoriametrics/victoria-logs:1.95.1
+    image: victoriametrics/victoria-logs:v1.43.0
     ports:
       - "9428:9428"
     # 数据存储目录,按需开启
-    # volumes:
-    #   - /data/logs:/storage:rw
+    volumes:
+      - logs_data:/storage
     command:
       - --envflag.enable
       - --envflag.prefix=VM_
@@ -132,25 +124,32 @@ services:
       retries: 3
       start_period: 30s
 
-  # wp-monitor:
-  #   container_name: wp-monitor
-  #   image: dysec-docker-alpha.corp.dy-sec.com/wp-monitor:1.0-alpha.6
-  #   ports:
-  #     - "25816:25816"
-  #   networks:
-  #     - app-network
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "ps -aux | grep /app/wp_monitor -q"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 30s
+  wp-monitor:
+    container_name: wp-monitor
+    image: dysec-docker-alpha.corp.dy-sec.com/wp-monitor:1.0-alpha.8
+    ports:
+      - "25816:25816"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "ps -aux | grep /app/wp_monitor -q"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      # 挂载配置文件目录
+      - ./wp-monitor:/app/config
 
 networks:
   app-network:
     driver: bridge
 
 
-# volumes:
-#   kafka_data:
-#     driver: local
+volumes:
+  kafka_data:
+   driver: local
+  logs_data:
+   driver: local
+  metrics_data:
+    driver: local
