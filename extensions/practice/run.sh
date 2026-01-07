@@ -19,7 +19,7 @@ mkdir -p "$LOG_DIR" "$PID_DIR"
 # =========================
 # 启动 docker
 # =========================
-docker compose up -d
+# docker compose up -d
 
 # =========================
 # 进入工作目录
@@ -42,8 +42,10 @@ start_process() {
 
 # 启动各个进程
 start_process "wparse daemon --stat 2 -p" "$LOG_DIR/wparse-info.log" "$PID_DIR/wparse.pid"
-start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" "$LOG_DIR/wpgen-kafka.log" "$PID_DIR/wpgen-kafka.pid"
+sleep 1
+# start_process "wpgen sample -c wpgen-tcp-2.toml --stat 2 -p" "$LOG_DIR/wpgen-tcp-2.log" "$PID_DIR/wpgen-tcp-2.pid"
 start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" "$LOG_DIR/wpgen-tcp.log" "$PID_DIR/wpgen-tcp.pid"
+start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" "$LOG_DIR/wpgen-kafka.log" "$PID_DIR/wpgen-kafka.pid"
 start_process "wpgen sample -c wpgen-file.toml --stat 2 -p" "$LOG_DIR/wpgen-file.log" "$PID_DIR/wpgen-file.pid"
 
 echo "[INFO] All processes started. PIDs stored in $PID_DIR."

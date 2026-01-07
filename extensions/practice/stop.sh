@@ -37,7 +37,7 @@ fi
 # =========================
 # 停止 docker compose
 # =========================
-echo "[INFO] Stopping Docker Compose..."
-docker compose down || true
+# echo "[INFO] Stopping Docker Compose..."
+# docker compose down || true
 
 echo "[INFO] All services stopped."

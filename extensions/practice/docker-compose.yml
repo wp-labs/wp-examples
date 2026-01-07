@@ -29,25 +29,18 @@ services:
     # volumes:
     #   - "kafka_data:/bitnami"
     environment:
-      # KRaft 必须
-      KAFKA_NODE_ID: 0
-      KAFKA_PROCESS_ROLES: controller,broker
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
-
-      # 监听器
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: |
-        PLAINTEXT://106.55.164.250:9092
-        
-
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://106.55.164.250:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-
-      # 可选参数
-      KAFKA_MESSAGE_MAX_BYTES: 10485760
-      KAFKA_MAX_REQUEST_SIZE: 10485760
-      KAFKA_FETCH_MESSAGE_MAX_BYTES: 10485760
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
     healthcheck:
       test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
       interval: 5s
@@ -152,6 +145,28 @@ services:
       - ./config:/app/config
       # 挂载日志目录（可读写）
       - ./log:/app/log
+
+  grafana:
+    container_name: grafana
+    image: dysec/grafana:11.6.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+      - ./grafana/dashboards:/usr/share/grafana/dashboards:ro
+    environment:
+      - TZ=Asia/Shanghai
+      - GF_SECURITY_ADMIN_USER=dayu 
+      - GF_SECURITY_ADMIN_PASSWORD=Dayu@1234
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://127.0.0.1:3000/api/health | grep ok"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
   app-network:
