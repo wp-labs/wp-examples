@@ -1,0 +1,25 @@
+services:
+  grafana:
+    container_name: grafana
+    image: dysec-docker-alpha.corp.dy-sec.com/grafana/grafana:v11.6.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+      - ./grafana/dashboards:/usr/share/grafana/dashboards:ro
+    environment:
+      - TZ=Asia/Shanghai
+      - GF_SECURITY_ADMIN_USER=dayu 
+      - GF_SECURITY_ADMIN_PASSWORD=Dayu@1234
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://127.0.0.1:3000/api/health | grep ok"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+networks:
+  app-network:
+    driver: bridge
