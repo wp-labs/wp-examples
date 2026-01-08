@@ -153,13 +153,15 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      - /var/lib/grafana/plugins
+      - grafana_data:/var/lib/grafana
       - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
       - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
       - ./grafana/dashboards:/usr/share/grafana/dashboards:ro
     environment:
       - TZ=Asia/Shanghai
-      - GF_SECURITY_ADMIN_USER=dayu
-      - GF_SECURITY_ADMIN_PASSWORD=Dayu@1234
+      - GF_SECURITY_ADMIN_USER=demo
+      - GF_SECURITY_ADMIN_PASSWORD=demo
     networks:
       - app-network
     healthcheck:
@@ -178,8 +180,10 @@ networks:
 
 volumes:
   kafka_data:
-   driver: local
+    driver: local
   logs_data:
-   driver: local
+    driver: local
   metrics_data:
+    driver: local
+  grafana_data:
     driver: local

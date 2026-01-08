@@ -39,5 +39,6 @@ fi
 # =========================
 # echo "[INFO] Stopping Docker Compose..."
 # docker compose down || true
+rm -rf $WORK_DIR/data
 
 echo "[INFO] All services stopped."
