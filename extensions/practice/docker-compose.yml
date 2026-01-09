@@ -160,8 +160,8 @@ services:
       - ./grafana/dashboards:/usr/share/grafana/dashboards:ro
     environment:
       - TZ=Asia/Shanghai
-      - GF_SECURITY_ADMIN_USER=demo
-      - GF_SECURITY_ADMIN_PASSWORD=demo
+      - GF_SECURITY_ADMIN_USER=dayu
+      - GF_SECURITY_ADMIN_PASSWORD=Dayu@1234
     networks:
       - app-network
     healthcheck:

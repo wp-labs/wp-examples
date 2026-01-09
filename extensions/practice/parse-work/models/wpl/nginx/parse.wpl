@@ -6,22 +6,14 @@ package /nginx {
    }
 
   rule flb_nginx {
-       (
-       	json(
-       		time_timestamp@date,
-       		chars@log| (
-       			ip:sip,
-       			_^2,
-       			time:timestamp<[,]>,
-       			_\",
-       			chars\\\",
-       			http/status,
-       			digit,
-       			_\",
-       			chars\\\",
-       			_\",
-       			chars\\\",
-       			_,
-       		)))
+        (
+            json | take(log) | json_unescape() | (
+                ip:sip,
+                2*_,
+                time:recv_time<[,]>,
+                http/request",http/status,digit,chars",
+                http/agent",_"
+            )  
+        )
   }
 }

@@ -47,10 +47,10 @@ start_process() {
 
 # 启动各个进程
 start_process "wparse daemon --stat 2 -p" "$LOG_DIR/wparse-info.log" "$PID_DIR/wparse.pid"
-# sleep 1
-# start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" "$LOG_DIR/wpgen-kafka.log" "$PID_DIR/wpgen-kafka.pid"
-# start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" "$LOG_DIR/wpgen-tcp.log" "$PID_DIR/wpgen-tcp.pid"
-# start_process "wpgen sample -c wpgen-file.toml --stat 2 -p" "$LOG_DIR/wpgen-file.log" "$PID_DIR/wpgen-file.pid"
+sleep 1
+start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" "$LOG_DIR/wpgen-kafka.log" "$PID_DIR/wpgen-kafka.pid"
+start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" "$LOG_DIR/wpgen-tcp.log" "$PID_DIR/wpgen-tcp.pid"
+start_process "wpgen sample -c wpgen-file.toml --stat 2 -p" "$LOG_DIR/wpgen-file.log" "$PID_DIR/wpgen-file.pid"
 
 echo "[INFO] All processes started. PIDs stored in $PID_DIR."
 
