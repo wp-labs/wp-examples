@@ -1,0 +1,6 @@
+package /example {
+
+   rule nginx {
+        (ip:sip,_^2,time<[,]>,http/request",http/status,digit,chars",http/agent",_")
+    }
+}

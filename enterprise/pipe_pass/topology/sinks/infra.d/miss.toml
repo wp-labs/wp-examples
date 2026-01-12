@@ -1,0 +1,17 @@
+version = "2.0"
+
+[sink_group]
+name = "miss"
+oml = []
+tags = []
+
+[[sink_group.sinks]]
+connect = "file_raw_sink"
+tags = []
+
+[sink_group.sinks.params]
+file = "miss.dat"
+
+[sink_group.sinks.expect]
+max = 0.1
+min = 0.0

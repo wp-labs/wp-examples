@@ -1,0 +1,24 @@
+version = "1.0"
+
+[sink_group]
+name = "example"
+oml = ["/oml/example/simple"]
+
+[[sink_group.sinks]]
+name = "example_work_zone"
+filter = "./topology/sinks/business.d/filter_to_wz.conf"
+connect = "file_proto_sink"
+params = {  file = "example_work_zone.dat" }
+
+#[[sink_group.sinks]]
+#name = "example_core_zone"
+#filter = "./models/sinks/business.d/filter_to_cs.conf"
+#connect = "file_proto_sink"
+#params = {  file = "example_core_zone.dat" }
+
+[[sink_group.sinks]]
+name = "example_other"
+filter = "./topology/sinks/business.d/filter_to_wz.conf"
+filter_expect = false
+connect = "file_proto_sink"
+params = {  file = "example_other.dat" }

@@ -1,0 +1,22 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/filter"
+oml = ["/oml/sh*"]
+[[sink_group.sinks]]
+name = "all"
+#connect = "file_proto_sink"
+connect = "file_json_sink"
+params = {  file = "sink_filter_all.dat" }
+[sink_group.sinks.expect]
+ratio = 1.00
+tol   = 0.01
+
+[[sink_group.sinks]]
+name = "safe"
+connect = "file_proto_sink"
+filter = "./topology/sinks/business.d/filter.conf"
+params = {  file = "sink_filter_safe.dat" }
+[sink_group.sinks.expect]
+ratio = 0.5
+tol   = 0.01

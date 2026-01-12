@@ -1,0 +1,9 @@
+package work_case {
+    #[tag(data_type: "告警日志", logtype: "cs_attack_alert_log", alert_cat_level1_cd: "106", alert_cat_level1_name: "信息收集", alert_cat_level2_cd: "106008", alert_cat_level2_name: "暴力猜解")]
+    rule cs_attack_alert_log/adv_threat_log {
+        (_:pri<<,>>,time:access_time, 2*_, symbol(adv_threat_log), _),
+        (chars\[),
+        (json(time_timestamp@found_time:occur_time,@alert_describe:alert_name,@risk_type,@alert_level,ip@iplist:terminal_ip,@host_name:terminal_name,@domain_name:domain,@detail*,@att_src:attacker_ip)),
+        (*_)
+    }
+}

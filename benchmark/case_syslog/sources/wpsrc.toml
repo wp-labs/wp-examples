@@ -1,0 +1,12 @@
+[[sources]]
+enable =  true
+key = "syslog_1"
+connect = "syslog_tcp_src"
+params = { header_mode = "strip", prefer_newline = true , port =1514}
+
+
+[[sources]]
+enable = false
+key = "syslog_2"
+connect = "syslog_tcp_src"
+params = { header_mode = "strip", prefer_newline = true , port = 1515}

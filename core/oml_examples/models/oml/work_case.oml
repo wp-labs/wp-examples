@@ -1,0 +1,14 @@
+name: work_case
+rule: work_case/*
+---
+x_agent_id = take(agent_id);
+symbol = read();
+botnet = read();
+path_all = collect read(keys : [details*path] );
+process_path  = match read(symbol) {
+    symbol(botnet) => read();
+    symbol(adv_threat_log) => collect read(keys :[details*path]);
+};
+
+details*path = read();
+* = take() ;

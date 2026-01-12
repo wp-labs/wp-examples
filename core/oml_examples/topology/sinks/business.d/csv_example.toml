@@ -1,0 +1,11 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/csv_example"
+oml = ["csv_example"]
+[[sink_group.sinks]]
+connect = "file_proto_sink"
+params = {  file = "csv_example.dat" }
+[sink_group.sinks.expect]
+ratio = 0.637
+tol   = 0.01

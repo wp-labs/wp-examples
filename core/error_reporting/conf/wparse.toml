@@ -1,0 +1,49 @@
+version = "1.0"
+robust = "normal"
+
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+[topology]
+sources = "./topology/sources"
+sinks = "./topology/sinks"
+
+[performance]
+parse_workers = 2
+rate_limit_rps = 10000
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+level = "info,ctrl=info,launch=info,oml=info"
+output = "File"
+[log_conf.file]
+path = "./data/logs"
+
+[stat]
+window_sec = 60
+
+[[stat.pick]]
+key = "pick_stat"
+target = "*"
+fields = []
+top_n = 20
+
+[[stat.parse]]
+key = "parse_stat"
+target = "*"
+fields = []
+top_n = 20
+
+[[stat.sink]]
+key = "sink_stat1"
+target = "*"
+fields = []
+top_n = 5
+
+[[stat.sink]]
+key = "sink_stat2"
+target = "example/simple_file_sink"
+fields = ["access_ip"]
+top_n = 2

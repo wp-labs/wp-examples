@@ -1,0 +1,5 @@
+[[sources]]
+key = "file_1"
+enable = true
+connect = "file_src"
+params  = { file = "gen.dat"}

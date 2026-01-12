@@ -1,0 +1,9 @@
+package /shh { 
+    #[tag(dat_type: "告警日志", logtype: "test_rule16", alert_src: "68")] 
+    rule test_rule16 { 
+      (_:pri<<,>>,5*_), 
+        (time:update_time\|\!,ip:access_ip\|\!,symbol(cloud16|!)), 
+        ( json(@dev_ip,@alarm_sip:victim_ip,@attck:attack_method,@alarm_id:alert_id,@access_time:occur_time,digit@group_id:asset_group_id,digit@phase:killchain,@dimension:attack_dimension,digit@status:dispose_status_cd,digit@host_state:attack_result_cd,@action:alert_desc,ip@attack_sip:attacker_ip,digit@hazard_level:severity,@white_id:is_white_list,@operate_system:os_name,@machineName:dev_name,@serial_num:dev_serial_num,@insScore:inspection_score,@result:protect_status, @score:behavior_score,@insLevel:inspection_status,@newMachineId:server_uuid,@destIpAddress:dip_geo,@osType:os_type,@localTimestamp:server_local_time,@action:ioc_desc,@backId:traceback_id,@userIdList:log_user,@srcEventId:origin_event_id,@srcIpAddress:sip_geo,@eventIdStr:event_id,@groupName:group_name,@phaseDesc:killchain_desc,@sowareVersion:software_version,@object:op_object,@type_chain:origin_alert_cat_cd,_@*)) 
+    } 
+}
+

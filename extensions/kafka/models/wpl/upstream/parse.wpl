@@ -1,0 +1,6 @@
+package /upstream {
+
+   rule example_json {
+        (json)
+    }
+}

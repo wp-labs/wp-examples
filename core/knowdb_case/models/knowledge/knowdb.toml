@@ -1,0 +1,23 @@
+version = 2
+[csv]
+has_header = false
+trim = true
+
+[[tables]]
+name = "example"
+[tables.columns]
+by_header = [
+    "name",
+    "pinying",
+]
+
+[tables.expected_rows]
+min = 1
+
+
+[[tables]]
+name = "zone_data"
+[tables.columns]
+by_index = [0, 1, 2]
+[tables.expected_rows]
+min = 2

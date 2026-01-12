@@ -1,0 +1,18 @@
+version = "1.0"
+
+[generator]
+mode = "sample"
+count = 1000
+speed = 1000
+parallel = 1
+
+[output]
+connect = "file_raw_sink"
+name = "gen_out"
+params = { base = "./data/in_dat", file = "gen.dat" }
+
+[logging]
+level = "warn"
+module_levels = ["ctrl=info", "launch=info"]
+output = "file"
+file_path = "./data/logs/"

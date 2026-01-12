@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS `new_table` ( `id` int AUTO_INCREMENT NOT NULL PRIMARY KEY, `x_recv_time` varchar(64), `x_occur_time` varchar(64), `x_from_ip` varchar(64))

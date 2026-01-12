@@ -1,0 +1,40 @@
+version = "1.0"
+
+[models]
+wpl = "../../models/wpl"
+oml = "../../models/oml"
+
+[topology]
+sources = "../sources"
+sinks = "../../sinks/trans_to_blackhole"
+
+[performance]
+parse_workers = 6
+#rate_limit_rps = 0
+#rate_limit_rps = 139990
+#rate_limit_rps = 150000
+rate_limit_rps = 1500000
+#rate_limit_rps = 100000
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+level = "warn,ctrl=info,mtrc=info"
+output = "File"
+[log_conf.file]
+path = "./data/logs/"
+
+[stat]
+
+[[stat.pick]]
+key = "pick_stat"
+target = "*"
+
+[[stat.parse]]
+key = "parse_stat"
+target = "*"
+
+[[stat.sink]]
+key = "sink_stat"
+target = "*"

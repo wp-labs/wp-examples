@@ -1,0 +1,40 @@
+version = "1.0"
+
+#skip_sink = true
+#skip_parse = true
+[models]
+wpl = "../../models/wpl"
+oml = "../../models/oml"
+[topology]
+sources = "../sources"
+sinks = "../../sinks/parse_to_blackhole"
+
+[performance]
+parse_workers = 6
+rate_limit_rps = 0
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+level = "warn,ctrl=info"
+output = "File"
+[log_conf.file]
+path = "./data/logs"
+
+[stat]
+#window_sec = 60
+
+[[stat.pick]]
+key = "pick_stat"
+target = "*"
+fields = ["pick-pending"]
+
+
+[[stat.parse]]
+key = "parse_stat"
+target = "*"
+
+[[stat.sink]]
+key = "sink_stat"
+target = "*"

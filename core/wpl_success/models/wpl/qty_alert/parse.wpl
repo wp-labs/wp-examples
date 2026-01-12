@@ -1,0 +1,27 @@
+package /qty {
+    #[tag(data_type: "webids_alert")]
+    rule webids_alert {
+        (symbol(webids_alert),chars:serialno,chars:rule_id,chars:rule_name,time_timestamp:write_date,chars:vuln_type,ip:sip,digit:sport,ip:dip,digit:dport,digit:severity,chars:host,chars:parameter,chars:uri,chars:filename,chars:referer,chars:method,chars:vuln_desc,time:public_date,chars:vuln_harm,chars:solution,chars:confidence,chars:victim_type,chars:attack_flag,chars:attacker,chars:victim,digit:attack_result,chars:kill_chain,chars:code_language,time:loop_public_date,chars:rule_version,chars:xff,chars:vlan_id,chars:vxlan_id)\|\!
+    }
+    #[tag(data_type: "webshell_alert")]
+    rule webshell_alert {
+        (symbol(webshell_alert),chars:serialno,chars:rule_id,ip:host,chars:uri,chars:file_md5,ip:sip,digit:sport,ip:dip,digit:dport,chars:attack_type,time_timestamp:write_date,digit:severity,chars:attack_desc,chars:attack_harm,digit:confidence,chars:file_dir,chars:victim_type,chars:attack_flag,chars:attacker,chars:victim,digit:attack_result,chars:kill_chain,chars:rule_name,chars:vlan_id,chars:vxlan_id)\|\!
+    }
+    #[tag(data_type: "ips_alert")]
+    rule ips_alert {
+        (symbol(ips_alert),chars:serialno,chars:rule_id,chars:rule_name,time_timestamp:write_date,chars:vuln_type,ip:sip,digit:sport,ip:dip,digit:dport,digit:severity,chars:info_id,chars:affected_system,chars:protocol_id,chars:attack_method,digit:appid,chars:detail_info,chars:bulletin,digit:confidence,chars:victim_type,chars:attack_flag,chars:attacker,chars:victim,chars:cnnvd,digit:attack_result,chars:kill_chain,chars:rule_version,chars:vlan_id,chars:vxlan_id)\|\!
+    }
+    #[tag(data_type: "ioc_alert")]
+    rule ioc_alert {
+        (symbol(ioc_alert),chars:serialno,chars:rule_id,chars:host,chars:uri,chars:file_md5,ip:sip,digit:sport,ip:dip,digit:dport,time_timestamp:write_date,digit:severity,chars:confidence,chars:file_dir,chars:attacker,chars:victim,chars:attack_type,chars:attack_name,chars:ioc,chars:ioc_type,chars:proto,chars:tproto,chars:dns_type,chars:dnsarecord,chars:file_name,chars:malicious_family,chars:campaign,chars:targeted,chars:platform,chars:ioc_source,chars:vlan_id,chars:vxlan_id)\|\!
+    }
+    #[tag(data_type: "system")]
+    rule system {
+        (time:updatetime\|\!,ip:sip\|\!,chars:log_type\|\!,chars:values<[,]>)
+    }
+    #[tag(data_type: "audit")]
+    rule audit {
+        (kv(chars@username),kv(chars@serialno),kv(chars@submod),kv(chars@detail),kv(time@updatetime),kv(ip@ip),kv(chars@sub2),kv(chars@log_type),kv(chars@module),kv(digit@sub_type))\|\!
+    }
+
+}

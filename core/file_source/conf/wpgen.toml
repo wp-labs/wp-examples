@@ -1,0 +1,22 @@
+version = ""
+
+[generator]
+mode = "sample"
+count = 1000
+speed = 1000
+parallel = 2
+
+[output]
+connect = "file_raw_sink"
+
+[output.params]
+base = "data/in_dat"
+file = "gen.dat"
+
+[logging]
+level = ""
+module_levels = []
+output = ""
+file_path = "./data/logs"
+
+[presets]

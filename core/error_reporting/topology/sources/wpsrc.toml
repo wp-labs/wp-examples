@@ -1,0 +1,8 @@
+[[sources]]
+key = "file_raw_sink"
+enable = true
+connect = "file_src"
+params = {  file = "gen.dat"  }
+
+
+# (kafka/syslog samples removed in V2; keep minimal file sources for this case)

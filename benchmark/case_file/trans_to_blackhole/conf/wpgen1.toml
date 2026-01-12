@@ -1,0 +1,20 @@
+version = "1.0"
+
+[generator]
+mode = "sample"
+count = 1000
+speed = 0
+parallel = 1
+
+[output]
+# 仅当存在 connect 时，其他 output 字段和旧式 [output.*] 子块将被忽略
+connect = "file_raw_sink"
+name = "gen_out"
+# 覆写允许的参数（参考 connectors/sink.d 中对应连接器 allow_override）
+params = { base = "./data/in_dat", file = "gen1.dat" }
+
+[logging]
+level = "warn"
+module_levels = ["ctrl=info", "launch=info"]
+output = "file"
+file_path = "./data/logs/"

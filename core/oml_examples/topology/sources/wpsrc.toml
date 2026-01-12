@@ -1,0 +1,5 @@
+[[sources]]
+key = "file_1"
+enable = true
+connect = "file_src"
+tags = ["dev_src_ip : 10.0.0.1"]
