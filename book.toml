@@ -11,4 +11,3 @@ build-dir = "book"
 [output.html]
 default-theme = "ayu"
 git-repository-url = "https://github.com/wp-labs/warp-parse"
-git-repository-icon = "fa-github"
