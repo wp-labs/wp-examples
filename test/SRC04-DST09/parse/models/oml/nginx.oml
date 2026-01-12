@@ -1,0 +1,4 @@
+name : nginx
+rule : nginx/flb_nginx/*
+---
+* : auto = take() ;

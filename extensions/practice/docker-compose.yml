@@ -12,6 +12,7 @@ services:
     volumes:
       # 测试的日志
       - ./fluent-bit/test-logs:/test-logs:ro
+      - /:/host:ro
       # Mount configuration file
       - ./fluent-bit/fluent-bit.yml:/fluent-bit/etc/fluent-bit.yml:ro
     privileged: true
@@ -116,7 +117,7 @@ services:
       - --http.shutdownDelay=15s
       - --httpListenAddr=:9428
       - --loggerFormat=json
-      - --retentionPeriod=15d
+      - --retentionPeriod=10h
       - --storageDataPath=/storage
     environment:
       - TZ=Asia/Shanghai
@@ -160,8 +161,8 @@ services:
       - ./grafana/dashboards:/usr/share/grafana/dashboards:ro
     environment:
       - TZ=Asia/Shanghai
-      - GF_SECURITY_ADMIN_USER=demo
-      - GF_SECURITY_ADMIN_PASSWORD=demo
+      - GF_SECURITY_ADMIN_USER=dayu
+      - GF_SECURITY_ADMIN_PASSWORD=Dayu@1234
     networks:
       - app-network
     healthcheck:

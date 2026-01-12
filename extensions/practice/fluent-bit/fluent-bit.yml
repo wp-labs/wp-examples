@@ -11,7 +11,13 @@ pipeline:
     - name: tail
       path: ./test-logs/*.dat
       path_key: filename
-      # read_from_head: true
+      tag: dummy.nginx
+
+    - name: tail
+      path: /host/var/log/nginx/access.log
+      path_key: filename
+      tag: prod.nginx
+
     - name: tcp
       listen: 0.0.0.0
       port: 5170
@@ -20,11 +26,17 @@ pipeline:
       format: none
 
   outputs:
-    # - name: stdout
-    #   match: "*"
+    - name: stdout
+      match: "prod.nginx"
 
     - name: tcp
       match: "*"
       host: host.docker.internal
       port: 19002
+      format: json_lines
+
+    - name: tcp
+      match: "prod.nginx"
+      host: host.docker.internal
+      port: 19003
       format: json_lines

@@ -1,0 +1,32 @@
+package /nginx {
+
+  rule flb_nginx {
+        (
+            json | take(log) | json_unescape() | (
+                ip:sip,
+                _^2,
+                chars:timestamp<[,]>,
+                http/request",
+                chars:status,
+                chars:size,
+                chars:referer",
+                http/agent",
+                *_
+            )
+        )
+  }
+
+   rule nginx {
+        (
+            ip:sip,
+            _^2,
+            chars:timestamp<[,]>,
+            http/request",
+            chars:status,
+            chars:size,
+            chars:referer",
+            http/agent",
+            *_
+        )
+   }
+}

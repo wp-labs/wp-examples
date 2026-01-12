@@ -1,0 +1,37 @@
+version = "2.0"
+
+[sink_group]
+name = "file_01"
+rule = ["/nginx/*"]
+
+
+# Kafka
+[[sink_group.sinks]]
+connect = "kafka_sink"
+name = "kafka-1"
+params= { topic = "wp.output.event" ,brokers = "localhost:9092" }
+tags = ["sink_category:business"]
+
+# # Kafka
+[[sink_group.sinks]]
+connect = "kafka_sink"
+name = "kafka-2"
+params= { topic = "wp.output.event" ,brokers = "127.0.0.1:9093" }
+tags = ["sink_category:business"]
+
+
+# doris
+[[sink_group.sinks]]
+name = "doris-1"
+connect = "doris_sink"
+params = {endpoint = "mysql://localhost:9030?charset=utf8mb4&connect_timeout=10",database = "wp_test",table = "events_parsed",user = "root",password = ""}
+
+# doris
+[[sink_group.sinks]]
+name = "doris-2"
+connect = "doris_sink"
+params = {endpoint = "mysql://localhost:9031?charset=utf8mb4&connect_timeout=10",database = "wp_test",table = "events_parsed",user = "root",password = ""}
+
+[sink_group.sinks.expect]
+ratio = 0.50
+tol   = 0.02

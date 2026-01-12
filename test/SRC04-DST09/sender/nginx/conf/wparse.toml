@@ -1,0 +1,31 @@
+version = "1.0"
+robust = "normal"
+skip_parse = false
+skip_sink = false
+
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+
+[topology]
+sources = "./topology/sources"
+sinks = "./topology/sinks"
+
+[performance]
+rate_limit_rps = 10000
+parse_workers = 2
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+level = "warn,ctrl=info,launch=info,source=info,sink=info,stat=info,runtime=warn,oml=warn,wpl=warn,klib=warn,orion_error=error,orion_sens=warn"
+output = "File"
+
+[log_conf.file]
+path = "./data/logs/"
+
+[stat]
+pick = []
+parse = []
+sink = []

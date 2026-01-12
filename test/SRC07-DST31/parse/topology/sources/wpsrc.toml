@@ -1,0 +1,43 @@
+# TCP输入源
+[[sources]]
+enable =  true
+key = "tcp-1"
+connect = "tcp_src"
+params = { prefer_newline = true , port =19002, instances = 1}
+tags = ["src:tcp-1"]
+
+# # TCP输入源
+[[sources]]
+enable =  true
+key = "tcp-2"
+connect = "tcp_src"
+params = { prefer_newline = true , port =19003, instances = 1}
+tags = ["src:tcp-2"]
+
+# kafka输入源
+[[sources]]
+enable = true
+key = "kafka-1"
+connect = "kafka_src"
+tags = ["src:kafka","topic:wp.input.event"]
+params= { topic = "wp.input.event" ,brokers = "localhost:9092" }
+
+# kafka输入源
+[[sources]]
+enable = true
+key = "kafka-2"
+connect = "kafka_src"
+tags = ["src:kafka","topic:wp.input.event"]
+params= { topic = "wp.input.event" ,brokers = "localhost:9093" }
+
+[[sources]]
+enable =  true
+key = "syslog-1"
+connect = "syslog_tcp_src"
+params = { header_mode = "strip", prefer_newline = true , port =1514}
+
+[[sources]]
+enable =  true
+key = "syslog-2"
+connect = "syslog_tcp_src"
+params = { header_mode = "strip", prefer_newline = true , port =1515}

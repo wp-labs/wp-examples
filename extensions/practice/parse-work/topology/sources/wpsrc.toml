@@ -14,10 +14,10 @@ connect = "tcp_src"
 params = { prefer_newline = true , port =19002, instances = 1}
 tags = ["src:tcp"]
 
-# # TCP输入源
-# [[sources]]
-# enable =  true
-# key = "tcp_2"
-# connect = "tcp_src"
-# params = { prefer_newline = true , port =19002, instances = 1}
-# tags = ["src:tcp-2"]
+# TCP输入源
+[[sources]]
+enable =  true
+key = "nginx"
+connect = "tcp_src"
+params = { prefer_newline = true , port =19003, instances = 1}
+tags = ["src:nginx"]
