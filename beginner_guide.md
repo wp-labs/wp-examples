@@ -137,6 +137,10 @@ WPL放置：
 ```
 
 ### 生成数据
+
+[使用 wpgen ](https://docs.warpparse.ai/zh/10-user/01-cli/04-wpgen.html)
 ### 批量解析
+[使用 wparse](https://docs.warpparse.ai/zh/10-user/01-cli/03-wparse.html)
 
 ## Docker
+>TODO:
