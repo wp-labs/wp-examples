@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: peaceiris/mdbook:v0.4.36
+      image: peaceiris/mdbook:latest
     steps:
       - uses: actions/checkout@v4
 
