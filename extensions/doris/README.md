@@ -1,4 +1,4 @@
-# wp-extensions/doris 使用说明
+# doris 使用说明
 
 本目录提供一套 **File Source → Doris Stream Load** 的端到端示例，用来验证 WarpParse 在离线文件解析后写入 Doris 的链路是否按预期工作。
 

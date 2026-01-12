@@ -1,4 +1,4 @@
-# 用例：TCP Roundtrip（wpgen → tcp_sink → tcp_source → file）
+# TCP Roundtrip
 
 目标：演示通用 TCP 输入/输出的端到端链路。
 
@@ -24,4 +24,3 @@ wproj validate sink-file -v --input-cnt 10000
 - conf/wparse.toml：主配置（sources/sinks/model 路径）
 - models/sources/wpsrc.toml：source 列表（包含 `tcp_src`）
 - conf/wpgen.toml：生成器配置（输出 `tcp_sink` 到本机端口）
-

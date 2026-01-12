@@ -4,8 +4,8 @@ type = "mysql"
 allow_override = ["endpoint", "username", "password","database","table","columns"]
 [connectors.params]
 endpoint = "localhost:3306"
-username = "root"
-password = "123456"
+username = "${SEC_MYSQL_USER}"
+password = "${SEC_MYSQL_PWD}"
 database = "wparse"
 table = "nginx_logs"
 columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]

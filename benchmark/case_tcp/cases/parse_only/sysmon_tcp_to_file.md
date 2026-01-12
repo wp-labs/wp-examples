@@ -1,4 +1,4 @@
-# 测试场景：sysmon_tcp_to_file
+# sysmon_tcp_to_file
 
 本测试用于验证 **sysmon_tcp_to_file** 场景下的引擎性能（Mac M4 Mini，日志解析）。
 

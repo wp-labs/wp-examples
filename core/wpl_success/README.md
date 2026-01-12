@@ -1,4 +1,4 @@
-# wpl_success 场景说明
+# wpl_success
 
 本用例演示"WPL 成功解析全链路"的场景：验证 WPL 规则能够成功解析多种安全告警日志格式（webids_alert、webshell_alert、ips_alert、ioc_alert、system、audit 等），并正确路由到业务 sink。适用于验证解析规则的正确性与完整性。
 

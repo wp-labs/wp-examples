@@ -1,4 +1,4 @@
-# 测试场景：mixed_tcp_to_file
+# mixed_tcp_to_file
 
 本测试用于验证 **mixed_tcp_to_file** 场景下的引擎性能（Mac M4 Mini，日志解析+转换）。
 

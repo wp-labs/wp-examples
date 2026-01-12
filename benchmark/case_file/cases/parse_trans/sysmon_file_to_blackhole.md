@@ -1,4 +1,4 @@
-# 测试场景：sysmon_file_to_blackhole
+# sysmon_file_to_blackhole
 
 本测试用于验证 **sysmon_file_to_blackhole** 场景下的引擎性能（Mac M4 Mini，日志解析+转换）。
 

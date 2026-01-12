@@ -1,4 +1,4 @@
-# error_reporting 场景说明
+# error_reporting
 
 本用例演示"错误数据报表与多格式输出"的场景：针对 skyeye_stat 类型的系统监控日志进行解析，通过 OML 进行数据转换，并支持多种输出格式（JSON、KV 等）。适用于错误数据的收集、分析与报表生成。
 

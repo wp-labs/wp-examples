@@ -1,4 +1,4 @@
-# knowdb_case 场景说明
+# knowdb_case 
 
 本用例演示"知识库（KnowDB）查询与数据关联"的场景：通过 WPL 规则解析日志后，使用 OML 中的 `select ... from ... where` 语句从知识库中查询关联数据，实现日志解析与业务数据的动态关联。
 
