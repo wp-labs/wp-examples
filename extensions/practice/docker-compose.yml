@@ -1,7 +1,6 @@
 services:
 # http://host.docker.internal:8080/system-obs/alert/alert-message
 
-
   fluent-bit:
     image: fluent/fluent-bit:4.0.3
     container_name: fluent-bit
@@ -72,7 +71,7 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - app-network   
+      - app-network
 
   victoria-metrics:
     container_name: victoria-metrics

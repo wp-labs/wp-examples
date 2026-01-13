@@ -4,16 +4,16 @@ version = "1.0"
 mode = "sample"
 count = 10000000000000000
 speed = 20
-parallel = 10
+parallel = 1
 
 [output]
 # 仅当存在 connect 时，其他 output 字段和旧式 [output.*] 子块将被忽略
 name = "gen_out"
 connect = "tcp_sink"
-params = { port= 19002 }
+params = { port= 19003 }
+
 
 [logging]
-level = ""
-module_levels = []
+level = "debug,mtrc=error,ctrl=debug,data=trace"
 output = ""
 file_path = "./data/logs"

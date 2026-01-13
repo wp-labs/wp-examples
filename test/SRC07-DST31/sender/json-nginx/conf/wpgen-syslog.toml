@@ -12,7 +12,7 @@ name = "gen_out"
 # 覆写允许的参数（参考 connectors/sink.d 中对应连接器 allow_override）
 #connect = "file_raw_sink"
 connect = "syslog_tcp_sink"
-params = { port= 1514  }
+params = { port= 1515  }
 
 [logging]
 level = ""
