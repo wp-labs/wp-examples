@@ -135,43 +135,43 @@ http 2018-11-30T22:23:00.186641Z app/my-lb 192.168.1.10:2000 10.0.0.15:8080 0.01
 
 ```json
 {
-	"direct_chars": "13", //直接赋值
-	"direct_digit": 13,
-	"simple_chars": "simple_chars",
-	"simple_port": "simple_chars",
-	"simple_ip": "192.168.1.10",
-	"ip_ip4_to_int": 3232235786, //ip转int
-	"html_unescape": "<script>", //html转码
-	"html_escape": "&lt;script&gt;",
-	"str_escape": "hello\\\"world",//转义
-	"select_chars": "select_one",
-	"match_chars": "1",
-	"time": "2026-01-12 19:38:43.452811", //标准时间
-	"date": 20260112, //日期
-	"hour": 2026011219, //小时
-	"timestamp": 1767009600000, //北京时间
-	"timestamp1": 1766980800, //秒
-	"timestamp2": 1766980800000, //毫秒
-	"timestamp3": 1766980800000000, //微秒
-	"timestamp4": 1768246851, //UTC+8秒
-	"timestamp5": 1768246851009, //UTC+8毫秒
-	"timestamp6": 1768246851009507, //UTC+8微秒
-	"base64_en": "aGVsbG8=", //base64
-	"base64_de": "hello",
-	"array_get": "val1", //数组取值
-	"array_str": "[\"val1\",\"val2\",\"val3\"]", //数组字符
-	"name": "file.txt", //文件路径取值
-	"path": "/path/to/resource",
-	"domain": "example.com", //http取值
-	"host": "example.com",
-	"uri": "/path/to/resource?foo=1&bar=2",
-	"params": "foo=1&bar=2",
-	"obj": "nested", //多层取值
-	"splice": "foo:bar|baz:qux", //字符拼接
-	"num_range": "大于 0 小于 1000", //范围判断
-	"extends": { //扩展字段
-		"extend1": "ext_value_1",
-		"extend2": "ext_value_2"
-	}
+    "direct_chars": "13", //直接赋值
+    "direct_digit": 13,
+    "simple_chars": "simple_chars",//直接赋值
+    "simple_port": 80,
+    "simple_ip": "192.168.1.10",
+    "ip_ip4_to_int": 3232235786, //ip转int(192.168.1.10)
+    "html_unescape": "<script>", //html转码
+    "html_escape": "&lt;script&gt;",//html转码
+    "str_escape": "hello\\\"world",//转义
+    "select_chars": "select_one", //使用option
+    "match_chars": "1",			// left为1，right为2
+    "time": "2026-01-12 19:38:43.452811", //当前标准时间
+    "date": 20260112, //当前时间(YYYYMMDD格式)
+    "hour": 2026011219, //当前时间（YYYYMMDDHH格式）
+    "timestamp": 1766980800000, //北京时间毫秒级时间戳（使用日志中的时间2025-12-29 12:00:00）
+    "timestamp1": 1766980800, //秒（使用日志中的时间2025-12-29 12:00:00）
+    "timestamp2": 1766980800000, //毫秒（使用日志中的时间2025-12-29 12:00:00）
+    "timestamp3": 1766980800000000, //微秒（使用日志中的时间2025-12-29 12:00:00）
+    "timestamp4": 1768246851, //UTC+8秒（使用当前时间）
+    "timestamp5": 1768246851009, //UTC+8 毫秒（使用当前时间）
+    "timestamp6": 1768246851009507, //UTC+8 微秒（使用当前时间0）
+    "base64_en": "aGVsbG8=", //base64
+    "base64_de": "hello word",
+    "array_get": "val1", //数组取值
+    "array_str": "[\"val1\",\"val2\",\"val3\"]", //数组转json
+    "name": "file.txt", //文件路径取值
+    "path": "/path/to/resource", // 从全路径中获取目录路径
+    "domain": "example.com", //http取值
+    "host": "example.com",
+    "uri": "/path/to/resource?foo=1&bar=2",
+    "params": "foo=1&bar=2",
+    "obj": "nested", //多层取值
+    "splice": "foo:bar|baz:qux", //字符拼接
+    "num_range": "大于 0 小于 1000", //范围判断
+    "extends": { //扩展字段
+        "extend1": "ext_value_1",
+        "extend2": "ext_value_2"
+    }
 }
 ```
