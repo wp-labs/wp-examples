@@ -143,4 +143,14 @@ WPL放置：
 [使用 wparse](https://docs.warpparse.ai/zh/10-user/01-cli/03-wparse.html)
 
 ## Docker
->TODO:
+
+
+下载最新版本
+```bash
+docker pull ghcr.io/wp-labs/warp-parse:latest
+```
+
+
+```bash
+sudo docker run -it --rm --user root --entrypoint /bin/bash <image-id>
+```
