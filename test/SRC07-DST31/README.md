@@ -1,5 +1,5 @@
 ## 介绍
-
+![1768295030715](image/README/1768295030715.png)
 SRC07-DST31 场景演示了 “多 Source 类型（Kafka + TCP + Syslog）→ 多 Sink 类型（Kafka + File + VictoriaLogs + MySQL + Doris）” 的端到端链路。示例中：
 
 - `sender/` 目录下的 3 组 `wpgen`（nginx/json-nginx/sys）同时向 Kafka、TCP、Syslog 发出样例日志；
