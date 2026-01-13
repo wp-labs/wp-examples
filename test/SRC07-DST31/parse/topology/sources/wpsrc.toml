@@ -1,43 +1,43 @@
 # TCP输入源
 [[sources]]
 enable =  true
-key = "tcp-1"
+key = "tcp-nginx_sys"
 connect = "tcp_src"
 params = { prefer_newline = true , port =19002, instances = 1}
-tags = ["src:tcp-1"]
+tags = ["src:tcp-nginx_sys"]
 
 # # TCP输入源
 [[sources]]
 enable =  true
-key = "tcp-2"
+key = "tcp-jnginx"
 connect = "tcp_src"
 params = { prefer_newline = true , port =19003, instances = 1}
-tags = ["src:tcp-2"]
+tags = ["src:tcp-jnginx"]
+
+# # kafka输入源
+# [[sources]]
+# enable = true
+# key = "kafka-nginx_sys"
+# connect = "kafka_src"
+# tags = ["src:kafka","topic:wp.input.event"]
+# params= { topic = "wp.input.event" ,brokers = "localhost:9092" }
 
 # kafka输入源
 [[sources]]
 enable = true
-key = "kafka-1"
-connect = "kafka_src"
-tags = ["src:kafka","topic:wp.input.event"]
-params= { topic = "wp.input.event" ,brokers = "localhost:9092" }
-
-# kafka输入源
-[[sources]]
-enable = true
-key = "kafka-2"
+key = "kafka-jnginx"
 connect = "kafka_src"
 tags = ["src:kafka","topic:wp.input.event"]
 params= { topic = "wp.input.event" ,brokers = "localhost:9093" }
 
 [[sources]]
 enable =  true
-key = "syslog-1"
+key = "syslog-nginx_sys"
 connect = "syslog_tcp_src"
 params = { header_mode = "strip", prefer_newline = true , port =1514}
 
 [[sources]]
 enable =  true
-key = "syslog-2"
+key = "syslog-jnginx"
 connect = "syslog_tcp_src"
 params = { header_mode = "strip", prefer_newline = true , port =1515}
