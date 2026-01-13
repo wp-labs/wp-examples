@@ -1,0 +1,35 @@
+global:
+  scrape_interval: 30s
+  scrape_timeout: 10s
+scrape_configs:
+  - job_name: victoriametrics
+    static_configs:
+      - targets: [ "victoria-metrics:8428" ]
+  - job_name: victorialogs
+    honor_timestamps: true
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets: [ "victoria-logs:9428" ]
+        labels:
+          instance: "victoria-logs"
+
+  - job_name: "fluent-bit"
+    honor_timestamps: true
+    metrics_path: /api/v1/metrics/prometheus
+    scheme: http
+    static_configs:
+      - targets: ["fluent-bit:2020"]   # 替换为你的 exporter 地址
+        labels:
+          instance: "fluent-bit"
+
+
+  - job_name: "kafka"
+    honor_timestamps: true
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets: ["kafka-exporter:9308"]   # 替换为你的 exporter 地址
+        labels:
+          instance: "kafka-exporter"
+

@@ -33,4 +33,5 @@ CREATE TABLE wp_jnginx (
                            PRIMARY KEY (wp_event_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备请求事件解析表';
 
-select * from wp_nginx
+select * from wp_nginx;
+select * from wp_jnginx;

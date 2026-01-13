@@ -47,7 +47,7 @@ start_process() {
 # 启动各个进程
 cd $BASE_DIR/parse
 start_process "wparse daemon --stat 2 -p" "$LOG_DIR/wparse-info.log" "$PID_DIR/wparse.pid"
-sleep 1
+sleep 2
 
 cd $BASE_DIR/sender/json-nginx
 start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" "$LOG_DIR/jnginx-kafka.log" "$PID_DIR/jnginx-kafka.pid"

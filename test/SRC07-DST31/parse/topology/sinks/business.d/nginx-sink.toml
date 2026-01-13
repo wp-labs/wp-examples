@@ -7,25 +7,25 @@ rule = ["/nginx/nginx"]
 # file
 [[sink_group.sinks]]
 connect = "file_json_sink"
-name = "file-1"
+name = "file-1-nginx"
 params = { file = "file-1.dat" }
 
 # Kafka
 [[sink_group.sinks]]
 connect = "kafka_sink"
-name = "kafka-1"
+name = "kafka-1-nginx"
 params= { topic = "wp.output.nginx" ,brokers = "localhost:9092" }
-tags = ["sink:kafka-1"]
+tags = ["sink:kafka-1-nginx"]
 
 # vlog
 [[sink_group.sinks]]
-name = "vlog-1"
+name = "vlog-1-nginx"
 connect = "victorialogs_sink"
 params = { endpoint = "http://localhost:9428", insert_path = "/insert/jsonline", flush_interval_secs = 3}
 
 # doris
 [[sink_group.sinks]]
-name = "doris-1"
+name = "doris-1-nginx"
 connect = "doris_sink"
 [sink_group.sinks.params]
 endpoint="mysql://localhost:9030/?charset=utf8mb4&connect_timeout=10"
@@ -36,15 +36,15 @@ table = "wp_nginx"
 
 # mysql
 [[sink_group.sinks]]
-name = "mysql-1"
-connect = "doris_sink"
+name = "mysql-1-nginx"
+connect = "mysql_sink"
 [sink_group.sinks.params]
-endpoint="mysql://localhost:3306/?charset=utf8mb4&connect_timeout=10"
-user = "root"
+endpoint = "localhost:3306"
+username = "root"
 password = "123456"
-database="test_db"
+database = "test_db"
 table = "wp_nginx"
-
+columns = ["wp_event_id","wp_src_key","sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
 
 [sink_group.sinks.expect]
 ratio = 0.50
@@ -54,24 +54,24 @@ tol   = 0.02
 # Kafka
 [[sink_group.sinks]]
 connect = "kafka_sink"
-name = "kafka-2"
-params= { topic = "wp.output.all" ,brokers = "127.0.0.1:9093" }
+name = "kafka-2-nginx"
+params= { topic = "wp.output.nginx" ,brokers = "127.0.0.1:9093" }
 
 # file
 [[sink_group.sinks]]
 connect = "file_json_sink"
-name = "file-2"
+name = "file-2-nginx"
 params = { file = "file-2.dat" }
 
 # vlog
 [[sink_group.sinks]]
-name = "vlog-2"
+name = "vlog-2-nginx"
 connect = "victorialogs_sink"
 params = { endpoint = "http://localhost:9429", insert_path = "/insert/jsonline", flush_interval_secs = 3}
 
 # doris
 [[sink_group.sinks]]
-name = "doris-2"
+name = "doris-2-nginx"
 connect = "doris_sink"
 [sink_group.sinks.params]
 endpoint="mysql://localhost:9031/?charset=utf8mb4&connect_timeout=10"
@@ -82,12 +82,12 @@ table = "wp_nginx"
 
 # mysql
 [[sink_group.sinks]]
-name = "mysql-2"
-connect = "doris_sink"
+name = "mysql-2-nginx"
+connect = "mysql_sink"
 [sink_group.sinks.params]
-endpoint="mysql://localhost:3307/?charset=utf8mb4&connect_timeout=10"
-user = "root"
+endpoint = "localhost:3307"
+username = "root"
 password = "123456"
-database="test_db"
+database = "test_db"
 table = "wp_nginx"
-
+columns = ["wp_event_id","wp_src_key","sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
