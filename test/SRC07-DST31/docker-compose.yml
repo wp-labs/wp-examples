@@ -197,7 +197,7 @@ services:
 
   wp-monitor:
     container_name: wp-monitor
-    image: dysec-docker-alpha.corp.dy-sec.com/wp-monitor:1.0-alpha.8
+    image: dysec-docker-alpha.corp.dy-sec.com/wp-monitor:v2.0.1-alpha
     ports:
       - "25816:25816"
     healthcheck:

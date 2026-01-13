@@ -8,6 +8,10 @@ SRC07-DST31 场景演示了 “多 Source 类型（Kafka + TCP + Syslog）→ �
 
 下文给出使用步骤及关键说明。
 
+## 巡检
+执行vlogs-check.sh、脚本会定期重启wpgen，然后对比vlog和file收到的数据数量
+
+
 ## 目录速览
 
 | 路径 | 说明 |
