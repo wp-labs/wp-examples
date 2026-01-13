@@ -2,8 +2,8 @@ version = "2.0"
 
 [sink_group]
 name = "all"
-#parallel = 2
-parallel = 4
+#parallel = 5
+parallel = 8
 rule= ["*"]
 #tags = ["group:benchmark", "type:business"]
 

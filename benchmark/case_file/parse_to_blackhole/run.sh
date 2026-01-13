@@ -30,12 +30,9 @@ benchmark_set_line_cnt
 
 # 检查数据文件（使用单个配置 "gen"）
 benchmark_check_data_files "gen"
-benchmark_check_data_files "gen1"
 
 # 条件生成数据
 
 benchmark_conditional_data_gen "$WPL_PATH" "$SPEED_MAX" "$LINE_CNT" "wpgen.toml"
-benchmark_conditional_data_gen "$WPL_PATH" "$SPEED_MAX" "$LINE_CNT" "wpgen1.toml"
-
 # 执行 batch 模式测试
 benchmark_run_batch "$WPL_PATH"
