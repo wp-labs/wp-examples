@@ -1,0 +1,4 @@
+name : /oml/benchmark_2
+rule : /benchmark/benchmark_2
+---
+* : auto = take() ;
