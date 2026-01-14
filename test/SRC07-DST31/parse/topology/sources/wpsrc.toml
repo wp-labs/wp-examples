@@ -14,13 +14,13 @@ connect = "tcp_src"
 params = { prefer_newline = true , port =19003, instances = 1}
 tags = ["src:tcp-jnginx"]
 
-# # kafka输入源
-# [[sources]]
-# enable = true
-# key = "kafka-nginx_sys"
-# connect = "kafka_src"
-# tags = ["src:kafka","topic:wp.input.event"]
-# params= { topic = "wp.input.event" ,brokers = "localhost:9092" }
+# kafka输入源
+[[sources]]
+enable = true
+key = "kafka-nginx_sys"
+connect = "kafka_src"
+tags = ["src:kafka","topic:wp.input.event"]
+params= { topic = "wp.input.event" ,brokers = "localhost:9092" }
 
 # kafka输入源
 [[sources]]

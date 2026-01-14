@@ -124,8 +124,8 @@ services:
     ports:
       - "9428:9428"
     # 数据存储目录,按需开启
-    volumes:
-      - vlogs-1:/storage
+    # volumes:
+    #   - vlogs-1:/storage
     command:
       - --envflag.enable
       - --envflag.prefix=VM_
@@ -149,8 +149,8 @@ services:
     ports:
       - "9429:9428"
     # 数据存储目录,按需开启
-    volumes:
-      - vlogs-2:/storage
+    # volumes:
+    #   - vlogs-2:/storage
     command:
       - --envflag.enable
       - --envflag.prefix=VM_
@@ -251,9 +251,9 @@ networks:
         - subnet: 172.30.81.0/24
 
 volumes:
-  vlogs-1:
-    driver: local
-  vlogs-2:
-    driver: local
+  # vlogs-1:
+  #   driver: local
+  # vlogs-2:
+  #   driver: local
   metrics_data:
     driver: local

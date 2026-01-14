@@ -9,7 +9,8 @@ SRC07-DST31 场景演示了 “多 Source 类型（Kafka + TCP + Syslog）→ �
 下文给出使用步骤及关键说明。
 
 ## 巡检
-执行vlogs-check.sh、脚本会定期重启wpgen，然后对比vlog和file收到的数据数量
+vlogs-check.sh、脚本会定期重启wpgen，然后对比vlog和file收到的数据数量.将存在差异的情况发送到`report/vlogs-check-report.log`中
+后台执行：`vlogs-check.sh -b`
 
 
 ## 目录速览

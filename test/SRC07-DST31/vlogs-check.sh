@@ -1,10 +1,44 @@
 #!/bin/bash
 set -euo pipefail
 
+DEBUG=0
+RUN_IN_BACKGROUND=0
+while getopts ":db" opt; do
+    case "$opt" in
+        d) DEBUG=1 ;;
+        b) RUN_IN_BACKGROUND=1 ;;
+        \?) echo "Usage: $0 [-d]" >&2; exit 1 ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+log_debug() {
+    if [[ "$DEBUG" -eq 1 ]]; then
+        echo "$@"
+    fi
+}
+
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_DIR="$BASE_DIR/parse/data/logs"
 PID_DIR="$BASE_DIR/pids"
-mkdir -p "$LOG_DIR" "$PID_DIR"
+REPORT_DIR="$BASE_DIR/report"
+REPORT_LOG="$REPORT_DIR/vlogs-check.log"
+REPORT_MISMATCH_FILE="$REPORT_DIR/vlogs-check-report.log"
+mkdir -p "$LOG_DIR" "$PID_DIR" "$REPORT_DIR"
+
+if [[ "$RUN_IN_BACKGROUND" -eq 1 && -z "${VLOGS_CHECK_CHILD:-}" ]]; then
+    echo "[INFO] vlogs-check will run in background. Logs: $REPORT_LOG"
+    cmd=(env VLOGS_CHECK_CHILD=1 "$0")
+    if [[ "$DEBUG" -eq 1 ]]; then
+        cmd+=("-d")
+    fi
+    cmd+=("$@")
+    nohup "${cmd[@]}" > "$REPORT_LOG" 2>&1 &
+    echo "" > "$REPORT_MISMATCH_FILE"
+    bg_pid=$!
+    echo "[INFO] Background PID: $bg_pid"
+    exit 0
+fi
 
 VERSION_FILTER="${LOG_VERSION_FILTER:-}"
 DOCKER_COMPOSE_CMD=${DOCKER_COMPOSE_CMD:-"docker compose"}
@@ -12,24 +46,33 @@ DOCKER_COMPOSE_CMD=${DOCKER_COMPOSE_CMD:-"docker compose"}
 # VictoriaLogs 获取日志总数方法
 # ============================================
 
-# 全局时间变量（ISO 8601 UTC）
+# 全局时间计算函数
 OS_TYPE=$(uname)
 
-if [[ "$OS_TYPE" == "Linux" ]]; then
-    # Linux / GNU date
-    END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    START_TIME=$(date -u -d "2 days ago" +"%Y-%m-%dT%H:%M:%SZ")
-elif [[ "$OS_TYPE" == "Darwin" ]]; then
-    # macOS / BSD date
-    END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    START_TIME=$(date -u -v -2d +"%Y-%m-%dT%H:%M:%SZ")
-else
-    echo "Unsupported OS: $OS_TYPE"
-    exit 1
-fi
+compute_time_range() {
+    if [[ "$OS_TYPE" == "Linux" ]]; then
+        END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        START_TIME=$(date -u -d "2 days ago" +"%Y-%m-%dT%H:%M:%SZ")
+    elif [[ "$OS_TYPE" == "Darwin" ]]; then
+        END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        START_TIME=$(date -u -v -2d +"%Y-%m-%dT%H:%M:%SZ")
+    else
+        echo "Unsupported OS: $OS_TYPE"
+        exit 1
+    fi
+}
 
 # VictoriaLogs 地址
 VLOGS_URL="http://localhost:9428/select/logsql/stats_query"
+
+normalize_label() {
+    echo "$1" | tr '[:lower:]-' '[:upper:]_'
+}
+
+format_signed() {
+    local value="$1"
+    printf "%+d" "$value"
+}
 
 # -------------------------------
 # 方法：获取日志总条数
@@ -42,9 +85,11 @@ get_logs_count() {
     local query_condition="$1"
 
     if [ -z "$query_condition" ]; then
-        echo "Error: query_condition is empty"
+        log_debug "Error: query_condition is empty"
         return 1
     fi
+
+    compute_time_range
 
     # 执行 curl 查询
     local response
@@ -52,6 +97,11 @@ get_logs_count() {
         --data-urlencode "query=${query_condition} | stats count()" \
         --data-urlencode "start=${START_TIME}" \
         --data-urlencode "end=${END_TIME}")
+
+    # log_debug curl -s -G "${VLOGS_URL}" \
+    #     --data-urlencode "query=${query_condition} | stats count()" \
+    #     --data-urlencode "start=${START_TIME}" \
+    #     --data-urlencode "end=${END_TIME}"
 
     # 解析 count
     local count
@@ -65,12 +115,12 @@ count_log_contains() {
     local count
 
     if [ -z "$file" ] || [ -z "$keyword" ]; then
-        echo "[ERROR] 用法: count_log_contains 文件名 关键字"
+        log_debug "[ERROR] 用法: count_log_contains 文件名 关键字"
         return 1
     fi
 
     if [ ! -f "$file" ]; then
-        echo "[ERROR] 文件不存在: $file"
+        log_debug "[ERROR] 文件不存在: $file"
         return 1
     fi
 
@@ -93,13 +143,63 @@ compare_counts() {
     local vlog_count="$2"
     local file_count="$3"
 
+    local loss_info
+    loss_info=$(update_loss_stats "$label" "$file_count" "$vlog_count")
+    IFS=: read -r incremental_loss total_loss loss_ratio <<<"$loss_info"
+
+    local incremental_fmt total_fmt
+    incremental_fmt=$(format_signed "$incremental_loss")
+    total_fmt=$(format_signed "$total_loss")
+
     if [[ "$vlog_count" -eq "$file_count" ]]; then
-        echo "[OK] ${label}: vlog_count == file_count (${vlog_count})"
+        echo "[OK] ${label}: expected == vlogs (${vlog_count})"
         return 0
     fi
 
-    echo "[WARN] ${label}: vlog_count != file_count (vlog=${vlog_count}, file=${file_count})"
+    echo "[WARN] ${label}: expected=${file_count} vlogs=${vlog_count} last60s=${incremental_fmt} total_loss=${total_fmt} ratio=${loss_ratio}"
+    report_mismatch "$label" "$vlog_count" "$file_count" "$incremental_fmt" "$total_fmt" "$loss_ratio"
     return 1
+}
+
+report_mismatch() {
+    local label="$1"
+    local vlog_count="$2"
+    local file_count="$3"
+    local period_loss="${4:-0}"
+    local total_loss="${5:-0}"
+    local loss_ratio="${6:-0%}"
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    printf '%s label=%s expected=%s vlogs=%s last60s=%s total_loss=%s ratio=%s\n' \
+        "$timestamp" "$label" "$file_count" "$vlog_count" "$period_loss" "$total_loss" "$loss_ratio" >> "$REPORT_MISMATCH_FILE"
+}
+
+update_loss_stats() {
+    local label="$1"
+    local file_count="$2"
+    local vlog_count="$3"
+
+    local diff=$((vlog_count - file_count))
+
+    local key
+    key=$(normalize_label "$label")
+    local prev_var="PREV_DELTA_${key}"
+
+    local prev
+    prev=$(eval "echo \${$prev_var:-0}")
+
+    local incremental=$((diff - prev))
+
+    eval "$prev_var=$diff"
+
+    local ratio="0%"
+    if (( file_count != 0 )); then
+        ratio=$(awk -v d="$diff" -v f="$file_count" 'BEGIN{if (f!=0) printf "%+.2f%%", (d/f)*100; else printf "0%%"}')
+    else
+        ratio="+0.00%"
+    fi
+
+    printf '%s:%s:%s' "$incremental" "$diff" "$ratio"
 }
 
 vlog_check(){
@@ -129,21 +229,21 @@ kill_by_name() {
     local name="$1"
 
     if [ -z "$name" ]; then
-        echo "[ERROR] 请提供进程名称"
+        log_debug "[ERROR] 请提供进程名称"
         return 1
     fi
-    echo "[INFO] 查找进程: $name"
+    log_debug "[INFO] 查找进程: $name"
     pids=$(ps -ef | grep "$name" | grep -v grep | awk '{print $2}')
     if [ -z "$pids" ]; then
-        echo "[INFO] 未找到相关进程"
+        log_debug "[INFO] 未找到相关进程"
         return 0
     fi
-    echo "[INFO] 发现进程ID: $pids"
+    log_debug "[INFO] 发现进程ID: $pids"
     for pid in $pids; do
-        echo "[INFO] 正在终止进程: $pid"
-        kill "$pid"
+        log_debug "[INFO] 正在终止进程: $pid"
+        kill -9 "$pid"
     done
-    echo "[INFO] 完成"
+    log_debug "[INFO] 完成"
 }
 start_process() {
     local cmd="$1"
@@ -152,7 +252,7 @@ start_process() {
     local workdir="$3"
     local pid_file="$4"
 
-    echo "[INFO] Starting: $cmd (cwd: $workdir)"
+    log_debug "[INFO] Starting: $cmd (cwd: $workdir)"
     mkdir -p "$(dirname "$log_file")"
 
     (
@@ -166,63 +266,76 @@ start_process() {
         if [[ -n "$pid_file" ]]; then
             echo "$pid" > "$pid_file"
         fi
-        echo "[INFO] PID $pid recorded for $cmd"
+        log_debug "[INFO] PID $pid recorded for $cmd"
     )
 }
 
 start_all_wpgen() {
-    echo "[INFO] 启动全部 wpgen 进程"
-    start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" \
-        "$LOG_DIR/jnginx-kafka.log" "$BASE_DIR/sender/json-nginx" "$PID_DIR/jnginx-kafka.pid"
-    start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" \
-        "$LOG_DIR/jnginx-tcp.log" "$BASE_DIR/sender/json-nginx" "$PID_DIR/jnginx-tcp.pid"
-    start_process "wpgen sample -c wpgen-syslog.toml --stat 2 -p" \
-        "$LOG_DIR/jnginx-syslog.log" "$BASE_DIR/sender/json-nginx" "$PID_DIR/jnginx-syslog.pid"
+    log_debug "[INFO] 启动全部 wpgen 进程"
+    local parse_dir="$BASE_DIR/parse"
 
-    start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" \
-        "$LOG_DIR/nginx-kafka.log" "$BASE_DIR/sender/nginx" "$PID_DIR/nginx-kafka.pid"
-    start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" \
-        "$LOG_DIR/nginx-tcp.log" "$BASE_DIR/sender/nginx" "$PID_DIR/nginx-tcp.pid"
-    start_process "wpgen sample -c wpgen-syslog.toml --stat 2 -p" \
-        "$LOG_DIR/nginx-syslog.log" "$BASE_DIR/sender/nginx" "$PID_DIR/nginx-syslog.pid"
+    start_process "wpgen sample -c jnginx-kafka.toml --wpl ./models/wpl/nginx/jnginx --stat 2 -p" \
+        "$LOG_DIR/jnginx-kafka.log" "$parse_dir" ""
+    start_process "wpgen sample -c jnginx-tcp.toml --wpl ./models/wpl/nginx/jnginx --stat 2 -p" \
+        "$LOG_DIR/jnginx-tcp.log" "$parse_dir" ""
+    start_process "wpgen sample -c jnginx-syslog.toml --wpl ./models/wpl/nginx/jnginx --stat 2 -p" \
+        "$LOG_DIR/jnginx-syslog.log" "$parse_dir" ""
 
-    start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" \
-        "$LOG_DIR/sys-kafka.log" "$BASE_DIR/sender/sys" "$PID_DIR/sys-kafka.pid"
-    start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" \
-        "$LOG_DIR/sys-tcp.log" "$BASE_DIR/sender/sys" "$PID_DIR/sys-tcp.pid"
-    start_process "wpgen sample -c wpgen-syslog.toml --stat 2 -p" \
-        "$LOG_DIR/sys-syslog.log" "$BASE_DIR/sender/sys" "$PID_DIR/sys-syslog.pid"
+    start_process "wpgen sample -c nginx-kafka.toml --wpl ./models/wpl/nginx/nginx --stat 2 -p" \
+        "$LOG_DIR/nginx-kafka.log" "$parse_dir" ""
+    start_process "wpgen sample -c nginx-tcp.toml --wpl ./models/wpl/nginx/nginx --stat 2 -p" \
+        "$LOG_DIR/nginx-tcp.log" "$parse_dir" ""
+    start_process "wpgen sample -c nginx-syslog.toml --wpl ./models/wpl/nginx/nginx --stat 2 -p" \
+        "$LOG_DIR/nginx-syslog.log" "$parse_dir" ""
+
+    start_process "wpgen sample -c sys-kafka.toml --wpl ./models/wpl/sys --stat 2 -p" \
+        "$LOG_DIR/sys-kafka.log" "$parse_dir" ""
+    start_process "wpgen sample -c sys-tcp.toml --wpl ./models/wpl/sys --stat 2 -p" \
+        "$LOG_DIR/sys-tcp.log" "$parse_dir" ""
+    start_process "wpgen sample -c sys-syslog.toml --wpl ./models/wpl/sys --stat 2 -p" \
+        "$LOG_DIR/sys-syslog.log" "$parse_dir" ""
 }
 
 stop_all_wpgen() {
-    echo "[INFO] 停止所有 wpgen 进程"
+    log_debug "[INFO] 停止所有 wpgen 进程"
     kill_by_name wpgen || true
 }
 
 restart_docker_compose() {
-    echo "[INFO] 重启 docker compose 服务"
+    log_debug "[INFO] 重启 docker compose 服务"
     (
         cd "$BASE_DIR"
         # shellcheck disable=SC2206
         local cmd_parts=($DOCKER_COMPOSE_CMD)
-        "${cmd_parts[@]}" restart
+        if [[ "$DEBUG" -eq 1 ]]; then
+            "${cmd_parts[@]}" restart
+        else
+            "${cmd_parts[@]}" restart >/dev/null
+        fi
     )
 }
 
 main_loop() {
     while true; do
+
+        if ! vlog_check; then
+            echo "[WARN] vlog_check 检测到计数不一致"
+        fi
+
         restart_docker_compose
-        echo "[INFO] docker compose 已重启，等待 10 秒..."
-        sleep 10
+        log_debug "[INFO] docker compose 已重启，等待 5 秒..."
+        sleep 5
 
         stop_all_wpgen
+        log_debug "[INFO] 停止所有发送"
+        sleep 5
 
         if ! vlog_check; then
             echo "[WARN] vlog_check 检测到计数不一致"
         fi
 
         start_all_wpgen
-        echo "[INFO] 完成一轮巡检，60 秒后再次执行"
+        log_debug "[INFO] 完成一轮巡检，60 秒后再次执行"
         sleep 60
     done
 }

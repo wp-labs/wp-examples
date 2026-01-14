@@ -16,7 +16,7 @@ kill_by_name() {
     echo "[INFO] 发现进程ID: $pids"
     for pid in $pids; do
         echo "[INFO] 正在终止进程: $pid"
-        kill "$pid"
+        kill -9 "$pid"
     done
     echo "[INFO] 完成"
 }

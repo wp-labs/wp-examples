@@ -31,7 +31,7 @@ mkdir -p "$LOG_DIR" "$PID_DIR"
 start_process() {
     local cmd="$1"
     local log_file="$2"
-    local pid_file="$3"
+    # local pid_file="$3"
 
     echo "[INFO] Starting: $cmd"
     OS="$(uname -s)"
@@ -40,29 +40,27 @@ start_process() {
     else
         $cmd > "$log_file" 2>&1 &
     fi
-    echo $! > "$pid_file"
-    echo "[INFO] PID $! recorded in $pid_file"
 }
 
 # 启动各个进程
 cd $BASE_DIR/parse
-start_process "wparse daemon --stat 2 -p" "$LOG_DIR/wparse-info.log" "$PID_DIR/wparse.pid"
+start_process "wparse daemon --stat 2 -p" "$LOG_DIR/wparse-info.log"
 sleep 2
 
-cd $BASE_DIR/sender/json-nginx
-start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" "$LOG_DIR/jnginx-kafka.log" "$PID_DIR/jnginx-kafka.pid"
-start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" "$LOG_DIR/jnginx-tcp.log" "$PID_DIR/jnginx-tcp.pid"
-start_process "wpgen sample -c wpgen-syslog.toml --stat 2 -p" "$LOG_DIR/jnginx-syslog.log" "$PID_DIR/jnginx-syslog.pid"
+# cd $BASE_DIR/sender/json-nginx
+start_process "wpgen sample -c jnginx-kafka.toml --wpl ./models/wpl/nginx/jnginx --stat 2 -p" "$LOG_DIR/jnginx-kafka.log"
+start_process "wpgen sample -c jnginx-tcp.toml --wpl ./models/wpl/nginx/jnginx --stat 2 -p" "$LOG_DIR/jnginx-tcp.log"
+start_process "wpgen sample -c jnginx-syslog.toml --wpl ./models/wpl/nginx/jnginx --stat 2 -p" "$LOG_DIR/jnginx-syslog.log"
 
-cd $BASE_DIR/sender/nginx
-start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" "$LOG_DIR/nginx-kafka.log" "$PID_DIR/nginx-kafka.pid"
-start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" "$LOG_DIR/nginx-tcp.log" "$PID_DIR/nginx-tcp.pid"
-start_process "wpgen sample -c wpgen-syslog.toml --stat 2 -p" "$LOG_DIR/nginx-syslog.log" "$PID_DIR/nginx-syslog.pid"
+# cd $BASE_DIR/sender/nginx
+start_process "wpgen sample -c nginx-kafka.toml --wpl ./models/wpl/nginx/nginx --stat 2 -p" "$LOG_DIR/nginx-kafka.log"
+start_process "wpgen sample -c nginx-tcp.toml --wpl ./models/wpl/nginx/nginx --stat 2 -p" "$LOG_DIR/nginx-tcp.log"
+start_process "wpgen sample -c nginx-syslog.toml --wpl ./models/wpl/nginx/nginx --stat 2 -p" "$LOG_DIR/nginx-syslog.log"
 
-cd $BASE_DIR/sender/sys
-start_process "wpgen sample -c wpgen-kafka.toml --stat 2 -p" "$LOG_DIR/sys-kafka.log" "$PID_DIR/sys-kafka.pid"
-start_process "wpgen sample -c wpgen-tcp.toml --stat 2 -p" "$LOG_DIR/sys-tcp.log" "$PID_DIR/sys-tcp.pid"
-start_process "wpgen sample -c wpgen-syslog.toml --stat 2 -p" "$LOG_DIR/sys-syslog.log" "$PID_DIR/sys-syslog.pid"
+# cd $BASE_DIR/sender/sys
+start_process "wpgen sample -c sys-kafka.toml --wpl ./models/wpl/sys --stat 2 -p" "$LOG_DIR/sys-kafka.log"
+start_process "wpgen sample -c sys-tcp.toml --wpl ./models/wpl/sys --stat 2 -p" "$LOG_DIR/sys-tcp.log" 
+start_process "wpgen sample -c sys-syslog.toml --wpl ./models/wpl/sys --stat 2 -p" "$LOG_DIR/sys-syslog.log" 
 
 echo "[INFO] All processes started. PIDs stored in $PID_DIR."
 

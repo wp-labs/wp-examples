@@ -38,3 +38,12 @@ DISTRIBUTED BY HASH(wp_event_id) BUCKETS 8
 PROPERTIES (
     "replication_num" = "1"
 );
+
+
+
+curl -u root: \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -X POST 'http://localhost:8030/api/query/internal/mysql' \
+    --data-binary '{
+      "stmt": "select count(*) from test_db.wp_nginx;"
+     }'
