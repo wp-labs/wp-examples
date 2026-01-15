@@ -1,0 +1,14 @@
+# TCP输入源
+[[sources]]
+enable =  true
+key = "tcp_nginx"
+connect = "tcp_src"
+params = { prefer_newline = true , port =19002, instances = 1}
+tags = ["src:tcp-nginx_sys"]
+
+# [[sources]]
+# key = "file_nginx"
+# enable = true
+# connect = "file_src"
+# tags = ["wpsrc_in_ip : 10.0.0.1"]
+# params = { base = "./data/in_dat", file = "gen.dat", encode = "text" }
