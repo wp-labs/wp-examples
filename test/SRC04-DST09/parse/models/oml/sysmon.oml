@@ -1,4 +1,0 @@
-name : sysmon
-rule : /sysmon/*
----
-* : auto = take() ;
