@@ -1,4 +1,5 @@
 # Summary
+
 - [Changelog](CHANGLOG.md)
 - [Beginner Guide](beginner_guide.md)
 - [getting_started](getting_started/README.md)
@@ -16,15 +17,6 @@
   - [wpl_missing](core/wpl_missing/README.md)
   - [wpl_pipe](core/wpl_pipe/README.md)
   - [wpl_success](core/wpl_success/README.md)
-
-- [extension connector](extensions/README.md)
-  - [doris 使用说明](extensions/doris/README.md)
-  - [Kafka](extensions/kafka/README.md)
-  - [Readme](extensions/practice/README.md)
-  - [MySql](extensions/tcp_mysql/README.md)
-  - [wp-extensions/tcp_victorialogs 使用说明](extensions/tcp_victorialogs/README.md)
-
-
 - [Benchmark 用例指南](benchmark/README.md)
   - [Linux性能测试报告](benchmark/report/report_linux.md)
   - [Mac 性能测试报告](benchmark/report/report_mac.md)
@@ -73,3 +65,10 @@
     - [tcp_blackhole 说明](benchmark/case_tcp/parse_to_blackhole/README.md)
     - [tcp_blackhole 说明](benchmark/case_tcp/trans_to_blackhole/README.md)
   - [wpgen_test 场景说明](benchmark/wpgen_test/README.md)
+- [extension connector](extensions/README.md)
+  - [doris](extensions/doris/README.md)
+  - [Kafka](extensions/kafka/README.md)
+  - [practice](extensions/practice/README.md)
+  - [MySql](extensions/tcp_mysql/README.md)
+  - [Victorialogs](extensions/tcp_victorialogs/README.md)
+  - [victoriametrics](extensions/victoriametrics/README.md)
