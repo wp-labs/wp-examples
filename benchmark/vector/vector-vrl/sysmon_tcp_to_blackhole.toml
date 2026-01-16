@@ -1,0 +1,24 @@
+[sources.syslog_source_1]
+type = "socket"
+address = "127.0.0.1:19001"
+mode = "tcp"
+max_length = 10485760
+
+[transforms.parser]
+type = "remap"
+inputs = ["syslog_source_1"]
+source = '''
+  parsed_msg = parse_regex!(.message, r'^[^{]*(?P<body>\{.*)$')
+  .|= parse_regex!(parsed_msg.body, r'(?s)\{"Id":(?P<id>[^,]+),"Version":(?P<Version>[^,]+),"Level":(?P<severity>[^,]+),"Task":(?P<Task>[^,]+),"Opcode":(?P<Opcode>[^,]+),"Keywords":(?P<keywords>[^,]+),"RecordId":(?P<RecordId>[^,]+),"ProviderName":"(?P<ProviderName>[^"]*)","ProviderId":"(?P<ProviderId>[^"]*)","LogName":"(?P<LogName>[^"]*)","ProcessId":(?P<process_id>[^,]+),"ThreadId":(?P<ThreadId>[^,]+),"MachineName":"(?P<MachineName>[^"]*)","TimeCreated":"(?P<TimeCreated>[^"]*)","ActivityId":(?:(?P<ActivityId>[^,]+)|null),"RelatedActivityId":(?P<RelatedActivityId>[^,]+),"Qualifiers":(?P<Qualifiers>[^,]+),"LevelDisplayName":"(?P<LevelDisplayName>[^"]*)","OpcodeDisplayName":"(?P<OpcodeDisplayName>[^"]*)","TaskDisplayName":"(?P<TaskDisplayName>[^"]*)","Description":\{"RuleName":"(?P<rule_name>[^"]*)","UtcTime":"(?P<occur_time>[^"]*)","ProcessGuid":"(?P<process_guid>[^"]*)","ProcessId":"(?P<ProcessId>[^"]*)","Image":"(?P<process_path>[^"]*)","FileVersion":"(?P<file_version>[^"]*)","Description":"(?P<process_desc>[^"]*)","Product":"(?P<product_name>[^"]*)","Company":"(?P<product_company>[^"]*)","OriginalFileName":"(?P<origin_file_name>[^"]*)","CommandLine":"(?P<cmd_line>[^"]*)","CurrentDirectory":"(?P<current_dir>[^"]*)","User":"(?P<user_name>[^"]*)","LogonGuid":"(?P<logon_guid>[^"]*)","LogonId":"(?P<logon_id>[^"]*)","TerminalSessionId":"(?P<terminal_session_id>[^"]*)","IntegrityLevel":"(?P<integrity_level>[^"]*)","Hashes":"(?P<Hashes>[^"]*)","ParentProcessGuid":"(?P<parent_process_guid>[^"]*)","ParentProcessId":"(?P<parent_process_id>[^"]*)","ParentImage":"(?P<parent_process_path>[^"]*)","ParentCommandLine":"(?P<parent_cmd_line>[^"]*)","ParentUser":"(?P<parent_process_user>[^"]*)"\},"DescriptionRawMessage":"(?P<DescriptionRawMessage>[^"]*)"\}$')
+  del(.RecordId)
+  del(.ActivityId)
+  del(.RelatedActivityId)
+  del(.Qualifiers)
+  del(.message)
+'''
+[sinks.file_out]
+type = "blackhole"
+inputs = ["parser"]
+
+[api]
+    enabled = true

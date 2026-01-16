@@ -3,7 +3,7 @@ version = "2.0"
 [sink_group]
 name = "all"
 #parallel = 2
-parallel = 8
+parallel = 12
 oml= ["/oml/*"]
 #tags = ["group:benchmark", "type:business"]
 
