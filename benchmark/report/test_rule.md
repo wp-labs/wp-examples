@@ -43,7 +43,7 @@ match_chars = match read(option:[wp_src_ip]) {
 ```
 
 ### Vector-VRL
-- **解析配置（VRL，来源：benchmark/vector/vector-vrl/nginx_file_to_blackhole.toml）**
+- **解析配置**
 
 ```bash
 source = '''
@@ -52,7 +52,7 @@ source = '''
 '''
 ```
 
-- **解析+转换配置（VRL，来源：benchmark/vector/vector-vrl_transform/nginx_file_to_blackhole.toml）**
+- **解析+转换配置**
 
 ```toml
 source = '''
@@ -74,7 +74,7 @@ if .status == 500 {
 ```
 
 ### Vector-Fixed
-- **解析配置（VRL，来源：benchmark/vector/vector-fixed/nginx_file_to_blackhole.toml）**
+- **解析配置**
 
 ```toml
 source = '''
@@ -83,7 +83,7 @@ source = '''
 '''
 ```
 
-- **解析+转换配置（VRL，来源：benchmark/vector/vector-fixed_transform/nginx_file_to_blackhole.toml）**
+- **解析+转换配置**
 
 ```toml
 source = '''
@@ -111,7 +111,7 @@ if .status == 500 {
 ```
 
 ### Logstash
-- **解析配置（来源：benchmark/logstash/logstash_parse/nginx_file_to_blackhole.conf）**
+- **解析配置**
 
 ```conf
 input {
@@ -138,7 +138,7 @@ output {
 }
 ```
 
-- **解析+转换配置（来源：benchmark/logstash/logstash_trans/nginx_file_to_blackhole.conf）**
+- **解析+转换配置**
 
 ```conf
 input {
@@ -221,7 +221,7 @@ if .status == 500 {
 ```
 
 ### Vector-Fixed
-- **解析配置（VRL，来源：benchmark/vector/vector-fixed/nginx_file_to_blackhole.toml）**
+- **解析配置**
 
 ```toml
 source = '''
@@ -230,7 +230,7 @@ source = '''
 '''
 ```
 
-- **解析+转换配置（VRL，来源：benchmark/vector/vector-fixed_transform/nginx_file_to_blackhole.toml）**
+- **解析+转换配置**
 
 ```toml
 source = '''
@@ -258,7 +258,7 @@ if .status == 500 {
 ```
 
 ### Logstash
-- **解析配置（来源：benchmark/logstash/logstash_parse/nginx_file_to_blackhole.conf）**
+- **解析配置**
 
 ```conf
 input {
@@ -285,7 +285,7 @@ output {
 }
 ```
 
-- **解析+转换配置（来源：benchmark/logstash/logstash_trans/nginx_file_to_blackhole.conf）**
+- **解析+转换配置**
 
 ```conf
 input {
@@ -546,7 +546,7 @@ if .elb_status_code == 200 {
 ```
 
 ### Vector-Fixed
-- **解析配置（VRL，来源：benchmark/vector/vector-fixed/aws_file_to_blackhole.toml）**
+- **解析配置**
 
 ```toml
 source = '''
@@ -555,7 +555,7 @@ del(.message)
 '''
 ```
 
-- **解析+转换配置（VRL，来源：benchmark/vector/vector-fixed_transform/aws_file_to_blackhole.toml）**
+- **解析+转换配置**
 
 ```toml
 source = '''
@@ -587,7 +587,7 @@ source = '''
 ```
 
 ### Logstash
-- **解析配置（来源：benchmark/logstash/logstash_parse/aws_file_to_blackhole.conf）**
+- **解析配置**
 
 ```conf
 input {
@@ -621,7 +621,7 @@ output {
 }
 ```
 
-- **解析+转换配置（来源：benchmark/logstash/logstash_trans/aws_file_to_blackhole.conf）**
+- **解析+转换配置**
 
 ```conf
 input {
@@ -957,7 +957,7 @@ if .severity == "4" {
 ```
 
 ### Vector-Fixed
-- **解析配置（VRL，来源：benchmark/vector/vector-fixed/sysmon_file_to_blackhole.toml）**
+- **解析配置**
 
 ```toml
 source = '''
@@ -1008,7 +1008,7 @@ source = '''
 '''
 ```
 
-- **解析+转换配置（VRL，来源：benchmark/vector/vector-fixed_transform/sysmon_file_to_blackhole.toml）**
+- **解析+转换配置**
 
 ```toml
 source = '''
@@ -1085,7 +1085,7 @@ if .severity == "4" {
 ```
 
 ### Logstash
-- **解析配置（来源：benchmark/logstash/logstash_parse/sysmon_file_to_blackhole.conf）**
+- **解析配置**
 
 ```conf
 input {
@@ -1174,7 +1174,7 @@ output {
 }
 ```
 
-- **解析+转换配置（来源：benchmark/logstash/logstash_trans/sysmon_file_to_blackhole.conf）**
+- **解析+转换配置**
 
 ```conf
 input {
@@ -1543,7 +1543,7 @@ if .type == "l" {
 ```
 
 ### Vector-Fixed
-- **解析配置（VRL，来源：benchmark/vector/vector-fixed/apt_file_to_blackhole.toml）**
+- **解析配置**
 
 ```toml
 source = '''
@@ -1552,7 +1552,7 @@ source = '''
 '''
 ```
 
-- **解析+转换配置（VRL，来源：benchmark/vector/vector-fixed_transform/apt_file_to_blackhole.toml）**
+- **解析+转换配置**
 
 ```toml
 source = '''
@@ -1587,7 +1587,7 @@ if .type == "l" {
 ```
 
 ### Logstash
-- **解析配置（来源：benchmark/logstash/logstash_parse/apt_file_to_blackhole.conf）**
+- **解析配置**
 
 ```conf
 input {
@@ -1655,7 +1655,7 @@ output {
 }
 ```
 
-- **解析+转换配置（来源：benchmark/logstash/logstash_trans/apt_file_to_blackhole.conf）**
+- **解析+转换配置**
 
 ```conf
 input {
