@@ -1,0 +1,22 @@
+[sources.syslog_source_1]
+type = "socket"
+address = "127.0.0.1:19001"
+mode = "tcp"
+max_length = 10485760
+receive_buffer_bytes = 1048576
+max_connections = 3
+
+[transforms.parser]
+type = "remap"
+inputs = ["syslog_source_1"]
+source = '''
+  . |= parse_regex!(.message, r'^(?P<sip>\S+) \S+ \S+ \[(?P<timestamp>[^\]]+)\] "(?P<http_request>[^"]*)" (?P<status>\d{3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<http_agent>[^"]*)"')
+  del(.message)
+'''
+
+[sinks.file_out]
+type = "blackhole"
+inputs = ["parser"]
+
+[api]
+    enabled = true
