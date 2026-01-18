@@ -39,6 +39,4 @@ PROPERTIES (
     "replication_num" = "1"
 );
 
-
-select COUNT(*) from test_db.wp_nginx;
-select COUNT(*) from test_db.wp_nginx;
+select count(*) from test_db.wp_nginx;
