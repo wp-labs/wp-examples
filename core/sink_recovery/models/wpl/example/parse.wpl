@@ -1,6 +1,6 @@
 package /example {
 
    rule nginx {
-        (ip:sip,_^2,time/clf<[,]>,http/request",http/status,digit,chars",http/agent",_")
+        (ip:sip,2*_,time/clf<[,]>,http/request",http/status,digit,chars",http/agent",_")
     }
 }
