@@ -22,13 +22,13 @@ connect = "kafka_src"
 tags = ["src:kafka","topic:wp.input.event"]
 params= { topic = "wp.input.event" ,brokers = "localhost:9092" }
 
-# kafka输入源
-[[sources]]
-enable = true
-key = "kafka-jnginx"
-connect = "kafka_src"
-tags = ["src:kafka","topic:wp.input.event"]
-params= { topic = "wp.input.event" ,brokers = "localhost:9093" }
+# # kafka输入源
+# [[sources]]
+# enable = true
+# key = "kafka-jnginx"
+# connect = "kafka_src"
+# tags = ["src:kafka","topic:wp.input.event"]
+# params= { topic = "wp.input.event" ,brokers = "localhost:9093" }
 
 [[sources]]
 enable =  true

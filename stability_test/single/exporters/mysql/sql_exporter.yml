@@ -1,0 +1,12 @@
+global:
+  scrape_timeout_offset: 500ms
+  min_interval: 0s
+  max_connections: 2
+  max_idle_connections: 1
+
+target:
+  data_source_name: "mysql://exporter:exporter_pass@tcp(mysql-1:3306)/"
+  collectors: [mysql_table_stats]
+
+collector_files:
+  - "/config/mysql_table_stats.collector.yml"

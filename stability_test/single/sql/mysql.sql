@@ -40,5 +40,17 @@ CREATE TABLE wp_jnginx (
 
 delete from wp_nginx;
 
-select count(*) from wp_nginx;
-select * from wp_jnginx;
+select * from test_db.wp_jnginx;
+select count(*) from wp_jnginx;
+
+SELECT
+    'test_db' AS `schema`,
+    'wp_jnginx' AS table_name,
+    COUNT(*) AS row_count
+FROM test_db.wp_jnginx
+UNION ALL
+SELECT
+    'test_db' AS `schema`,
+    'wp_nginx' AS table_name,
+    COUNT(*) AS row_count
+FROM test_db.wp_nginx;

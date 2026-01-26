@@ -2,7 +2,7 @@ collector_name: doris_table_stats
 
 metrics:
   - metric_name: doris_table_data_bytes
-    type: gauge
+    type: counter
     help: "Data length reported by information_schema.tables in Apache Doris."
     key_labels: [schema, table_name]
     values: [data_bytes]
@@ -15,14 +15,19 @@ metrics:
       WHERE table_schema NOT IN ('information_schema', 'mysql', '__internal_schema');
 
   - metric_name: doris_table_row_count
-    type: gauge
+    type: counter
     help: "Estimated row count reported by information_schema.tables in Apache Doris."
     key_labels: [schema, table_name]
     values: [row_count]
     query: |
       SELECT
-        table_schema AS schema,
-        table_name AS table_name,
-        TABLE_ROWS AS row_count
-      FROM information_schema.tables
-      WHERE table_schema NOT IN ('information_schema', 'mysql', '__internal_schema');
+        'test_db' AS `schema`,
+        'wp_jnginx' AS table_name,
+        COUNT(*) AS row_count
+      FROM test_db.wp_jnginx
+      UNION ALL
+      SELECT
+        'test_db' AS `schema`,
+        'wp_nginx' AS table_name,
+        COUNT(*) AS row_count
+      FROM test_db.wp_nginx;

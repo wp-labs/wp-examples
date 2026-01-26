@@ -22,9 +22,9 @@ scrape_configs:
   - job_name: "mysql"
     metrics_path: /metrics
     static_configs:
-      - targets: ["mysqld-exporter-1:9104"]
+      - targets: ["mysql-sql-exporter-1:9399"]
         labels:
-          instance: "mysqld-exporter-1"
+          instance: "mysql-sql-exporter-1"
 
   - job_name: "doris"
     metrics_path: /metrics
@@ -32,12 +32,22 @@ scrape_configs:
       - targets: ["host.docker.internal:19399"]
         labels:
           instance: "doris-sql-exporter-1"
-
+  # http://localhost:19469/probe?script=victorialogs_count&params=key,logs_url&key=src&logs_url=http://43.135.36.218:9428/select/logsql/query
   - job_name: "victorialogs-script"
     metrics_path: /probe
     params:
       script: ["victorialogs_count"]
-      key: ["src"]
+      key: ["log_type"]
+      logs_url: ["http://victoria-logs-1:9428/select/logsql/query"]
+    static_configs:
+      - targets: ["vlogs-script-exporter-1:9469"]
+        labels:
+          instance: "vlogs-script-exporter-1"
+    scrape_timeout: 15s
+  - job_name: "file-script"
+    metrics_path: /probe
+    params:
+      script: ["logfile_counts"]
     static_configs:
       - targets: ["vlogs-script-exporter-1:9469"]
         labels:

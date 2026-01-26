@@ -11,7 +11,7 @@ services:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_LISTENERS: PLAINTEXT_INTERNAL://0.0.0.0:9092,PLAINTEXT_EXTERNAL://0.0.0.0:19092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_INTERNAL://kafka:9092,PLAINTEXT_EXTERNAL://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_INTERNAL://kafka-1:9092,PLAINTEXT_EXTERNAL://localhost:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT,PLAINTEXT_EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
@@ -89,8 +89,8 @@ services:
     ports:
       - "9428:9428"
     # 数据存储目录,按需开启
-    volumes:
-      - vlogs-1:/storage
+    # volumes:
+    #   - vlogs-1:/storage
     command:
       - --envflag.enable
       - --envflag.prefix=VM_
@@ -122,19 +122,17 @@ services:
     volumes:
       - ./sql/mysql.sql:/docker-entrypoint-initdb.d/init.sql
 
-  mysqld-exporter-1:
-    image: prom/mysqld-exporter:v0.18.0
-    container_name: mysqld-exporter-1
+  mysql-sql-exporter-1:
+    image: githubfree/sql_exporter:latest
+    container_name: mysql-sql-exporter-1
     depends_on:
       - mysql-1
-    command:
-      - "--config.my-cnf=/etc/.mysqld_exporter.cnf"
-      - "--collect.info_schema.tables"
-      - "--collect.perf_schema.eventsstatements"
+    command: ["--config.file=/config/sql_exporter.yml"]
     ports:
-      - "19104:9104"
+      - "19398:9399"
     volumes:
-      - ./exporters/mysql/.mysqld_exporter.cnf:/etc/.mysqld_exporter.cnf:ro
+      - ./exporters/mysql/sql_exporter.yml:/config/sql_exporter.yml:ro
+      - ./exporters/mysql/mysql_table_stats.collector.yml:/config/mysql_table_stats.collector.yml:ro
 
   wp-monitor:
     container_name: wp-monitor
@@ -210,6 +208,7 @@ services:
       - ./exporters/doris/doris_table_stats.collector.yml:/config/doris_table_stats.collector.yml:ro
     networks:
       custom_network_1:
+        ipv4_address: 172.30.80.50
 
   vlogs-script-exporter-1:
     image: ghcr.io/ricoberger/script_exporter:latest
@@ -220,6 +219,7 @@ services:
     volumes:
       - ./exporters/vlogs/scripts.yml:/etc/script-exporter/scripts.yml:ro
       - ./exporters/vlogs:/scripts:ro
+      - ./parse/data:/data:ro
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:9469/metrics"]
       interval: 30s
@@ -235,7 +235,7 @@ networks:
         - subnet: 172.30.80.0/24
 
 volumes:
-  vlogs-1:
-    driver: local
+  # vlogs-1:
+  #   driver: local
   metrics_data:
     driver: local
