@@ -1,6 +1,6 @@
 # Rule Definitions
 
-本文档汇总了测试中使用的解析与解析+转换规则，按日志类型与引擎归档，并用 Markdown 对“解析配置 / 解析+转换配置”作清晰标注。
+本文档汇总了测试中使用的解析与解析+转换规则，按日志类型与引擎归档。
 
 ## 1. Nginx Access Log (239B)
 
@@ -10,7 +10,7 @@
 ```bash
 package /nginx/ {
    rule nginx {
-        (ip:sip,_^2,chars:timestamp<[,]>,http/request:http_request",chars:status,chars:size,chars:referer",http/agent:http_agent",_")
+        (ip:sip,2*_,chars:timestamp<[,]>,http/request:http_request",chars:status,chars:size,chars:referer",http/agent:http_agent",_")
    }
 }
 ```
@@ -20,7 +20,7 @@ package /nginx/ {
 ```bash
 package /nginx/ {
    rule nginx {
-        (ip:sip,_^2,chars:timestamp<[,]>,http/request:http_request",chars:status,chars:size,chars:referer",http/agent:http_agent",_")
+        (ip:sip,2*_,chars:timestamp<[,]>,http/request:http_request",chars:status,chars:size,chars:referer",http/agent:http_agent",_")
    }
 }
 ```
@@ -42,21 +42,156 @@ match_chars = match read(option:[wp_src_ip]) {
 * : auto = read();
 ```
 
-### Vector
-- **解析配置（VRL）**
+### Vector-VRL
+- **解析配置**
 
 ```bash
 source = '''
-  parsed = parse_regex!(.message, r'^(?P<client>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] "(?P<request>[^"]*)" (?P<status>\d{3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<agent>[^"]*)" "(?P<extra>[^"]*)"')
-  .sip = parsed.client
-  .http_request = parsed.request
-  .status = parsed.status
-  .size = parsed.size
-  .referer = parsed.referer
-  .http_agent = parsed.agent
-  .timestamp = parsed.time
+  . |= parse_regex!(.message, r'^(?P<sip>\S+) \S+ \S+ \[(?P<timestamp>[^\]]+)\] "(?P<http_request>[^"]*)" (?P<status>\d{3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<http_agent>[^"]*)"')
   del(.message)
 '''
+```
+
+- **解析+转换配置**
+
+```toml
+source = '''
+  . |= parse_regex!(.message, r'^(?P<sip>\S+) \S+ \S+ \[(?P<timestamp>[^\]]+)\] "(?P<http_request>[^"]*)" (?P<status>\d{3}) (?P<size>\d+) "(?P<referer>[^"]*)" "(?P<http_agent>[^"]*)"')
+  del(.message)
+  .status = to_int!(.status)
+  .size = to_int!(.size)
+if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+} else if .host != "127.0.0.1" {
+    .match_chars = "attack_ip"
+}  
+if .status == 500 {
+    .str_status = "Internal Server Error"
+} else if .status == 404 {
+    .str_status = "Not Found"
+}  
+'''
+```
+
+### Vector-Fixed
+- **解析配置**
+
+```toml
+source = '''
+  . |= parse_nginx_log!(.message, format: "combined")
+  del(.message)
+'''
+```
+
+- **解析+转换配置**
+
+```toml
+source = '''
+  . |= parse_nginx_log!(.message, format: "combined")
+  .http_agent = .agent
+  del(.agent)
+  .http_request = .request
+  del(.request)
+  .sip = .client
+  del(.client)
+  .status = to_int!(.status)
+  .size = to_int!(.size)
+if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+} else if .host != "127.0.0.1" {
+    .match_chars = "attack_ip"
+}  
+if .status == 500 {
+    .str_status = "Internal Server Error"
+} else if .status == 404 {
+    .str_status = "Not Found"
+}  
+  del(.message)
+'''
+```
+
+### Logstash
+- **解析配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/simple_nginx_239B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+
+filter {
+  dissect {
+  mapping => {
+    "message" => '%{sip} - - [%{timestamp}] "%{http_request}" %{status} %{size} "%{referer}" "%{http_agent}"'
+  }
+}
+  mutate {
+  remove_field => ["message","@timestamp","@version","event","[event][original]"]
+}
+}
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
+```
+
+- **解析+转换配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/simple_nginx_239B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+    add_field => {
+      "src_ip"      => "127.0.0.1"
+    }
+  }
+}
+
+filter {
+  # 1) 解析：对齐你当前的 nginx dissect 字段
+  dissect {
+    mapping => {
+      "message" => '%{sip} - - [%{timestamp}] "%{http_request}" %{status} %{size} "%{referer}" "%{http_agent}"'
+    }
+  }
+
+  # 2) 类型转换：对齐 Vector 的 to_int
+  mutate {
+    convert => {
+      "status" => "integer"
+      "size"   => "integer"
+    }
+  }
+
+  # 3) 派生字段：对齐 Vector 示例里的 match_chars / str_status
+  # match_chars：根据 tcp 对端 host 判断
+  if [src_ip] == "127.0.0.1" {
+    mutate { add_field => { "match_chars" => "localhost" } }
+  } else {
+    mutate { add_field => { "match_chars" => "attack_ip" } }
+  }
+
+  # str_status：按 status 映射（你 Vector 里出现了 500 / 404，我补了常见的 200）
+  if [status] == 200 {
+    mutate { add_field => { "str_status" => "OK" } }
+  } else if [status] == 500 {
+    mutate { add_field => { "str_status" => "Internal Server Error" } }
+  } 
+
+  # 4) 清理无关字段：保持你的压测输出干净
+  mutate {
+    remove_field => ["message", "@timestamp", "@version", "event", "[event][original]"]
+  }
+}
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
 ```
 
 - **解析+转换配置（VRL）**
@@ -83,6 +218,127 @@ if .status == 500 {
     .str_status = "Not Found"
 }  
 '''
+```
+
+### Vector-Fixed
+- **解析配置**
+
+```toml
+source = '''
+  . |= parse_nginx_log!(.message, format: "combined")
+  del(.message)
+'''
+```
+
+- **解析+转换配置**
+
+```toml
+source = '''
+  . |= parse_nginx_log!(.message, format: "combined")
+  .http_agent = .agent
+  del(.agent)
+  .http_request = .request
+  del(.request)
+  .sip = .client
+  del(.client)
+  .status = to_int!(.status)
+  .size = to_int!(.size)
+if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+} else if .host != "127.0.0.1" {
+    .match_chars = "attack_ip"
+}  
+if .status == 500 {
+    .str_status = "Internal Server Error"
+} else if .status == 404 {
+    .str_status = "Not Found"
+}  
+  del(.message)
+'''
+```
+
+### Logstash
+- **解析配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/simple_nginx_239B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+
+filter {
+  dissect {
+  mapping => {
+    "message" => '%{sip} - - [%{timestamp}] "%{http_request}" %{status} %{size} "%{referer}" "%{http_agent}"'
+  }
+}
+  mutate {
+  remove_field => ["message","@timestamp","@version","event","[event][original]"]
+}
+}
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
+```
+
+- **解析+转换配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/simple_nginx_239B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+    add_field => {
+      "src_ip"      => "127.0.0.1"
+    }
+  }
+}
+
+filter {
+  # 1) 解析：对齐你当前的 nginx dissect 字段
+  dissect {
+    mapping => {
+      "message" => '%{sip} - - [%{timestamp}] "%{http_request}" %{status} %{size} "%{referer}" "%{http_agent}"'
+    }
+  }
+
+  # 2) 类型转换：对齐 Vector 的 to_int
+  mutate {
+    convert => {
+      "status" => "integer"
+      "size"   => "integer"
+    }
+  }
+
+  # 3) 派生字段：对齐 Vector 示例里的 match_chars / str_status
+  # match_chars：根据 tcp 对端 host 判断
+  if [src_ip] == "127.0.0.1" {
+    mutate { add_field => { "match_chars" => "localhost" } }
+  } else {
+    mutate { add_field => { "match_chars" => "attack_ip" } }
+  }
+
+  # str_status：按 status 映射（你 Vector 里出现了 500 / 404，我补了常见的 200）
+  if [status] == 200 {
+    mutate { add_field => { "str_status" => "OK" } }
+  } else if [status] == 500 {
+    mutate { add_field => { "str_status" => "Internal Server Error" } }
+  } 
+
+  # 4) 清理无关字段：保持你的压测输出干净
+  mutate {
+    remove_field => ["message", "@timestamp", "@version", "event", "[event][original]"]
+  }
+}
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
 ```
 
 ## 2. AWS ELB Log (411B)
@@ -192,7 +448,7 @@ str_elb_status = match read(option:[elb_status_code]) {
 * : auto = read();
 ```
 
-### Vector
+### Vector-VRL
 - **解析配置（VRL）**
 
 ```bash
@@ -287,6 +543,174 @@ if .elb_status_code == 200 {
     "ssl_protocol": .ssl_protocol,
 }
 '''
+```
+
+### Vector-Fixed
+- **解析配置**
+
+```toml
+source = '''
+. |= parse_aws_alb_log!(.message)
+del(.message)
+'''
+```
+
+- **解析+转换配置**
+
+```toml
+source = '''
+  . |= parse_aws_alb_log!(.message)
+  del(.message)
+  .symbol = .type
+  del(.type)
+  .elb_status_code    = to_int!(.elb_status_code)
+  .target_status_code = to_int!(.target_status_code)
+  .sent_bytes         = to_int!(.sent_bytes)
+
+  if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+  } else {
+    .match_chars = "attack_ip"
+  }
+
+  if .elb_status_code == 200 {
+    .str_elb_status = "ok"
+  } else if .elb_status_code == 404 {
+    .str_elb_status = "error"
+  }
+
+  .extends = {
+    "ssl_cipher": .ssl_cipher,
+    "ssl_protocol": .ssl_protocol,
+  }
+'''
+```
+
+### Logstash
+- **解析配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/medium_aws_411B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+
+filter {
+  dissect {
+    mapping => {
+      "message" => '%{symbol} %{timestamp} %{elb} %{client_host} %{target_host} %{request_processing_time} %{target_processing_time} %{response_processing_time} %{elb_status_code} %{target_status_code} %{received_bytes} %{sent_bytes} "%{raw_request}" "%{user_agent}" "%{ssl_cipher}" "%{ssl_protocol}" %{target_group_arn} "%{trace_id}" "%{domain_name}" "%{chosen_cert_arn}" %{matched_rule_priority} %{request_creation_time} "%{actions_executed}" "%{redirect_url}" "%{error_reason}" "%{target_port_list}" "%{target_status_code_list}" "%{classification}" "%{classification_reason}" %{traceability_id}'
+    }
+  }
+
+  dissect {
+    mapping => {
+      "raw_request" => "%{request_method} %{request_url} %{request_protocol}"
+    }
+  }
+
+  mutate {
+  remove_field => ["message","@timestamp","@version","event","[event][original]","raw_request"]
+}
+}
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
+```
+
+- **解析+转换配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/medium_aws_411B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+    add_field => {
+      "src_ip"      => "127.0.0.1"
+    }
+  }
+}
+
+filter {
+  #
+  # 1) 解析：AWS ALB 全字段 dissect（字段名对齐你现有命名）
+  #
+   dissect {
+    mapping => {
+      "message" => '%{symbol} %{timestamp} %{elb} %{client_host} %{target_host} %{request_processing_time} %{target_processing_time} %{response_processing_time} %{elb_status_code} %{target_status_code} %{received_bytes} %{sent_bytes} "%{raw_request}" "%{user_agent}" "%{ssl_cipher}" "%{ssl_protocol}" %{target_group_arn} "%{trace_id}" "%{domain_name}" "%{chosen_cert_arn}" %{matched_rule_priority} %{request_creation_time} "%{actions_executed}" "%{redirect_url}" "%{error_reason}" "%{target_port_list}" "%{target_status_code_list}" "%{classification}" "%{classification_reason}" %{traceability_id}'
+    }
+  }
+
+  #
+  # 2) 解析 raw_request -> request_method / request_url / request_protocol（你原 conf 里就有这一步）
+  #
+  dissect {
+    mapping => {
+      "raw_request" => "%{request_method} %{request_url} %{request_protocol}"
+    }
+    tag_on_failure => ["aws_raw_request_dissect_failure"]
+  }
+
+  #
+  # 3) 转换：类型对齐 Vector to_int/to_float 思路
+  #
+    mutate {
+    convert => {
+      "client_port"              => "integer"
+      "target_port"              => "integer"
+
+      "request_processing_time"  => "float"
+      "target_processing_time"   => "float"
+      "response_processing_time" => "float"
+
+      "elb_status_code"          => "integer"
+      "target_status_code"       => "integer"
+
+      "received_bytes"           => "integer"
+      "sent_bytes"               => "integer"
+
+      "matched_rule_priority"    => "integer"
+    }
+  }
+  mutate {
+    add_field => {
+      "[extends][ssl_cipher]"   => "%{ssl_cipher}"
+      "[extends][ssl_protocol]" => "%{ssl_protocol}"
+    }
+  }
+
+  # 2) match_chars：按你“显式注入字段”的手段来判断（推荐用 src_ip）
+  # 你如果已经在 input 里 add_field 了 src_ip，这里就能稳定命中 localhost
+  if [src_ip] == "127.0.0.1" {
+    mutate { add_field => { "match_chars" => "localhost" } }
+  } else {
+    mutate { add_field => { "match_chars" => "attack_ip" } }
+  }
+
+  # 3) str_elb_status：示例映射（按你 Vector 里类似逻辑）
+  if [elb_status_code] == 200 {
+    mutate { add_field => { "str_elb_status" => "ok" } }
+  } else if [elb_status_code] == 404 {
+    mutate { add_field => { "str_elb_status" => "not_found" } }
+  } else {
+    mutate { add_field => { "str_elb_status" => "error" } }
+  }
+
+  #
+  # 6) 清理：保持输出干净，对齐 benchmark 输出
+  #
+  mutate {
+    remove_field => ["message","raw_request","@timestamp","@version","event","[event][original]"]
+  }
+}
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
 ```
 
 ## 3. Sysmon Log (1K, JSON)
@@ -409,7 +833,7 @@ num_range = match read(option:[Id]) {
 * : auto = read();
 ```
 
-### Vector
+### Vector-VRL
 - **解析配置（VRL）**
 
 ```bash
@@ -532,6 +956,375 @@ if .severity == "4" {
 '''
 ```
 
+### Vector-Fixed
+- **解析配置**
+
+```toml
+source = '''
+  json_str = slice!(.message, start: 57)
+  parsed = parse_json!(json_str, max_depth: 2)
+  desc = parsed.Description
+  .cmd_line            = desc.CommandLine
+  .product_company     = desc.Company
+  .process_id          = parsed.ProcessId
+  .Opcode              = parsed.Opcode
+  .ProcessId           = parsed.ProcessId
+  .Task                = parsed.Task
+  .ThreadId            = parsed.ThreadId
+  .Version             = parsed.Version
+  .current_dir         = desc.CurrentDirectory
+  .process_desc        = desc.Description
+  .file_version        = desc.FileVersion
+  .Hashes              = desc.Hashes
+  .process_path        = desc.Image
+  .integrity_level     = desc.IntegrityLevel
+  .logon_guid          = desc.LogonGuid
+  .logon_id            = desc.LogonId
+  .origin_file_name    = desc.OriginalFileName
+  .parent_cmd_line     = desc.ParentCommandLine
+  .parent_process_path = desc.ParentImage
+  .parent_process_guid = desc.ParentProcessGuid
+  .parent_process_id   = desc.ParentProcessId
+  .parent_process_user = desc.ParentUser
+  .process_guid        = desc.ProcessGuid
+  .product_name        = desc.Product
+  .rule_name           = desc.RuleName
+  .terminal_session_id = desc.TerminalSessionId
+  .user_name           = desc.User
+  .occur_time          = desc.UtcTime
+  .DescriptionRawMessage = parsed.DescriptionRawMessage
+  .id                   = parsed.Id
+  .keywords             = parsed.Keywords
+  .severity             = parsed.Level
+  .LevelDisplayName     = parsed.LevelDisplayName
+  .LogName              = parsed.LogName
+  .MachineName          = parsed.MachineName
+  .OpcodeDisplayName    = parsed.OpcodeDisplayName
+  .ProviderId           = parsed.ProviderId
+  .ProviderName         = parsed.ProviderName
+  .TaskDisplayName      = parsed.TaskDisplayName
+  .TimeCreated          = parsed.TimeCreated
+  del(.message)
+'''
+```
+
+- **解析+转换配置**
+
+```toml
+source = '''
+  json_str = slice!(.message, start: 57)
+  parsed = parse_json!(json_str, max_depth: 2)
+  desc = parsed.Description
+  .cmd_line            = desc.CommandLine
+  .product_company     = desc.Company
+  .process_id          = parsed.ProcessId
+  .Opcode              = parsed.Opcode
+  .ProcessId           = parsed.ProcessId
+  .Task                = parsed.Task
+  .ThreadId            = parsed.ThreadId
+  .Version             = parsed.Version
+  .current_dir         = desc.CurrentDirectory
+  .process_desc        = desc.Description
+  .file_version        = desc.FileVersion
+  .Hashes              = desc.Hashes
+  .process_path        = desc.Image
+  .integrity_level     = desc.IntegrityLevel
+  .logon_guid          = desc.LogonGuid
+  .logon_id            = desc.LogonId
+  .origin_file_name    = desc.OriginalFileName
+  .parent_cmd_line     = desc.ParentCommandLine
+  .parent_process_path = desc.ParentImage
+  .parent_process_guid = desc.ParentProcessGuid
+  .parent_process_id   = desc.ParentProcessId
+  .parent_process_user = desc.ParentUser
+  .process_guid        = desc.ProcessGuid
+  .product_name        = desc.Product
+  .rule_name           = desc.RuleName
+  .terminal_session_id = desc.TerminalSessionId
+  .user_name           = desc.User
+  .occur_time          = desc.UtcTime
+  .DescriptionRawMessage = parsed.DescriptionRawMessage
+  .id                   = parsed.Id
+  .keywords             = parsed.Keywords
+  .severity             = parsed.Level
+  .LevelDisplayName     = parsed.LevelDisplayName
+  .LogName              = parsed.LogName
+  .MachineName          = parsed.MachineName
+  .OpcodeDisplayName    = parsed.OpcodeDisplayName
+  .ProviderId           = parsed.ProviderId
+  .ProviderName         = parsed.ProviderName
+  .TaskDisplayName      = parsed.TaskDisplayName
+  .TimeCreated          = parsed.TimeCreated
+  del(.message)
+  .LogonId = to_int!(.logon_id)
+  .Id = to_int!(.id)
+if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+} else if .host != "127.0.0.1" {
+    .match_chars = "attack_ip"
+}   
+if .severity == "4" {
+    .enrich_level = "severity"
+} else if .Level == "3" {
+    .enrich_level = "normal"
+}
+  .extends = {
+    "OriginalFileName": .origin_file_name,
+    "ParentCommandLine": .parent_cmd_line,
+}
+  .extends_dir = {
+    "ParentProcessPath": .parent_process_path,
+    "Process_path": .process_path,
+}
+  .num_range = if .Id >= 0 && .Id <= 1000 {
+    .Id
+  } else {
+    0
+  }
+'''
+```
+
+### Logstash
+- **解析配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/complex_sysmon_986B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+
+filter {
+  dissect {
+    mapping => {
+      "message" => "<%{?pri}>%{?syslog_month} %{?syslog_day} %{?syslog_time} %{?forwarder} %{?prefix_provider}:%{json_body}"
+    }
+  }
+
+  json {
+    source => "json_body"
+  }
+
+  mutate {
+    add_field => { "process_id" => "%{ProcessId}" }
+
+    rename => {
+      "[Description][RuleName]"        => "rule_name"
+      "[Description][UtcTime]"         => "occur_time"
+      "[Description][ProcessGuid]"     => "process_guid"
+      "[Description][ProcessId]"       => "ProcessId"
+      "[Description][Image]"           => "process_path"
+      "[Description][FileVersion]"     => "file_version"
+      "[Description][Description]"     => "process_desc"
+      "[Description][Product]"         => "product_name"
+      "[Description][Company]"         => "product_company"
+      "[Description][OriginalFileName]"=> "origin_file_name"
+      "[Description][CommandLine]"     => "cmd_line"
+      "[Description][CurrentDirectory]"=> "current_dir"
+      "[Description][User]"            => "user_name"
+      "[Description][LogonGuid]"       => "logon_guid"
+      "[Description][LogonId]"          => "logon_id"
+      "[Description][TerminalSessionId]"=> "terminal_session_id"
+      "[Description][IntegrityLevel]"  => "integrity_level"
+      "[Description][Hashes]"          => "Hashes"
+      "[Description][ParentProcessGuid]"=> "parent_process_guid"
+      "[Description][ParentProcessId]" => "parent_process_id"
+      "[Description][ParentImage]"     => "parent_process_path"
+      "[Description][ParentCommandLine]"=> "parent_cmd_line"
+      "[Description][ParentUser]"      => "parent_process_user"
+
+      "Id"        => "id"
+      "Level"     => "severity"
+      "Keywords"  => "keywords"
+    }
+  }
+
+  mutate {
+    convert => {
+      "id"        => "string"
+      "severity"  => "string"
+      "keywords"  => "string"
+
+      "Opcode"    => "string"
+      "Task"      => "string"
+      "ThreadId"  => "string"
+      "Version"   => "string"
+      "ProcessId" => "string"
+    }
+  }
+
+mutate {
+  remove_field => [
+    "Description",
+    "RecordId",
+    "ActivityId",
+    "RelatedActivityId",
+    "Qualifiers",
+    "pri","syslog_month","syslog_day","syslog_time",
+    "forwarder","prefix_provider","json_body","message",
+    "@timestamp","@version","event","[event][original]"
+  ]
+}
+}
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
+```
+
+- **解析+转换配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/complex_sysmon_986B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+    add_field => {
+      "src_ip"      => "127.0.0.1"
+    }
+  }
+}
+
+filter {
+  # =========================
+  # 解析段：完全沿用你现有 sysmon_syslog_to_file.conf 的写法（不改动）
+  # =========================
+  dissect {
+    mapping => {
+      "message" => "<%{?pri}>%{?syslog_month} %{?syslog_day} %{?syslog_time} %{?forwarder} %{?prefix_provider}:%{json_body}"
+    }
+    tag_on_failure => ["sysmon_prefix_dissect_failure"]
+  }
+
+  json {
+    source => "json_body"
+    tag_on_failure => ["sysmon_json_failure"]
+  }
+
+  mutate {
+    add_field => { "process_id" => "%{ProcessId}" }
+    rename => {
+      "[Description][RuleName]"         => "rule_name"
+      "[Description][UtcTime]"          => "occur_time"
+      "[Description][ProcessGuid]"      => "process_guid"
+      "[Description][ProcessId]"        => "ProcessId"
+      "[Description][Image]"            => "process_path"
+      "[Description][FileVersion]"      => "file_version"
+      "[Description][Description]"      => "process_desc"
+      "[Description][Product]"          => "product_name"
+      "[Description][Company]"          => "product_company"
+      "[Description][OriginalFileName]" => "origin_file_name"
+      "[Description][CommandLine]"      => "cmd_line"
+      "[Description][CurrentDirectory]" => "current_dir"
+      "[Description][User]"             => "user_name"
+      "[Description][LogonGuid]"        => "logon_guid"
+      "[Description][LogonId]"          => "logon_id"
+      "[Description][TerminalSessionId]"=> "terminal_session_id"
+      "[Description][IntegrityLevel]"   => "integrity_level"
+      "[Description][Hashes]"           => "Hashes"
+      "[Description][ParentProcessGuid]"=> "parent_process_guid"
+      "[Description][ParentProcessId]"  => "parent_process_id"
+      "[Description][ParentImage]"      => "parent_process_path"
+      "[Description][ParentCommandLine]"=> "parent_cmd_line"
+      "[Description][ParentUser]"       => "parent_process_user"
+      "Id"                              => "id"
+      "Level"                           => "severity"
+      "Keywords"                        => "keywords"
+    }
+  }
+
+  mutate {
+    convert => {
+      "id"        => "string"
+      "severity"  => "string"
+      "keywords"  => "string"
+      "Opcode"    => "string"
+      "Task"      => "string"
+      "ThreadId"  => "string"
+      "Version"   => "string"
+      "ProcessId" => "string"
+    }
+  }
+
+ # =========================
+# Sysmon Transform（对齐你 Vector 逻辑）
+# 插入位置：解析完成后 / remove_field 前
+# =========================
+
+# 0)（建议）保证数值比较可用：Id 转 integer（否则范围判断会变成字符串比较）
+mutate {
+  convert => {
+    "Id" => "integer"
+  }
+}
+
+# 1) match_chars：对齐 Vector 的 host 判断
+# Vector: if .host == "127.0.0.1" => localhost else attack_ip
+if [src_ip] == "127.0.0.1" {
+  mutate { add_field => { "match_chars" => "localhost" } }
+} else {
+  mutate { add_field => { "match_chars" => "attack_ip" } }
+}
+
+# 2) enrich_level：对齐 Vector 逻辑
+# Vector:
+# if .severity == "4" => "severity"
+# else if .Level == "3" => "normal"
+if [severity] == "4" or [Level] == "4" {
+  mutate { add_field => { "enrich_level" => "severity" } }
+} else if [Level] == "3" or [severity] == "3" {
+  mutate { add_field => { "enrich_level" => "normal" } }
+}
+
+# 3) extends：对齐 Vector 的聚合对象
+# .extends = { "OriginalFileName": .origin_file_name, "ParentCommandLine": .parent_cmd_line }
+mutate {
+  add_field => {
+    "[extends][OriginalFileName]"  => "%{origin_file_name}"
+    "[extends][ParentCommandLine]" => "%{parent_cmd_line}"
+  }
+}
+
+# 4) extends_dir：第二个聚合对象（对齐 Vector）
+# .extends_dir = { "ParentProcessPath": .parent_process_path, "Process_path": .process_path }
+mutate {
+  add_field => {
+    "[extends_dir][ParentProcessPath]" => "%{parent_process_path}"
+    "[extends_dir][Process_path]"      => "%{process_path}"
+  }
+}
+
+# 5) num_range：范围判断（对齐 Vector）
+# .num_range = if .Id >= 0 && .Id <= 1000 { .Id } else { 0 }
+if [Id] and [Id] >= 0 and [Id] <= 1000 {
+  mutate { add_field => { "num_range" => "%{Id}" } }
+} else {
+  mutate { add_field => { "num_range" => "0" } }
+}
+
+mutate { convert => { "num_range" => "integer" } }
+  mutate {
+    remove_field => [
+      "Description",
+      "RecordId",
+      "ActivityId",
+      "RelatedActivityId",
+      "Qualifiers",
+      "pri","syslog_month","syslog_day","syslog_time",
+      "forwarder","prefix_provider","json_body","message",
+      "@timestamp","@version","event","[event][original]"
+    ]
+  }
+}
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
+```
+
 ## 4. APT Threat Log (3K)
 
 ### WarpParse
@@ -652,7 +1445,7 @@ extends_info : obj = object {
 * : auto = read();
 ```
 
-### Vector
+### Vector-VRL
 - **解析配置（VRL）**
 
 ```bash
@@ -747,4 +1540,245 @@ if .type == "l" {
     0
 }
 '''
+```
+
+### Vector-Fixed
+- **解析配置**
+
+```toml
+source = '''
+  .|= parse_regex!(.message, r'(?s)^#(?P<timestamp>\w+\s+\d+\s+\d{4}\s+\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})\s+(?P<Hostname>\S+)\s+%%(?P<ModuleName>\d+[^/]+)/(?P<SeverityHeader>\d+)/(?P<symbol>[^()]+)\((?P<type>[^)]+)\)\[(?P<Count>\d+)\]:\s*(?P<Content>[^()]+?)\s*\(SyslogId=(?P<SyslogId>[^,]+),\s+VSys="(?P<VSys>[^"]+)",\s+Policy="(?P<Policy>[^"]+)",\s+SrcIp=(?P<SrcIp>[^,]+),\s+DstIp=(?P<DstIp>[^,]+),\s+SrcPort=(?P<SrcPort>[^,]+),\s+DstPort=(?P<DstPort>[^,]+),\s+SrcZone=(?P<SrcZone>[^,]+),\s+DstZone=(?P<DstZone>[^,]+),\s+User="(?P<User>[^"]+)",\s+Protocol=(?P<Protocol>[^,]+),\s+Application="(?P<Application>[^"]+)",\s+Profile="(?P<Profile>[^"]+)",\s+Direction=(?P<Direction>[^,]+),\s+ThreatType=(?P<ThreatType>[^,]+),\s+ThreatName=(?P<ThreatName>[^,]+),\s+Action=(?P<Action>[^,]+),\s+FileType=(?P<FileType>[^,]+),\s+Hash=(?P<Hash>.*)\)$')
+  del(.message)
+'''
+```
+
+- **解析+转换配置**
+
+```toml
+source = '''
+  .|= parse_regex!(.message, r'(?s)^#(?P<timestamp>\w+\s+\d+\s+\d{4}\s+\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})\s+(?P<Hostname>\S+)\s+%%(?P<ModuleName>\d+[^/]+)/(?P<SeverityHeader>\d+)/(?P<symbol>[^()]+)\((?P<type>[^)]+)\)\[(?P<Count>\d+)\]:\s*(?P<Content>[^()]+?)\s*\(SyslogId=(?P<SyslogId>[^,]+),\s+VSys="(?P<VSys>[^"]+)",\s+Policy="(?P<Policy>[^"]+)",\s+SrcIp=(?P<SrcIp>[^,]+),\s+DstIp=(?P<DstIp>[^,]+),\s+SrcPort=(?P<SrcPort>[^,]+),\s+DstPort=(?P<DstPort>[^,]+),\s+SrcZone=(?P<SrcZone>[^,]+),\s+DstZone=(?P<DstZone>[^,]+),\s+User="(?P<User>[^"]+)",\s+Protocol=(?P<Protocol>[^,]+),\s+Application="(?P<Application>[^"]+)",\s+Profile="(?P<Profile>[^"]+)",\s+Direction=(?P<Direction>[^,]+),\s+ThreatType=(?P<ThreatType>[^,]+),\s+ThreatName=(?P<ThreatName>[^,]+),\s+Action=(?P<Action>[^,]+),\s+FileType=(?P<FileType>[^,]+),\s+Hash=(?P<Hash>.*)\)$')
+  del(.message)
+.severity = to_int!(.SeverityHeader)
+.Count = to_int!(.Count)
+if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+} else if .host != "127.0.0.1" {
+    .match_chars = "attack_ip"
+}  
+if .type == "l" {
+.src_system_log_type = "日志信息"
+} else if .type == "s" {
+.src_system_log_type = "安全日志信息"
+}
+.extends_ip = {
+    "DstIp": .DstIp,
+    "SrcIp": .SrcIp,
+}
+.extends_info = {
+    "hostname": .Hostname,
+    "source_type": .source_type,
+}
+.num_range = if .Count >= 0 && .Count <= 1000 {
+    .Count
+} else {
+    0
+}
+'''
+```
+
+### Logstash
+- **解析配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/final_apt_3547B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+
+filter {
+
+ mutate { copy => { "message" => "raw" } }
+
+  mutate {
+    gsub => [ "raw", "^#", "" ]
+  }
+
+  grok {
+    match => {
+      "raw" => [
+        "^(?<timestamp>[A-Za-z]{3}\s+\d{1,2}\s+\d{4}\s+\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})\s+(?<Hostname>\S+)\s+%%(?<ModuleName>[^/]+)/(?<SeverityHeader>\d+)/(?<symbol>[^(]+)\((?<type>[^)]+)\)\[(?<Count>\d+)\]:\s+(?<Content>.*?)\s+\((?<kv_pairs>.*)\)\s*$"
+      ]
+    }
+    tag_on_failure => ["_grokfailure"]
+  }
+
+  kv {
+    source => "kv_pairs"
+    target => ""
+    value_split => "="
+    field_split_pattern => ", (?=[A-Za-z][A-Za-z0-9_]*=)"
+    trim_key => " "
+    trim_value => " \""
+    remove_char_value => "\""
+  }
+
+  if [ExtraInfo] and [Hash] {
+
+  mutate {
+    gsub => [
+      "ExtraInfo", "\\\\\"", "\""
+    ]
+  }
+
+  mutate {
+    replace => { "Hash" => "%{Hash}, ExtraInfo=\"%{ExtraInfo}\"" }
+    remove_field => ["ExtraInfo"]
+  }
+}
+
+  mutate {
+    remove_field => ["raw", "kv_pairs"]
+  }
+
+  mutate {
+    remove_field => ["@timestamp", "@version", "[event]","message"]
+  }
+
+}
+
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
+```
+
+- **解析+转换配置**
+
+```conf
+input {
+  file {
+    path => ["in_data/final_apt_3547B"]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+
+filter {
+
+
+ mutate { copy => { "message" => "raw" } }
+
+  mutate {
+    gsub => [ "raw", "^#", "" ]
+  }
+
+
+  grok {
+    match => {
+      "raw" => [
+        "^(?<timestamp>[A-Za-z]{3}\s+\d{1,2}\s+\d{4}\s+\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})\s+(?<Hostname>\S+)\s+%%(?<ModuleName>[^/]+)/(?<SeverityHeader>\d+)/(?<symbol>[^(]+)\((?<type>[^)]+)\)\[(?<Count>\d+)\]:\s+(?<Content>.*?)\s+\((?<kv_pairs>.*)\)\s*$"
+      ]
+    }
+    tag_on_failure => ["_grokfailure"]
+  }
+
+
+  kv {
+    source => "kv_pairs"
+    target => ""
+    value_split => "="
+    field_split_pattern => ", (?=[A-Za-z][A-Za-z0-9_]*=)"
+    trim_key => " "
+    trim_value => " \""
+    remove_char_value => "\""
+  }
+
+  if [ExtraInfo] and [Hash] {
+
+  mutate {
+    gsub => [
+      "ExtraInfo", "\\\\\"", "\""
+    ]
+  }
+
+  mutate {
+    replace => { "Hash" => "%{Hash}, ExtraInfo=\"%{ExtraInfo}\"" }
+    remove_field => ["ExtraInfo"]
+  }
+}
+
+
+  mutate {
+    remove_field => ["raw", "kv_pairs"]
+  }
+  # =========================
+# APT Transform（对齐 Vector 转换逻辑）
+# 插入位置：APT 解析完成后 / remove_field 之前
+# =========================
+
+# 1) severity / Count 转数值（对齐 to_int!）
+mutate {
+  convert => {
+    "SeverityHeader" => "integer"
+    "Count"          => "integer"
+  }
+}
+
+# Vector: .severity = to_int!(.SeverityHeader)
+mutate {
+  add_field => { "severity" => "%{SeverityHeader}" }
+}
+mutate { convert => { "severity" => "integer" } }
+
+# 2) match_chars（对齐 Vector 的 host 判断）
+if [src_ip] == "127.0.0.1" {
+  mutate { add_field => { "match_chars" => "localhost" } }
+} else {
+  mutate { add_field => { "match_chars" => "attack_ip" } }
+}
+
+# 3) src_system_log_type（对齐 Vector：type l/s）
+if [type] == "l" {
+  mutate { add_field => { "src_system_log_type" => "日志信息" } }
+} else if [type] == "s" {
+  mutate { add_field => { "src_system_log_type" => "安全日志信息" } }
+}
+
+# 4) 聚合字段 extends_ip（对齐 Vector）
+mutate {
+  add_field => {
+    "[extends_ip][DstIp]" => "%{DstIp}"
+    "[extends_ip][SrcIp]" => "%{SrcIp}"
+  }
+}
+
+# 5) 聚合字段 extends_info（对齐 Vector）
+mutate {
+  add_field => {
+    "[extends_info][hostname]"    => "%{Hostname}"
+    "[extends_info][source_type]" => "%{source_type}"
+  }
+}
+
+# 6) num_range：Count 范围判断（对齐 Vector）
+if [Count] and [Count] >= 0 and [Count] <= 1000 {
+  mutate { add_field => { "num_range" => "%{Count}" } }
+} else {
+  mutate { add_field => { "num_range" => "0" } }
+}
+mutate { convert => { "num_range" => "integer" } }
+
+  mutate {
+    remove_field => ["@timestamp", "@version", "[event]","message"]
+  }
+
+}
+
+
+output {
+  file { path => "/dev/null" codec => "json_lines" }
+}
 ```

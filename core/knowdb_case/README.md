@@ -43,7 +43,7 @@ name,pinying
 package /example {
   #[tag(from_dc: "warplog/cs/nginx")]
   rule nginx {
-    (ip:sip,_^2,time<[,]>,http/request",http/status,digit,chars",http/agent",_")
+    (ip:sip,2*_,time<[,]>,http/request",http/status,digit,chars",http/agent",_")
   }
 }
 ```

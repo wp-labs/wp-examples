@@ -4,7 +4,7 @@ package /nginx {
         (
             json | take(log) | json_unescape() | (
                 ip:sip,
-                _^2,
+                2*_,
                 chars:timestamp<[,]>,
                 http/request",
                 chars:status,
@@ -19,7 +19,7 @@ package /nginx {
    rule nginx {
         (
             ip:sip,
-            _^2,
+            2*_,
             chars:timestamp<[,]>,
             http/request",
             chars:status,
