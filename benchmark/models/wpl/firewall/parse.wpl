@@ -1,0 +1,9 @@
+package /firewall/{
+    rule firewall{
+        (
+          chars:timestamp\S,
+          2*_,
+          kv()| (*kv()\|),
+        )
+    }
+}
