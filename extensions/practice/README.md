@@ -19,28 +19,44 @@
 
 
 ## 监控
-本例子使用Victoria-metrics对fluent-bit、kafka、以及wparse几个关键组件的监控。[相关链接](http://106.55.164.250:8428/vmui/?#/?g0.expr=up&g0.range_input=30m&g0.end_input=2025-12-31T06%3A42%3A54&g0.tab=0&g0.relative_time=last_30_minutes)
+本例子使用Victoria-metrics对fluent-bit、kafka、以及wparse几个关键组件的监控。外部可以使用grafana进行监控：[相关链接](http://106.55.164.250:8428/vmui/?#/?g0.expr=up&g0.range_input=30m&g0.end_input=2025-12-31T06%3A42%3A54&g0.tab=0&g0.relative_time=last_30_minutes)
 ![1767163356003](image/README/1767163356003.png)
 
+### wp-monitor监控
+wp-monitor是我司自研的一款基于系统结构的指标展示组件，链接:`http://106.55.164.250:25816/wp-monitor`。
+![img.png](image/README/wp-monitor-1.png)
 
+### grafana监控
+账号：
+- grafana账号：admin
+- grafana密码：admin
+---
+目前我们提供了kafka和wparse的仪表盘
+- [kafka](http://106.55.164.250:3000/d/jwPKIsniz12/kafka-exporter-overview?orgId=1&from=now-24h&to=now&timezone=browser&var-job=kafka&var-instance=kafka-exporter&var-topic=$__all)
+![img.png](image/README/kafka-01.png)
+- [wparse](http://106.55.164.250:3000/d/df9b7ju8eo8owe/wparse-view?orgId=1&from=now-5m&to=now&timezone=browser&var-wparse=45e45da3-01f1-46c1-a30b-fd0e1a442bb4)
+![img.png](image/README/wparse-01.png)
 ## 项目使用
 > 前置条件：可以拉取docker-copmose中的镜像,并且镜像的CPU架构一致
-### 方式1 手工启动
+### 方式1 手工启动(MAC推荐)
 - 进入工作目录：`cd wp-examples/extensions/practice`
-- 将docker-compose中kafka相关的地址信息改为实际地址：
+- 将fluent-bit.yml中输出地址信息改为实际的wparse地址：
 ![1767163583267](image/README/1767163583267.png)
 - 启动docker相关组件：`docker compose up -d`
 
 - 进入wparse工作目录:`cd parse-work`
-- 启动wparse：`wparse daemon --stat 2 -p`
+- 启动wparse：`wparse daemon --stat 10 -p> data/logs/wparse-info.log 2>&1 &`
 - 启动发送相关工具：
-    - `wpgen sample -c wpgen-kafka.toml --stat 2 -p`
-    - `wpgen sample -c wpgen-tcp.toml --stat 2 -p`
-    - `wpgen sample -c wpgen-file.toml --stat 2 -p`
+  - `wpgen sample -c wpgen-kafka.toml --stat 10 -p > data/logs/wpgen-kafka.log 2>&1 &`
+  - `wpgen sample -c wpgen-tcp.toml --stat 10 -p > data/logs/wpgen-tcp.log 2>&1 &`
+  - `wpgen sample -c wpgen-file.toml --stat 10 -p > data/logs/wpgen-file.log 2>&1 &`
 
 
 ### 方式二 一键化启动脚本
+> 脚本依赖于nohup,一般linux会带此工具
 - 进入工作目录：`cd wp-examples/extensions/practice`
-- 将docker-compose中kafka相关的地址信息改为实际地址：
+- 将fluent-bit.yml中输出地址信息改为实际的wparse地址：
 ![1767163583267](image/README/1767163583267.png)
+- 启动docker相关组件：`docker compose up -d`
 - 执行：`./run.sh`
+- 停止：`./stop.sh`

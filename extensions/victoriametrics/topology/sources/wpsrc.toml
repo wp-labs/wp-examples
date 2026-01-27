@@ -1,0 +1,6 @@
+[[sources]]
+enable =  true
+key = "syslog_1"
+connect = "syslog_tcp_src"
+#params = { header_mode= "keep"}
+tags = ["dev_ip: source_syslog", "dev_sn: syslog_wparse"]

@@ -1,4 +1,4 @@
-# sink_filter 场景说明
+# sink_filter
 
 本用例演示“按 sink 过滤/分流”的场景：依据业务规则将输入样本分发到不同的 sink 路径（all/safe/residue 等），并通过 defaults.expect 与单项 expect 对输出比例进行离线校验。适用于验证过滤逻辑正确性、残留/错误路径占比是否符合预期。
 

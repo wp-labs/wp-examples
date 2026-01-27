@@ -1,0 +1,14 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/benchmark"
+oml = ["/oml/benchmark_1"]
+[[sink_group.sinks]]
+name = "proto"
+connect = "file_proto_sink"
+params = {  file = "benchmark.dat" }
+tags = ["sink_type:file" ]
+
+[sink_group.sinks.expect]
+ratio = 1.0
+tol   = 0.01

@@ -1,0 +1,42 @@
+services:
+
+  victoria-logs:
+    container_name: victoria-logs
+    image: victoriametrics/victoria-logs:v1.43.0
+    ports:
+      - "9428:9428"
+    # 数据存储目录,按需开启
+    command:
+      - --envflag.enable
+      - --envflag.prefix=VM_
+      - --http.shutdownDelay=15s
+      - --httpListenAddr=:9428
+      - --loggerFormat=json
+      - --retentionPeriod=1d
+      - --storageDataPath=/storage
+    environment:
+      - TZ=Asia/Shanghai
+    # 可选：添加健康检查（模拟 livenessProbe）
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:9428/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  script-exporter:
+    container_name: vlogs-script-exporter
+    image: ghcr.io/ricoberger/script_exporter:latest
+    ports:
+      - "9469:9469"
+    command:
+      - "--config.files=/etc/script-exporter/scripts.yml"
+    volumes:
+      - ./script-exporter/scripts.yml:/etc/script-exporter/scripts.yml:ro
+      - ./scripts:/scripts:ro
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:9469/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

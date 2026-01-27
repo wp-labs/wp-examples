@@ -10,7 +10,7 @@
 ```bash
 package /nginx/ {
    rule nginx {
-        (ip:sip,2*_,chars:timestamp<[,]>,http/request",chars:status,chars:size,chars:referer",http/agent",_")
+        (ip:sip,2*_,chars:timestamp<[,]>,http/request:http_request",chars:status,chars:size,chars:referer",http/agent:http_agent",_")
    }
 }
 ```
@@ -20,7 +20,7 @@ package /nginx/ {
 ```bash
 package /nginx/ {
    rule nginx {
-        (ip:sip,2*_,chars:timestamp<[,]>,http/request",chars:status,chars:size,chars:referer",http/agent",_")
+        (ip:sip,2*_,chars:timestamp<[,]>,http/request:http_request",chars:status,chars:size,chars:referer",http/agent:http_agent",_")
    }
 }
 ```

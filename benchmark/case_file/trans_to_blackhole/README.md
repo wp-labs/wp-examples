@@ -1,4 +1,4 @@
-# file_blackhole 说明
+# file_blackhole
 
 本用例演示"文件源 → Blackhole 汇"的批处理性能基准测试场景：使用 wpgen 生成测试数据文件，wparse 通过批处理模式读取并解析，输出到 blackhole 以测试纯解析吞吐性能。
 

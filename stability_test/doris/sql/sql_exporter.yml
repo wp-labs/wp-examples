@@ -1,0 +1,12 @@
+global:
+  scrape_timeout_offset: 500ms
+  min_interval: 0s
+  max_connections: 2
+  max_idle_connections: 1
+
+target:
+  data_source_name: "mysql://root:@tcp(doris-1-fe:9030)/"
+  collectors: [doris_table_stats]
+
+collector_files:
+  - "/config/doris_table_stats.collector.yml"

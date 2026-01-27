@@ -1,4 +1,4 @@
-# 测试场景：nginx_tcp_to_blackhole
+# nginx_tcp_to_blackhole
 
 本测试用于验证 **nginx_tcp_to_blackhole** 场景下的引擎性能（Mac M4 Mini，日志解析）。
 

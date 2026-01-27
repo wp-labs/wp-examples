@@ -6,3 +6,7 @@ oml = ["work_case"]
 [[sink_group.sinks]]
 connect = "file_json_sink"
 params = {  file = "work_case.json" }
+
+[sink_group.sinks.expect]
+ratio = 0.091
+tol   = 0.01

@@ -1,4 +1,4 @@
-# oml_examples 说明
+# oml_examples
 
 本用例演示"OML（Object Modeling Language）转换"的多种场景：通过丰富的 OML 示例展示数据转换、字段映射、条件匹配、知识库查询等高级特性。适用于学习 OML 语法与最佳实践。
 

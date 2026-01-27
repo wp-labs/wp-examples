@@ -1,4 +1,4 @@
-# 测试场景：aws_tcp_to_blackhole
+# aws_tcp_to_blackhole
 
 本测试用于验证 **aws_tcp_to_blackhole** 场景下的引擎性能（Mac M4 Mini，日志解析）。
 

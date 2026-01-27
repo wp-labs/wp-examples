@@ -1,7 +1,7 @@
 # kafka输入源
 [[sources]]
 enable = true
-key = "kafka_input"
+key = "kafka"
 connect = "kafka_src"
 tags = ["src:kafka","topic:wp.input.event"]
 params= { topic = "wp.input.event" ,brokers = "localhost:9092" }
@@ -13,3 +13,11 @@ key = "tcp_1"
 connect = "tcp_src"
 params = { prefer_newline = true , port =19002, instances = 1}
 tags = ["src:tcp"]
+
+# TCP输入源
+[[sources]]
+enable =  true
+key = "nginx"
+connect = "tcp_src"
+params = { prefer_newline = true , port =19003, instances = 1}
+tags = ["src:nginx"]

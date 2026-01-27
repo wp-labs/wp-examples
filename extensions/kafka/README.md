@@ -1,4 +1,4 @@
-# wp-connectors/Testcase 使用说明
+#  Kafka
 
 本目录提供一套基于 Kafka 的端到端校验用例，验证统一 Kafka Source/Sink 连接器是否按预期工作。
 

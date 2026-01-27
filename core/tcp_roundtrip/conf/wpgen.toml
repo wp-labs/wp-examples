@@ -3,7 +3,7 @@ version = "1.0"
 [generator]
 mode = "sample"
 count = 10000
-speed = 5000
+#speed = 5000
 parallel = 1
 
 [output]
@@ -15,9 +15,14 @@ addr = "127.0.0.1"
 port = 19000
 framing = "line"
 
+
+[generator.speed_profile]
+type = "sinusoidal"
+base = 3000              # 基准速率（行/秒）
+amplitude = 2000         # 波动幅度（行/秒）
+period_secs = 5.0       # 周期长度（秒）
+
 [logging]
-level = "warn"
-module_levels = ["ctrl=info", "launch=info"]
+level = "debug"
 output = "file"
 file_path = "./data/logs/"
-

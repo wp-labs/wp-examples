@@ -1,4 +1,4 @@
-# prometheus_metrics 场景说明
+# prometheus_metrics
 
 本用例演示"Prometheus 指标导出"的场景：通过 Prometheus sink 导出 warp-flow 的内部运行指标，支持通过 HTTP `/metrics` 端点拉取指标数据。适用于监控系统集成与性能观测。
 

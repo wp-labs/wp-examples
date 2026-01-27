@@ -1,4 +1,4 @@
-# 中断与恢复（core/recovery）
+# 中断与恢复
 
 本用例演示 sink 中断与恢复流程：当业务 sink 写入失败时，数据会落入 `rescue/` 目录；随后通过恢复流程（`wprescue daemon`）将救急文件回放到原目标 sink。
 

@@ -10,6 +10,9 @@ parallel = 1
 # 仅当存在 connect 时，其他 output 字段和旧式 [output.*] 子块将被忽略
 connect = "file_raw_sink"
 name = "gen_out"
+[output.params]
+base = "data/in_dat"
+file = "gen.dat"
 
 [logging]
 level = "warn"

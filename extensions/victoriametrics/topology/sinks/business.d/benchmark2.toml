@@ -1,0 +1,13 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/benchmark"
+oml = ["/oml/benchmark_2"]
+[[sink_group.sinks]]
+name = "blackhole_sink"
+connect = "blackhole_sink"
+tags = ["sink_type:blackhole" ]
+
+[sink_group.sinks.expect]
+ratio = 1.0
+tol   = 0.01

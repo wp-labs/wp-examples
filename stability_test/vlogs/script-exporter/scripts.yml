@@ -1,0 +1,8 @@
+scripts:
+  - name: victorialogs_count
+    command:
+      - python3
+    args:
+      - /scripts/victorialogs_metric.py
+      - --logs-url=http://victoria-logs:9428/select/logsql/query
+    allow_env_overwrite: true

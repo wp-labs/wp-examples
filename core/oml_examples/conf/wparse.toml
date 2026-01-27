@@ -19,7 +19,7 @@ path = "./data/rescue"
 level = "warn,ctrl=info,launch=info"
 output = "File"
 [log_conf.file]
-path = "./logs/"
+path = "./data/logs/"
 
 [stat]
 window_sec = 60

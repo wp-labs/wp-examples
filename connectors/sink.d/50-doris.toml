@@ -8,35 +8,13 @@ allow_override = [
   "password",
   "database",
   "table",
-  # "create_table",
-  # "pool_size",
-  # "batch_size"
+  "create_table",
 ]
 
 [connectors.params]
 
-endpoint="mysql://localhost:9030/test_db?charset=utf8mb4&connect_timeout=10"
-user = "root"
-password = ""
-database="test_db"
-table = "events_parsed"
-create_table = """
-CREATE TABLE events_parsed (
-    sn           VARCHAR(64) COMMENT '设备序列号',
-    dev_name     VARCHAR(128) COMMENT '设备名称',
-    sip          VARCHAR(45) COMMENT '源 IP',
-    from_zone    VARCHAR(32) COMMENT '来源区域',
-    from_ip      VARCHAR(45) COMMENT '来源 IP',
-    requ_uri     VARCHAR(512) COMMENT '请求 URI',
-    requ_status  SMALLINT COMMENT '请求状态码',
-    resp_len     INT COMMENT '响应长度',
-    src_city     VARCHAR(32) COMMENT '源城市'
-)
-    ENGINE=OLAP
-    DUPLICATE KEY(sn)
-COMMENT '设备请求事件解析表'
-DISTRIBUTED BY HASH(sn) BUCKETS 8
-PROPERTIES (
-    "replication_num" = "1"
-);
-"""
+# endpoint="mysql://localhost:9030/test_db?charset=utf8mb4&connect_timeout=10"
+# user = "root"
+# password = ""
+# database="test_db"
+# table = "events_parsed"

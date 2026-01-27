@@ -15,6 +15,7 @@ record.md
 **/recover.lock
 *.html
 *.py
+book
 wp-docs
 tmp
 .md

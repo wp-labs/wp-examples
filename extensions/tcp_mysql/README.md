@@ -1,4 +1,4 @@
-# wp-extensions/tcp_mysql 使用说明
+# MySql
 
 本目录提供一套基于 TCP 传输的端到端 MySQL 入库用例，验证统一 TCP Source 与 MySQL Sink 连接器是否按预期工作。
 

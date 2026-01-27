@@ -22,7 +22,7 @@ if command -v lsof >/dev/null 2>&1; then
 fi
 
 echo "2> start work (no print_stat)"
-wparse deamon --stat 5 -w 8 &
+wparse deamon --stat 2  -w 2 &
 # Wait for PID file with simple loop
 for i in {1..50}; do
   if test -f "./.run/wparse.pid"; then
@@ -32,10 +32,9 @@ for i in {1..50}; do
 done
 sleep 3
 
-LINE_CNT=10000
-SPEED_MAX=5000
+LINE_CNT=50000
 echo "1> gen sample data"
-wpgen sample -n "$LINE_CNT" -s "$SPEED_MAX" --stat 10
+wpgen sample -n "$LINE_CNT"  --stat  1 -p
 
 
 sleep 3

@@ -1,0 +1,28 @@
+services:
+
+ mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"   # Root 用户密码（必须设置）
+      MYSQL_DATABASE: "default"          # 初始创建的数据库
+      MYSQL_INNODB_BUFFER_POOL_SIZE: "1G"
+      ALLOW_EMPTY_PASSWORD: "no"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./sql/mysql.sql:/docker-entrypoint-initdb.d/init.sql
+
+ mysqld-exporter:
+    image: prom/mysqld-exporter:v0.18.0
+    container_name: mysqld-exporter
+    depends_on:
+      - mysql
+    command:
+      - "--config.my-cnf=/etc/.mysqld_exporter.cnf"
+      - "--collect.info_schema.tables"
+      - "--collect.perf_schema.eventsstatements"
+    ports:
+      - "9104:9104"
+    volumes:
+      - ./config/.mysqld_exporter.cnf:/etc/.mysqld_exporter.cnf:ro
