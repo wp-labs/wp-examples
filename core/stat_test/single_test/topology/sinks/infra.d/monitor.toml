@@ -9,9 +9,3 @@ params = {  file = "monitor.dat" }
 
 [sink_group.sinks.expect]
 max = 1.0
-
-
-# [[sink_group.sinks]]
-# connect = "kafka_sink"
-# name = "kafka_generator_output"
-# params= { topic = "monitor" ,brokers = "localhost:9092" }
