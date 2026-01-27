@@ -40,5 +40,5 @@ PROPERTIES (
 );
 
 
-delete from wp_nginx;
+select COUNT(*) from test_db.wp_nginx;
 select COUNT(*) from test_db.wp_nginx;

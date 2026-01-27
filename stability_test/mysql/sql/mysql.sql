@@ -2,6 +2,11 @@
 CREATE DATABASE IF NOT EXISTS test_db;
 USE test_db;
 
+-- Exporter user for Prometheus scraping
+CREATE USER IF NOT EXISTS 'exporter'@'%' IDENTIFIED BY 'exporter_pass';
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'%';
+FLUSH PRIVILEGES;
+
 -- wp_nginx 表
 DROP TABLE IF EXISTS wp_nginx;
 CREATE TABLE wp_nginx (
