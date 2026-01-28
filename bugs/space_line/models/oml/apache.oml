@@ -1,0 +1,6 @@
+name : /oml/apache
+rule : /apache/*
+---
+* : auto = read();
+EventId = chars(E1);
+EventTemplate = chars(jk2_init() Found child <*> in scoreboard slot <*>);

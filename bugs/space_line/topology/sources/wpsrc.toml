@@ -1,0 +1,7 @@
+# 主要文件数据源（启用）
+[[sources]]
+enable = true
+key = "file_1"
+connect = "file_src"
+#tags = ["type:file", "purpose:benchmark"]
+params = {  file = "gen.dat"  }

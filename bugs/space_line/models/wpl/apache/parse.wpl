@@ -1,0 +1,10 @@
+package /apache/ {
+    rule apache
+    {
+        (
+            chars:Time<[,]>,
+            chars:Level<[,]>,
+            chars:Content\
+        )
+    }
+}
