@@ -1,0 +1,39 @@
+version = "1.0"
+robust = "normal"
+
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+
+[topology]
+sources = "./topology/sources"
+sinks = "./topology/sinks"
+
+[performance]
+#rate_limit_rps = 200000
+rate_limit_rps = 0
+parse_workers = 4
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+level = "warn,ctrl=debug,data=debug"
+output = "File"
+
+[log_conf.file]
+path = "./data/logs"
+
+[stat]
+[[stat.pick]]
+key = "pick_stat"
+target = "*"
+
+
+[[stat.parse]]
+key = "parse_stat"
+target = "*"
+
+[[stat.sink]]
+key = "sink_stat"
+target = "*"

@@ -1,0 +1,23 @@
+version = "1.0"
+
+[generator]
+mode = "sample"
+count = 10000
+speed = 10000
+parallel = 1
+
+[output]
+connect = "syslog_udp_sink"
+#connect = "syslog_tcp_sink"
+#connect = "tcp_sink"
+name = "gen_out"
+
+[output.params]
+addr = "127.0.0.1"
+port =  1524
+
+
+[logging]
+level = "debug"
+output = "file"
+file_path = "./data/logs/"

@@ -7,17 +7,14 @@ speed = 1000
 parallel = 1
 
 [output]
-#connect = "file_raw_sink"
-connect = "syslog_udp_sink"
+connect = "file_raw_sink"
+#connect = "syslog_udp_sink"
 
 [output.params]
-#base = "data/in_dat"
-#file = "gen.dat"
+base = "data/in_dat"
+file = "gen.dat"
 
 [logging]
-level = ""
-module_levels = []
-output = ""
-file_path = "./data/logs"
-
-[presets]
+level = "debug"
+output = "file"
+file_path = "./data/logs/"
