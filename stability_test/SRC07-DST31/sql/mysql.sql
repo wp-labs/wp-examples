@@ -34,5 +34,6 @@ CREATE TABLE wp_jnginx (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备请求事件解析表';
 
 delete from wp_nginx;
+
 select count(*) from wp_nginx;
 select * from wp_jnginx;

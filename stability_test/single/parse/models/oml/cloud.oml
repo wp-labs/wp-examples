@@ -1,0 +1,4 @@
+name : /cloud
+rule : /cloud/*
+---
+* : auto = take() ;

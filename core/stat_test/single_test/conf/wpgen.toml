@@ -1,0 +1,23 @@
+version = "1.0"
+
+[generator]
+mode = "sample"
+count = 10000
+speed = 2000
+parallel = 2
+
+[output]
+connect = "tcp_sink"
+name = "gen_out"
+
+[output.params]
+addr = "127.0.0.1"
+port = 19000
+framing = "line"
+
+[logging]
+level = "warn"
+module_levels = ["ctrl=info", "launch=info"]
+output = "file"
+file_path = "./data/logs/"
+

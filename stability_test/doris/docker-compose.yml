@@ -36,6 +36,20 @@ services:
       custom_network_1:
         ipv4_address: 172.30.80.3
 
+  doris-sql-exporter:
+    image: githubfree/sql_exporter:latest
+    container_name: doris-sql-exporter
+    depends_on:
+      - doris-1-fe
+    command: ["--config.file=/config/sql_exporter.yml"]
+    ports:
+      - "9399:9399"
+    volumes:
+      - ./sql/sql_exporter.yml:/config/sql_exporter.yml:ro
+      - ./sql/doris_table_stats.collector.yml:/config/doris_table_stats.collector.yml:ro
+    networks:
+      - custom_network_1
+
 networks:
   custom_network_1:
     driver: bridge

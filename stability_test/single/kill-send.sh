@@ -20,9 +20,9 @@ kill_by_name() {
     done
     echo "[INFO] 完成"
 }
-kill_by_name wparse
-sleep 1
+#kill_by_name wparse
+#sleep 1
 
 kill_by_name wpgen
 
-rm -rf $BASE_DIR/parse/data
+#rm -rf $BASE_DIR/parse/data

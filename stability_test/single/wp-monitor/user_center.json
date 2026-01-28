@@ -1,0 +1,7 @@
+{
+    "endpoint": "http://159.75.161.95:30380",
+    "secret_url": "/api/user-center/auth/secret",
+    "login_url": "/api/user-center/auth/login",
+    "validate_url": "/api/user-center/auth/validate",
+    "logout_url": "/api/user-center/auth/logout"
+}

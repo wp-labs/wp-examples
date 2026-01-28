@@ -1,0 +1,40 @@
+version = "1.0"
+
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+
+[topology]
+sources = "./topology/sources"
+sinks = "./topology/sinks"
+
+[performance]
+parse_workers = 2
+rate_limit_rps =  0
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+level = "debug,ctrl=debug,data=trace"
+output = "File"
+[log_conf.file]
+path = "./data/logs"
+
+
+[stat]
+
+[[stat.pick]]
+key = "pick_stat"
+target = "*"
+fields = ["wpl_tag","wp_src_key"]
+
+[[stat.parse]]
+key = "parse_stat"
+target = "*"
+fields = ["wpl_tag", "wp_src_key"]
+
+[[stat.sink]]
+key = "sink_stat"
+target = "*"
+fields = ["wpl_tag","wp_src_key", "sink_category"]

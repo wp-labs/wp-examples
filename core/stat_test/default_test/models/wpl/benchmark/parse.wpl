@@ -1,0 +1,6 @@
+ package /benchmark {
+    rule benchmark_1 {
+                (digit:id,digit:len,time,sn,chars:dev_name,time,kv,sn,chars:dev_name,time,time,ip,kv,chars,kv,kv,chars,kv,kv,chars,chars,ip,chars,http/request<[,]>,http/agent")\,
+    }
+ }
+

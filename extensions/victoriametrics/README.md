@@ -183,34 +183,34 @@ curl -s 'http://localhost:8428/api/v1/label/__name__/values'
 
 ### 指标数据
 
-wparse\_source\_types
+wparse_source_types
 
 *   pid：wparse的进程pid
-*   source\_type： 日志的来源
+*   source_type： 日志的来源
 
-wparse\_sink\_types
+wparse_sink_types
 
 *   pid： waprse的进程pid
-*   sink\_type：sink的类型（mysql，victorialogs等）
+*   sink_type：sink的类型（mysql，victorialogs等）
 
-wparse\_receive\_data
+wparse_receive_data
 
 *   pid：wparse的进程pid
 *   key：source-key
-*   source\_type：日志的来源
+*   source_type：日志的来源
 
-wparse\_parse\_all
+wparse_parse_all
 
 *   pid：wparse的进程pid
 *   parse：
 
-wparse\_parse\_success
+wparse_parse_success
 
-*   rule\_name: 匹配到的规则名称
-*   log\_business：具体的日志类型
+*   rule_name: 匹配到的规则名称
+*   log_business：具体的日志类型
 *   pid：wparse的进程pid
 
-wparse\_send\_to\_sink
+wparse_send_to_sink
 
 *   pid：waprse的进程pid
-*   sink\_type：sink的类型（mysql，victorialogs等）
+*   sink_type：sink的类型（mysql，victorialogs等）

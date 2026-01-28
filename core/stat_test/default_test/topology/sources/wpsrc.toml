@@ -1,0 +1,13 @@
+[[sources]]
+enable = true
+key = "tcp_in"
+connect = "tcp_src"
+tags = ["source:tcp", "type:raw"]
+
+[sources.params]
+addr = "127.0.0.1"
+port = 19000
+framing = "auto"
+prefer_newline = true
+tcp_recv_bytes = 10240
+

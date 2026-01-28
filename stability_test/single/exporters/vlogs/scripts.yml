@@ -1,0 +1,19 @@
+scripts:
+  # http://localhost:19469/probe?key=log_type&logs_url=http%3A%2F%2Fvictoria-logs-1%3A9428%2Fselect%2Flogsql%2Fquery&script=victorialogs_count
+  - name: victorialogs_count
+    command:
+      - python3
+    args:
+      - /scripts/victorialogs_metric.py
+      - --logs-url=http://victoria-logs-1:9428/select/logsql/query
+    allow_env_overwrite: true
+      
+  - name: logfile_counts
+    command:
+      - python3
+    args:
+      - /scripts/file_log_count.py
+      - --files=/data/out_dat/file-1-nginx.dat,/data/out_dat/file-1-jnginx.dat
+      - --metric-name=logfile_line_count
+      - --label-name=file
+    allow_env_overwrite: true
