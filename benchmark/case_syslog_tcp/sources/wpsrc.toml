@@ -2,7 +2,7 @@
 enable =  true
 key = "syslog_1"
 connect = "syslog_tcp_src"
-params = { header_mode = "strip", prefer_newline = true , port =1514}
+params = { header_mode = "skip", prefer_newline = true , port =1514}
 
 
 [[sources]]
