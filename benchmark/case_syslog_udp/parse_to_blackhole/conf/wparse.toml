@@ -16,7 +16,7 @@ rate_limit_rps =  0
 path = "./data/rescue"
 
 [log_conf]
-level = "warn,ctrl=info,launch=info,klib=info"
+level = "warn,ctrl=info"
 output = "File"
 [log_conf.file]
 path = "./data/logs"

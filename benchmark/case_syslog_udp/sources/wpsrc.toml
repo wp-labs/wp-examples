@@ -2,11 +2,11 @@
 enable =  true
 key = "syslog_1"
 connect = "syslog_udp_src"
-params = { header_mode = "strip", prefer_newline = true , port =1524}
+params = { header_mode = "skip",  port =1524}
 
 
 [[sources]]
 enable = false
 key = "syslog_2"
 connect = "syslog_udp_src"
-params = { header_mode = "strip", prefer_newline = true , port = 1525}
+params = { header_mode = "skip", port = 1525}
