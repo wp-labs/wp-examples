@@ -1,4 +1,58 @@
-# file_file 说明
+# File Parse to File
+
+Benchmark for "File Source → File Sink" batch processing scenario: uses wpgen to generate test data files, wparse reads and parses in batch mode, outputs to files to test complete data processing pipeline performance.
+
+## Purpose
+
+Validate the ability to:
+- Read data from files in batch mode
+- Apply WPL parsing rules
+- Write parsed output to files
+- Measure complete file-to-file pipeline throughput
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| File Source | Reading from pre-generated data files |
+| Batch Processing | wparse batch mode execution |
+| File Sink | Writing parsed output to files |
+| Complete Pipeline | Full file-to-file transformation |
+
+## Quick Start
+
+```bash
+cd benchmark/case_file/parse_to_file
+
+# Default test (20M lines, 2 workers)
+./run.sh
+
+# Medium dataset (200K lines)
+./run.sh -m
+
+# Custom configuration
+./run.sh -w 4 -f nginx
+```
+
+## Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `-m` | Medium dataset | 20M → 200K lines |
+| `-f` | Force regenerate data | Smart detection |
+| `-w <cnt>` | Worker count | 2 |
+| `wpl_dir` | WPL rule directory | nginx |
+| `speed` | Generation rate limit | 0 (unlimited) |
+
+## Data Flow
+
+```
+wpgen → gen.dat → wparse batch → all.dat (output file)
+```
+
+---
+
+# file_file 说明 (中文)
 
 本用例演示"文件源 → 文件汇"的性能基准测试场景：使用 wpgen 生成测试数据文件，wparse 通过批处理模式读取并解析，输出到文件以测试完整的数据处理管道性能。
 

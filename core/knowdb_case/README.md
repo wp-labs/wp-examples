@@ -1,4 +1,50 @@
-# knowdb_case 
+# KnowDB Case
+
+This example demonstrates knowledge database (KnowDB) queries and data association for enriching parsed logs with business data.
+
+## Purpose
+
+Validate the ability to:
+- Load CSV-based knowledge bases
+- Query knowledge bases using SQL-like OML syntax
+- Dynamically associate parsed log data with business data
+- Enrich parsed results with external lookups
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| CSV Knowledge Base | Loading data from CSV files |
+| SQL-like Queries | `select ... from ... where` in OML |
+| Dynamic Lookup | Runtime data association |
+| Table Configuration | `knowdb.toml` for table mapping |
+
+## Knowledge Base Structure
+
+```
+models/knowledge/example/
+├── create.sql     # Table schema definition
+├── data.csv       # Data file
+└── insert.sql     # Data insertion statements
+```
+
+## OML Query Example
+
+```oml
+# Query math score from example_score table
+math_score = select math from example_score where id = read(sid);
+```
+
+## Quick Start
+
+```bash
+cd core/knowdb_case
+./run.sh
+```
+
+---
+
+# knowdb_case (中文)
 
 本用例演示"知识库（KnowDB）查询与数据关联"的场景：通过 WPL 规则解析日志后，使用 OML 中的 `select ... from ... where` 语句从知识库中查询关联数据，实现日志解析与业务数据的动态关联。
 

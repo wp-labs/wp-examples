@@ -1,4 +1,115 @@
-#  Kafka
+# Kafka
+
+This directory provides an end-to-end Kafka validation case to verify the unified Kafka Source/Sink connectors work as expected.
+
+- Producer: `wpgen` writes sample data to Kafka (input topic, default `wp.testcase.events.raw`)
+- Engine: `wparse` reads from Kafka input, parses and routes to multiple sinks (including Kafka output topic, default `wp.testcase.events.parsed`, and a file sink)
+- Optional verification: Use `wpkit kafka consume` to verify messages on the Kafka output topic
+
+## Data Flow
+
+The diagram below shows the data flow and key components (`wp.testcase.events.raw/wp.testcase.events.parsed`).
+
+```mermaid
+flowchart LR
+    subgraph Producer
+      WPGEN[wpgen sample]\n(按 wpgen.toml 写 Kafka)
+    end
+    subgraph Kafka
+      KAFKA_IN[(KAFKA_INPUT_TOPIC)]
+      KAFKA_OUT[(KAFKA_OUTPUT_TOPIC)]
+    end
+    subgraph Engine
+      WPARSE[wparse batch\n(-n 限制条数自动退出)]
+      SINKS{{Sink Group\n(models/sink)}}
+      OML[OML 映射/脱敏]
+    end
+    subgraph Verifier
+      FILE[file sink: events.parsed.prototext]
+      CONSUME[wpkit kafka consume\n(可选验证)]
+    end
+
+    WPGEN -- produce --> KAFKA_IN
+    WPARSE -- consume --> KAFKA_IN
+    WPARSE -- route --> OML --> SINKS
+    SINKS -- write --> FILE
+    SINKS -- produce --> KAFKA_OUT
+    CONSUME -- verify --> KAFKA_OUT
+```
+
+If Mermaid is not supported, refer to the ASCII version:
+
+```
+wpgen(sample) --> Kafka(KAFKA_INPUT_TOPIC) --> wparse(batch) --> [OML/route] --> sinks{file,kafka}
+    sinks --> file: data/out_dat/events.parsed.prototext
+    sinks --> Kafka(KAFKA_OUTPUT_TOPIC) --> (optional) wpkit kafka consume verification
+```
+
+## Directory Structure
+
+- `conf/`
+  - `wparse.toml`: Engine main config (directories/concurrency/logging, etc.)
+  - `wpgen.toml`: Data generator config (points to Kafka sink, overrides input topic)
+- `topology/source/wpsrc.toml`: Source routing (contains two `[[sources]]`: `kafka_input` subscribes to input topic; `kafka_output_tap` subscribes to output topic for self-testing/demo, can be disabled as needed)
+- `topology/sink/business.d/example.toml`: Business sink routing (contains a file sink and a Kafka sink)
+- `models/oml/...`: OML models (result field mapping/masking)
+- `case_verify.sh`: One-click verification script (starts `wparse` → `wpgen` sends → verification)
+
+Note: Source and Sink connector IDs reference definitions in the repository root `connectors/` directory:
+- `connectors/source.d/30-kafka.toml`: id=`kafka_src` (allows overriding `topic/group_id/config`)
+- `connectors/sink.d/30-kafka.toml`: id=`kafka_sink` (allows overriding `topic/config/num_partitions/replication/brokers/fmt`)
+
+## Prerequisites
+
+- Kafka running locally, default address `localhost:9092` (or override via environment variables, see below)
+
+## Quick Start
+
+Enter the case directory and run the script (default `debug`):
+
+```bash
+cd extensions/wp-connectors/testcase
+./case_verify.sh            # or ./case_verify.sh release
+```
+
+Main script steps:
+1) Clean run directory (preserving `conf/` templates), build binaries to `target/<profile>`, add to `PATH`
+2) `wpkit conf check` for config self-check; clean data directory
+3) Start `wparse` in background (`-n` limits processing count, auto-exits on completion)
+4) Run `wpgen sample` to generate sample data and write to Kafka input topic
+5) Wait for `wparse` to exit and perform file sink verification (optional)
+
+## Parameters
+
+The script supports the following optional environment variables:
+
+- `PROFILE`: Build and run profile (`debug|release`), default `debug`
+- `LINE_CNT`: Number of sample records to generate/process, default `3000`
+- `STAT_SEC`: Statistics print interval (seconds), default `3`
+- `KAFKA_BOOTSTRAP_SERVERS`: Kafka address, default `localhost:9092`
+- `KAFKA_INPUT_TOPIC`: Input topic (`wpgen` writes, `wparse` consumes), default `wp.testcase.events.raw`
+- `KAFKA_OUTPUT_TOPIC`: Output topic (`wparse` Kafka sink writes), default `wp.testcase.events.parsed`
+
+Example:
+
+```bash
+KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092 KAFKA_INPUT_TOPIC=my_in KAFKA_OUTPUT_TOPIC=my_out ./case_verify.sh
+```
+
+## Result Verification
+
+- File Sink: The script runs `wpkit stat file` and `wpkit validate sink-file -v`; output is available in `data/out_dat/` as `events.parsed.prototext` (per `models/sink/business.d/example.toml` file sink config)
+- Kafka Output: Optionally run the following command to view output topic (recommend using a fresh group to avoid messages being consumed by other consumers)
+
+```bash
+wpkit kafka consume --brokers ${KAFKA_BOOTSTRAP_SERVERS:-localhost:9092} \
+  --group wpkit-consume-$$ \
+  --topic "${KAFKA_OUTPUT_TOPIC:-wp.testcase.events.parsed}"
+```
+
+---
+
+# Kafka (中文)
 
 本目录提供一套基于 Kafka 的端到端校验用例，验证统一 Kafka Source/Sink 连接器是否按预期工作。
 

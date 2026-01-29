@@ -1,4 +1,108 @@
-# Benchmark 用例指南
+# Benchmark Guide
+
+The benchmark directory contains performance test cases based on `benchmark/benchmark_common.sh`. Test cases are organized by data source type, with each case containing different processing scenarios. This document explains the overall structure, common parameters, and the purpose of each test scenario.
+
+## Prerequisites
+
+1. All scripts run in release profile by default and depend on `wparse`/`wpgen`/`wproj` being in PATH.
+2. Run scripts from the benchmark directory or specific test directory.
+
+## Directory Structure
+
+```
+benchmark/
+├── benchmark_common.sh      # Common function library (parameter parsing, environment initialization)
+├── check_run.sh            # Batch test script (runs all tests with -m parameter)
+├── models/                 # Shared model files
+│   ├── wpl/               # WPL rule sets (nginx, sysmon, apt, aws, etc.)
+│   └── oml/               # OML transformation models
+├── sinks/                 # Shared sink configurations
+│   ├── parse_to_blackhole/
+│   ├── parse_to_file/
+│   ├── trans_to_blackhole/
+│   └── trans_to_file/
+├── case_tcp/              # TCP data source test scenarios
+├── case_file/             # File data source test scenarios
+├── case_syslog_tcp/       # Syslog TCP test scenarios
+├── case_syslog_udp/       # Syslog UDP test scenarios
+└── wpgen_test/            # wpgen performance test
+```
+
+## Test Scenarios
+
+**Processing Modes:**
+- `parse`: Parse mode - pure WPL parsing only
+- `trans`: Transform mode - WPL parsing + OML transformation
+
+**Output Targets:**
+- `blackhole`: Discards data, tests pure parsing/forwarding performance
+- `file`: Outputs to files, tests complete processing pipeline
+
+## Test Case Matrix
+
+| Case | Mode | Input | Output | Purpose |
+|------|------|-------|--------|---------|
+| case_tcp/parse_to_blackhole | Parse | TCP (daemon) | Blackhole | TCP reception + pure parsing performance |
+| case_tcp/parse_to_file | Parse | TCP (daemon) | File | Full TCP-to-file parsing pipeline |
+| case_tcp/trans_to_blackhole | Trans | TCP (daemon) | Blackhole | Parsing + OML transformation performance |
+| case_tcp/trans_to_file | Trans | TCP (daemon) | File | Full transformation pipeline |
+| case_file/parse_to_blackhole | Parse | File (batch) | Blackhole | Pure parsing throughput |
+| case_file/parse_to_file | Parse | File (batch) | File | File-to-file parsing |
+| case_file/trans_to_blackhole | Trans | File (batch) | Blackhole | Parsing + OML transformation throughput |
+| case_file/trans_to_file | Trans | File (batch) | File | Full transformation pipeline |
+| case_syslog_tcp/parse_to_blackhole | Parse | Syslog TCP | Blackhole | Syslog TCP pure parsing |
+| case_syslog_tcp/trans_to_blackhole | Trans | Syslog TCP | Blackhole | Syslog TCP parsing + transformation |
+| case_syslog_udp/parse_to_blackhole | Parse | Syslog UDP | Blackhole | Syslog UDP pure parsing |
+| case_syslog_udp/trans_to_blackhole | Trans | Syslog UDP | Blackhole | Syslog UDP parsing + transformation |
+
+## Common Options
+
+All test scripts share the following parameters (parsed by `benchmark_parse_args` in `benchmark_common.sh`):
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `-m` | Use medium dataset (200K lines) | 20M lines |
+| `-f` | Force regenerate input data | Smart detection |
+| `-c <cnt>` | Specify line count (overrides -m) | - |
+| `-w <cnt>` | Specify wparse worker count | 6 (daemon) / 10 (batch) |
+| `wpl_dir` | WPL rule set directory (positional) | nginx |
+| `speed` | Generation rate limit (lines/sec, 0=unlimited) | 0 |
+
+Run `./run.sh -h` to see supported options for a specific test script.
+
+## Quick Start
+
+### Run Single Test
+
+```bash
+cd benchmark
+
+# Default config (nginx rules, large dataset)
+./case_tcp/parse_to_blackhole/run.sh
+
+# Medium dataset
+./case_tcp/parse_to_blackhole/run.sh -m
+
+# Use sysmon rules, 12 workers, 1M lines/sec rate limit
+./case_tcp/parse_to_blackhole/run.sh -w 12 sysmon 1000000
+```
+
+### Run All Tests
+
+```bash
+cd benchmark
+./check_run.sh
+```
+
+## FAQ
+
+- **WPL model load failure**: Check `wpl` path in wparse.toml is correct relative to test directory
+- **Data generation failure**: Check disk space and wpgen.toml configuration
+- **Slow test execution**: Use `-m` parameter to reduce data size, adjust `-w` for worker count
+
+---
+
+# Benchmark 用例指南 (中文)
 
 benchmark 目录收录了基于 `benchmark/benchmark_common.sh` 的性能测试用例。测试用例按数据源类型组织为多个 case 目录，每个 case 下包含不同的处理场景。本文档说明整体结构、通用参数与各测试场景的用途。
 
@@ -22,61 +126,57 @@ benchmark/
 │   ├── trans_to_blackhole/
 │   └── trans_to_file/
 ├── case_tcp/              # TCP 数据源测试场景
-│   ├── sources/           # TCP 源配置
-│   ├── parse_to_blackhole/
-│   ├── parse_to_file/
-│   ├── trans_to_blackhole/
-│   └── trans_to_file/
 ├── case_file/             # File 数据源测试场景
-│   ├── sources/           # File 源配置
-│   ├── parse_to_blackhole/
-│   ├── parse_to_file/
-│   ├── trans_to_blackhole/
-│   └── trans_to_file/
-├── case_syslog/           # Syslog 数据源测试场景
-│   ├── sources/           # Syslog 源配置
-│   ├── parse_to_blackhole/
-│   └── trans_to_blackhole/
+├── case_syslog_tcp/       # Syslog TCP 测试场景
+├── case_syslog_udp/       # Syslog UDP 测试场景
 └── wpgen_test/            # wpgen 性能测试
 ```
 
-### 测试场景说明
+## 测试场景说明
 
 **处理模式：**
-- `parse`: 解析模式 - 使用 WPL 规则对日志进行解析和转换
-- `trans`: 透传模式 - 不进行解析，直接转发原始数据
+- `parse`: 解析模式 - 纯 WPL 解析
+- `trans`: 转换模式 - WPL 解析 + OML 转换
 
 **输出目标：**
 - `blackhole`: 黑洞输出 - 丢弃数据，用于测试纯解析/转发性能
 - `file`: 文件输出 - 输出到文件，测试完整的处理链路
 
-**示例：**
-- `parse_to_blackhole`: 解析后丢弃，测试解析性能
-- `parse_to_file`: 解析后写入文件，测试完整解析链路
-- `trans_to_blackhole`: 透传后丢弃，测试转发性能
-- `trans_to_file`: 透传后写入文件，测试完整转发链路
+## 测试用例矩阵
+
+| 用例 | 模式 | 输入 | 输出 | 用途 |
+|------|------|------|------|------|
+| case_tcp/parse_to_blackhole | 解析 | TCP (daemon) | 黑洞 | TCP 接收 + 纯解析性能 |
+| case_tcp/parse_to_file | 解析 | TCP (daemon) | 文件 | 完整 TCP 到文件解析管道 |
+| case_tcp/trans_to_blackhole | 转换 | TCP (daemon) | 黑洞 | 解析 + OML 转换性能 |
+| case_tcp/trans_to_file | 转换 | TCP (daemon) | 文件 | 完整转换管道 |
+| case_file/parse_to_blackhole | 解析 | 文件 (batch) | 黑洞 | 纯解析吞吐量 |
+| case_file/parse_to_file | 解析 | 文件 (batch) | 文件 | 文件到文件解析 |
+| case_file/trans_to_blackhole | 转换 | 文件 (batch) | 黑洞 | 解析 + OML 转换吞吐量 |
+| case_file/trans_to_file | 转换 | 文件 (batch) | 文件 | 完整转换管道 |
+| case_syslog_tcp/parse_to_blackhole | 解析 | Syslog TCP | 黑洞 | Syslog TCP 纯解析 |
+| case_syslog_tcp/trans_to_blackhole | 转换 | Syslog TCP | 黑洞 | Syslog TCP 解析 + 转换 |
+| case_syslog_udp/parse_to_blackhole | 解析 | Syslog UDP | 黑洞 | Syslog UDP 纯解析 |
+| case_syslog_udp/trans_to_blackhole | 转换 | Syslog UDP | 黑洞 | Syslog UDP 解析 + 转换 |
 
 ## 通用选项
 
 所有测试脚本共享以下参数（由 `benchmark_common.sh` 中的 `benchmark_parse_args` 解析）：
 
-- **`-m`**: 使用中等规模数据集（LINE_CNT=200,000 行）；默认使用大规模数据集（20,000,000 行）
-- **`-f`**: 强制重新生成输入数据，即使 `./data/in_dat/*.dat` 已存在（部分脚本支持）
-- **`-c <cnt>`**: 指定数据条数，与 `-m` 互斥，优先级更高
-- **`-w <cnt>`**: 指定 wparse worker 数量
-  - daemon 模式默认 6 worker
-  - batch/blackhole 模式默认 10 worker
-- **`wpl_dir`**: 指定 WPL 规则集目录（位置参数）
-  - 可选值：`nginx`、`sysmon`、`apt`、`aws` 等
-  - 默认值：`nginx`
-  - 路径相对于 `benchmark/models/wpl/`
-- **`speed`**: 样本生成限速（行/秒），0 表示不限速（位置参数，默认 0）
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `-m` | 使用中等规模数据集（20 万行） | 2000 万行 |
+| `-f` | 强制重新生成输入数据 | 智能检测 |
+| `-c <cnt>` | 指定数据条数（与 -m 互斥，优先级更高） | - |
+| `-w <cnt>` | 指定 wparse worker 数量 | 6 (daemon) / 10 (batch) |
+| `wpl_dir` | WPL 规则集目录（位置参数） | nginx |
+| `speed` | 样本生成限速（行/秒，0 表示不限速） | 0 |
 
 执行 `./run.sh -h` 可查看某个测试脚本支持的选项组合。
 
 ## 快速开始
 
-### 1. 运行单个测试
+### 运行单个测试
 
 ```bash
 cd benchmark
@@ -89,189 +189,17 @@ cd benchmark
 
 # 使用 sysmon 规则，12 个 worker，限速 1M 行/秒
 ./case_tcp/parse_to_blackhole/run.sh -w 12 sysmon 1000000
-
-# 自定义数据量和 worker 数
-./case_file/parse_to_file/run.sh -c 500000 -w 8
 ```
 
-### 2. 批量测试所有场景
-
-使用 `check_run.sh` 脚本自动运行所有测试用例（使用 `-m` 参数进行小数据测试）：
+### 批量测试所有场景
 
 ```bash
 cd benchmark
 ./check_run.sh
 ```
 
-**输出示例：**
-```
-========================================
-Benchmark Check - Small Data Test
-========================================
-
-检查 case_tcp ...
-  → 运行 case_tcp/parse_to_blackhole ...
-    ✓ case_tcp/parse_to_blackhole 通过
-
-  → 运行 case_tcp/parse_to_file ...
-    ✓ case_tcp/parse_to_file 通过
-  ...
-
-========================================
-测试总结
-========================================
-总测试数: 10
-通过: 10
-失败: 0
-
-所有测试通过！
-```
-
-## 测试场景清单
-
-### TCP 数据源测试（case_tcp）
-
-| 测试场景 | 说明 | 配置文件 |
-| --- | --- | --- |
-| `parse_to_blackhole` | TCP 数据解析后丢弃，测试 TCP 接收 + 解析性能 | wpgen.toml, wparse.toml |
-| `parse_to_file` | TCP 数据解析后写入文件 | wpgen.toml, wparse.toml |
-| `trans_to_blackhole` | TCP 数据透传后丢弃，测试 TCP 接收 + 转发性能 | wpgen.toml, wparse.toml |
-| `trans_to_file` | TCP 数据透传后写入文件 | wpgen.toml, wparse.toml |
-
-**数据源：** wpgen 通过 TCP 连接（默认端口 19001）发送样本数据
-
-### File 数据源测试（case_file）
-
-| 测试场景 | 说明 | 配置文件 |
-| --- | --- | --- |
-| `parse_to_blackhole` | 文件数据解析后丢弃，测试文件读取 + 解析性能 | wpgen.toml, wparse.toml |
-| `parse_to_file` | 文件数据解析后写入文件，测试完整 file-to-file 链路 | wpgen.toml, wparse.toml |
-| `trans_to_blackhole` | 文件数据透传后丢弃 | wpgen.toml, wparse.toml |
-| `trans_to_file` | 文件数据透传后写入文件 | wpgen.toml, wparse.toml |
-
-**数据源：** wpgen 预先生成数据文件到 `./data/in_dat/`
-
-### Syslog 数据源测试（case_syslog）
-
-| 测试场景 | 说明 | 配置文件 |
-| --- | --- | --- |
-| `parse_to_blackhole` | Syslog UDP 数据解析后丢弃 | wpgen.toml, wparse.toml |
-| `trans_to_blackhole` | Syslog UDP 数据透传后丢弃 | wpgen.toml, wparse.toml |
-
-**数据源：** wpgen 通过 Syslog UDP 协议发送样本数据
-
-### wpgen 性能测试（wpgen_test）
-
-专门测试 wpgen 的样本数据生成能力，不启动 wparse。
-
-## 配置文件说明
-
-每个测试场景目录下通常包含：
-
-```
-<test_scenario>/
-├── conf/
-│   ├── wparse.toml    # wparse 引擎配置
-│   └── wpgen.toml     # wpgen 数据生成配置
-├── data/              # 运行时数据目录（自动创建）
-│   ├── in_dat/        # 输入数据
-│   ├── out_dat/       # 输出数据
-│   ├── logs/          # 日志文件
-│   └── rescue/        # 异常数据
-├── .run/              # 运行时文件（PID 等）
-└── run.sh             # 测试脚本
-```
-
-### wparse.toml 配置要点
-
-```toml
-[models]
-wpl = "../../models/wpl"    # WPL 规则路径（相对于测试目录）
-oml = "../../models/oml"    # OML 模型路径
-
-[topology]
-sources = "../sources"      # 数据源配置路径
-sinks = "../../sinks/xxx"   # Sink 配置路径
-
-[performance]
-parse_workers = 6           # 解析 worker 数量
-rate_limit_rps = 0          # 速率限制（0 表示不限制）
-```
-
-### wpgen.toml 配置要点
-
-```toml
-[generator]
-mode = "sample"             # 生成模式
-count = 1000                # 每批次数量
-speed = 0                   # 生成速度限制
-parallel = 4                # 并行度
-
-[output]
-connect = "tcp_sink"        # 连接器类型（tcp_sink/file_raw_sink 等）
-params = { port = 19001 }   # 连接器参数
-```
-
-## 性能调优建议
-
-### 确定最佳 Worker 数
-
-1. 从 CPU 核心数开始测试
-2. 使用不同 worker 数运行同一测试：
-   ```bash
-   ./case_tcp/parse_to_blackhole/run.sh -m -w 2
-   ./case_tcp/parse_to_blackhole/run.sh -m -w 4
-   ./case_tcp/parse_to_blackhole/run.sh -m -w 6
-   ./case_tcp/parse_to_blackhole/run.sh -m -w 8
-   ```
-3. 对比吞吐量，找到性价比最优点
-
-### 数据规模选择
-
-- **开发/调试**：使用 `-m` 参数（20 万行），快速验证
-- **性能测试**：使用默认规模（2000 万行）或自定义 `-c` 参数
-- **压力测试**：使用 `-c` 指定更大数据量
-
-### 避免 I/O 瓶颈
-
-- `blackhole` 测试：测试纯计算性能，无 I/O 影响
-- `file` 测试：注意磁盘 I/O 可能成为瓶颈
-- 使用 SSD 或 RAM disk 可提升 I/O 性能
-
-## 输出与校验
-
-每个脚本会自动调用以下命令显示结果：
-
-- `wproj data stat`: 打印数据统计信息（输入/输出条数、耗时等）
-- `wproj validate sink-file`: 校验输出文件（仅限 file 输出场景）
-
-若遇到数据残留导致统计不准，可手动执行：
-```bash
-wproj data clean   # 清理 wparse 数据
-wpgen data clean   # 清理 wpgen 数据
-```
-
-或使用 `-f` 参数强制重新生成数据（部分脚本支持）。
-
 ## 常见问题
 
-###  WPL 模型加载失败
-
-检查 wparse.toml 中的 `wpl` 路径是否正确，应相对于测试目录：
-```toml
-[models]
-wpl = "../../models/wpl"  # 正确
-# wpl = "../../../models/wpl"  # 错误（旧配置）
-```
-
-###  数据生成失败
-
-- 检查磁盘空间是否充足
-- 确认 wpgen.toml 配置正确
-- 查看 `./data/logs/` 下的日志文件
-
-###  测试运行缓慢
-
-- 使用 `-m` 参数减小数据规模
-- 调整 `-w` 参数优化 worker 数
-- 检查系统资源使用情况（CPU、内存、磁盘 I/O）
+- **WPL 模型加载失败**：检查 wparse.toml 中的 `wpl` 路径是否相对于测试目录正确
+- **数据生成失败**：检查磁盘空间是否充足，确认 wpgen.toml 配置正确
+- **测试运行缓慢**：使用 `-m` 参数减小数据规模，调整 `-w` 参数优化 worker 数

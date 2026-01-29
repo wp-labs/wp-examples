@@ -1,7 +1,147 @@
-# doris sink介绍
+# Doris Sink
+
+The Doris sink uses MySQL protocol to interact with Doris. Compared to the MySQL sink, this plugin has better compatibility (MySQL sink is not compatible with Doris, but Doris sink is compatible with MySQL).
+
+## Overview
+
+This directory provides an end-to-end **File Source → Doris Stream Load** example to verify the WarpParse pipeline for parsing offline files and writing results into Doris.
+
+- Collection: `wpgen` generates sample logs and writes them to `data/in_dat/gen.dat`
+- Engine: `wparse batch` reads the file source, applies WPL/OML parsing and mapping
+- Writing: `doris_sink` writes results to Doris via Stream Load, while also saving prototext files for verification
+
+## Data Flow
+
+```mermaid
+flowchart LR
+    subgraph Storage
+      FILE["gen.dat<br/>(wpgen generated file)"]
+    end
+    subgraph Engine
+      WPARSE["wparse batch<br/>(File Source)"]
+      OML["OML Mapping<br/>(models/oml)"]
+      SINKS{{"Sink Group<br/>(models/sink)"}}
+    end
+    subgraph Doris
+      DORIS[(wp_test.events_parsed)]
+    end
+
+    FILE -- consume --> WPARSE
+    WPARSE -- route --> OML --> SINKS
+    SINKS -- Stream Load --> DORIS
+```
+
+If Mermaid is not supported, refer to the ASCII version:
+
+```
+wpgen(sample) --> gen.dat --> wparse(batch+file_src) --> [OML/route] --> sinks{file_proto,doris_stream_load}
+    sinks --> Doris: wp_test.events_parsed
+```
+
+## Directory Structure
+
+- `conf/`
+  - `wpgen.toml`: Sample generation config (adjustable count/rate)
+  - `wparse.toml`: Engine main config (model directory, topology, concurrency, logging, etc.)
+- `topology/`
+  - `sources/wpsrc.toml`: File Source listening on `./data/in_dat/gen.dat`
+  - `sinks/business.d/example.toml`: Sink group, outputs both prototext and writes to Doris
+- `models/`: `wpl` parsing rules and `oml` field mapping (`models/oml/benchmark2/adm.oml`, etc.)
+- `data/`: Sample input, output, logs (`run.sh` auto-cleans/reuses)
+- `run.sh`: One-click script for data generation, wparse execution, validation, and Doris queries
+
+Note: Source/Sink connectors reference definitions in the repository root `connectors/` directory:
+
+- `connectors/source.d/10-file.toml` (id=`file_src`, allows overriding `base/file/encode`)
+- `connectors/sink.d/50-doris.toml` (id=`doris_sink`, allows overriding `endpoint/database/table/mapping`)
+
+## Prerequisites
+
+1. `wproj`, `wpgen`, `wparse` CLI installed and configured
+2. An available Doris cluster; can start a single-node FE/BE via `facilities/doris/start-doris.sh`
+
+## Quick Start
+
+1. Create a Doris cluster
+```bash
+sh ./facilities/doris/start-doris.sh
+```
+2. Parse logs
+```bash
+cd extensions/doris
+./run.sh             # Default debug mode
+```
+3. View results
+  - Open: `http://localhost:8030/Playground/result/wp_test-events_parsed`
+  - Execute query: `select * from events_parsed`
+  ![1767606837537](image/README/1767606837537.png)
+
+Script steps:
+
+1. `wproj check` → `wproj data clean` → `wpgen data clean`, ensures a clean directory
+2. Uses `wpgen rule` to generate `LINE_CNT` sample records (default `data/in_dat/gen.dat`)
+3. Runs `wparse batch --stat 2 -S 1 -p` to parse from File Source
+4. `wproj data stat` & `wproj data validate --input-cnt LINE_CNT` to verify output
+
+### Environment Variables
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `LINE_CNT` | `5000` | Number of samples generated/processed per run |
+| `STAT_SEC` | `3` | `wpgen`/`wparse` statistics interval |
+| `DATA_FILE` | `./data/in_dat/gen.dat` | File Source read path |
+| `DORIS_HOST` / `DORIS_PORT` | `127.0.0.1` / `9030` | Doris MySQL access address |
+| `DORIS_DB` / `DORIS_TABLE` | `wp_test` / `events_parsed` | Doris database and table names |
+| `DORIS_USER` / `DORIS_PASSWORD` | `root` / empty | Doris account credentials |
+
+Example:
+
+```bash
+LINE_CNT=20000 STAT_SEC=5 \
+DORIS_DB=doris_demo DORIS_TABLE=log_events \
+DORIS_HOST=docker.for.mac.localhost DORIS_PASSWORD=secret ./run.sh
+```
+
+## Configuration
+
+```toml
+[[sink_group.sinks]]
+name = "doris_stream_load"
+connect = "doris_sink"
+[sink_group.sinks.params]
+endpoint = "mysql://localhost:9030?charset=utf8mb4&connect_timeout=10"
+database = "wp_test"
+table = "events_parsed"
+user = "root"
+password = ""
+pool_size = 4
+batch_size = 2048
+# create_table = """..."""
+```
+
+Key fields:
+
+- `endpoint`: Doris FE MySQL access address used for Stream Load (supports multiple parameters)
+- `database`/`table`: Target database and table, must match actual Doris objects
+- `user`/`password`: Doris login credentials, supports empty password
+- `pool_size`: Connection pool size (default 4), increase for higher write concurrency
+- `batch_size`: Number of events per write batch, should match Doris load and timeout settings
+- `create_table`: Optional CREATE TABLE SQL, auto-executed when table doesn't exist
+
+## FAQ
+
+- **Doris connection failed**: Verify the `endpoint` address is reachable, user/password are correct, and FE has MySQL interface enabled
+- **Insufficient permissions**: The Doris account needs `SELECT/INSERT` privileges, plus `LOAD` permission for Stream Load
+- **Field mismatch**: Check `models/oml` and Doris table structure, adjust order/naming via OML if needed
+- **File not found**: Ensure `DATA_FILE` path matches `topology/sources/wpsrc.toml`, or re-run the script to generate samples
+
+---
+
+# Doris Sink (中文)
+
 doris sink他采用mysql协议对doris进行操作，该插件相比于mysql sink有更好的兼容性。（mysql sink不兼容doris，doris sink兼容mysql）
 
-# doris 使用说明
+## 概述
 
 本目录提供一套 **File Source → Doris Stream Load** 的端到端示例，用来验证 WarpParse 在离线文件解析后写入 Doris 的链路是否按预期工作。
 

@@ -1,4 +1,47 @@
-# oml_examples
+# OML Examples
+
+This example provides comprehensive OML (Object Modeling Language) transformation demonstrations covering data transformation, field mapping, conditional matching, and knowledge base queries.
+
+## Purpose
+
+Validate the ability to:
+- Transform parsed data using OML models
+- Perform conditional matching with `match` expressions
+- Query knowledge bases with SQL-like syntax
+- Create nested objects and collect fields dynamically
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Conditional Matching | `match ... {}` with pattern matching |
+| Range Matching | `in(digit(1), digit(3))` for value ranges |
+| Tuple Matching | `(read(city), read(count))` for multi-field conditions |
+| Negation Matching | `!chars(warp)` for exclusion patterns |
+| Optional Fields | `take(option:[severity])` for optional handling |
+| Knowledge Base Query | `select ... from ... where` SQL-like queries |
+| Wildcard Collection | `* = take()` for passthrough fields |
+| Object Creation | `object { ... }` for nested structures |
+| Pipeline Processing | `pipe ... \| base64_en` for transformations |
+
+## OML Models Included
+
+| Model | Description |
+|-------|-------------|
+| csv_example.oml | CSV data processing with conditional matching |
+| skyeye_stat.oml | System monitoring data transformation |
+| work_case.oml | Business case data processing |
+
+## Quick Start
+
+```bash
+cd core/oml_examples
+./run.sh
+```
+
+---
+
+# oml_examples (中文)
 
 本用例演示"OML（Object Modeling Language）转换"的多种场景：通过丰富的 OML 示例展示数据转换、字段映射、条件匹配、知识库查询等高级特性。适用于学习 OML 语法与最佳实践。
 

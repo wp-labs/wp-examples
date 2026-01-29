@@ -1,6 +1,48 @@
-# syslog_blackhole 说明
+# Syslog UDP Trans to Blackhole
 
-本用例演示"Syslog 源 → Blackhole 汇"的性能基准测试场景：使用 wpgen 通过 Syslog 协议发送数据，wparse 以 daemon 模式接收并处理，输出到 blackhole 以测试网络接收与解析的综合性能。
+Benchmark for "Syslog UDP Source → Blackhole Sink" transformation daemon mode scenario: uses wpgen to send data via Syslog UDP protocol, wparse receives in daemon mode with WPL parsing and OML transformation, outputs to blackhole to test Syslog UDP + parsing + transformation performance.
+
+## Purpose
+
+Validate the ability to:
+- Receive data via Syslog UDP in daemon mode
+- Apply WPL parsing rules to syslog data
+- Apply OML transformation models
+- Measure Syslog UDP + parsing + transformation throughput
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Syslog UDP Source | Receiving data via Syslog UDP (port 1524) |
+| Daemon Mode | wparse daemon mode execution |
+| WPL Parsing | Applying parsing rules |
+| OML Transformation | Applying transformation models |
+| Blackhole Sink | Discarding output to measure throughput |
+
+## Quick Start
+
+```bash
+cd benchmark/case_syslog_udp/trans_to_blackhole
+
+# Default test
+./run.sh
+
+# Medium dataset
+./run.sh -m
+```
+
+## Data Flow
+
+```
+wpgen → Syslog UDP (port 1524) → wparse daemon (parse + OML) → blackhole sink
+```
+
+---
+
+# syslog_udp_trans_blackhole 说明 (中文)
+
+本用例演示"Syslog UDP 源 → Blackhole 汇"的转换性能基准测试场景：使用 wpgen 通过 Syslog UDP 协议发送数据，wparse 以 daemon 模式接收并进行 WPL 解析和 OML 转换，输出到 blackhole 以测试 Syslog UDP + 解析 + 转换的综合性能。
 
 ## 目录结构
 

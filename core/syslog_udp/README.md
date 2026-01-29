@@ -1,26 +1,63 @@
-# TCP Roundtrip
+# Syslog UDP
 
-目标：演示通用 TCP 输入/输出的端到端链路。
+This example demonstrates UDP Syslog source integration for receiving and processing syslog messages.
 
-- wpgen：通过 `connect = "tcp_sink"` 将样本数据推送到本机端口
-- wparse：启用 `tcp_src` 源监听同一端口，落地到文件 sink
+## Purpose
 
-步骤
-1) 启动解析器
+Validate the ability to:
+- Receive syslog messages via UDP protocol
+- Parse syslog format data with WPL rules
+- Route parsed data to configured sinks
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| UDP Source | Receiving data via UDP syslog protocol |
+| Syslog Parsing | Parsing RFC-compliant syslog messages |
+| Real-time Processing | Daemon mode for continuous reception |
+| Data Routing | Routing to business and infrastructure sinks |
+
+## Quick Start
+
+```bash
+cd core/syslog_udp
+./run.sh
 ```
-wparse deamon --stat 5
+
+## Steps
+
+1. Start the parser (daemon mode)
+```bash
+wparse daemon --stat 5
 ```
-2) 生成数据（推送到 TCP）
-```
+
+2. Generate and send syslog data
+```bash
 wpgen sample -n 10000 --stat 5
 ```
-3) 停止解析器并校验
-```
-wproj stat sink-file
+
+3. Stop and validate
+```bash
+wproj data stat
 wproj validate sink-file -v --input-cnt 10000
 ```
 
-关键文件
-- conf/wparse.toml：主配置（sources/sinks/model 路径）
-- models/sources/wpsrc.toml：source 列表（包含 `tcp_src`）
-- conf/wpgen.toml：生成器配置（输出 `tcp_sink` 到本机端口）
+## Key Files
+
+- `conf/wparse.toml`: Main configuration
+- `models/sources/wpsrc.toml`: UDP syslog source configuration
+- `conf/wpgen.toml`: Generator config (UDP syslog output)
+
+---
+
+# Syslog UDP (中文)
+
+本用例演示 UDP Syslog 源集成场景，用于接收和处理 syslog 消息。
+
+## 目标
+
+验证以下能力：
+- 通过 UDP 协议接收 syslog 消息
+- 使用 WPL 规则解析 syslog 格式数据
+- 将解析后的数据路由到配置的 sink

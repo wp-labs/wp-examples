@@ -1,5 +1,53 @@
 # TCP Roundtrip
 
+This example demonstrates TCP input/output end-to-end data flow.
+
+## Purpose
+
+Validate the ability to:
+- Push data via TCP sink from generator
+- Receive data via TCP source in parser
+- Process and output to file sinks
+- Verify data integrity through the TCP pipeline
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| TCP Sink | Pushing data to TCP endpoint |
+| TCP Source | Receiving data from TCP port |
+| End-to-End Flow | Complete data path validation |
+| Data Integrity | Input/output count verification |
+
+## Quick Start
+
+```bash
+cd core/tcp_roundtrip
+./run.sh
+```
+
+## Steps
+
+1. Start the parser
+```bash
+wparse daemon --stat 5
+```
+
+2. Generate data (push to TCP)
+```bash
+wpgen sample -n 10000 --stat 5
+```
+
+3. Stop and validate
+```bash
+wproj stat sink-file
+wproj validate sink-file -v --input-cnt 10000
+```
+
+---
+
+# TCP Roundtrip (中文)
+
 目标：演示通用 TCP 输入/输出的端到端链路。
 
 - wpgen：通过 `connect = "tcp_sink"` 将样本数据推送到本机端口

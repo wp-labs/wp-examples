@@ -1,4 +1,44 @@
-# syslog_blackhole 说明
+# Syslog TCP Parse to Blackhole
+
+Benchmark for "Syslog TCP Source → Blackhole Sink" daemon mode scenario: uses wpgen to send data via Syslog TCP protocol, wparse receives in daemon mode and parses, outputs to blackhole to test Syslog TCP reception and parsing performance.
+
+## Purpose
+
+Validate the ability to:
+- Receive data via Syslog TCP in daemon mode
+- Apply WPL parsing rules to syslog data
+- Measure Syslog TCP + parsing throughput
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Syslog TCP Source | Receiving data via Syslog TCP (port 1514) |
+| Daemon Mode | wparse daemon mode execution |
+| Blackhole Sink | Discarding output to measure throughput |
+| Protocol Parsing | Syslog protocol handling |
+
+## Quick Start
+
+```bash
+cd benchmark/case_syslog_tcp/parse_to_blackhole
+
+# Default test
+./run.sh
+
+# Medium dataset
+./run.sh -m
+```
+
+## Data Flow
+
+```
+wpgen → Syslog TCP (port 1514) → wparse daemon → blackhole sink
+```
+
+---
+
+# syslog_blackhole 说明 (中文)
 
 本用例演示"Syslog 源 → Blackhole 汇"的性能基准测试场景：使用 wpgen 通过 Syslog 协议发送数据，wparse 以 daemon 模式接收并处理，输出到 blackhole 以测试网络接收与解析的综合性能。
 

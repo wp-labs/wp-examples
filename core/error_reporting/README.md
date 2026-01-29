@@ -1,4 +1,44 @@
-# error_reporting
+# Error Reporting
+
+This example demonstrates error data reporting with multi-format output for system monitoring logs.
+
+## Purpose
+
+Validate the ability to:
+- Parse skyeye_stat system monitoring logs
+- Transform data using OML models
+- Output to multiple formats (JSON, KV)
+- Collect and analyze error data for reporting
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| WPL Parsing | Parsing system monitoring metrics (CPU, memory, disk) |
+| OML Transformation | Data enrichment with `take()`, `Time::now()`, `fmt()`, `object{}` |
+| Multi-format Output | JSON and KV format outputs |
+| Field Collection | Using `collect` for dynamic field gathering |
+| Pipeline Processing | Using `pipe ... \| base64_en` for data encoding |
+
+## OML Features Demonstrated
+
+- `take()`: Extract fields from parsed results
+- `Time::now()`: Get current timestamp
+- `fmt()`: String formatting with template
+- `object {}`: Create nested objects
+- `collect`: Collect matching fields dynamically
+- `pipe ... | base64_en`: Pipeline processing with Base64 encoding
+
+## Quick Start
+
+```bash
+cd core/error_reporting
+./run.sh
+```
+
+---
+
+# error_reporting (中文)
 
 本用例演示"错误数据报表与多格式输出"的场景：针对 skyeye_stat 类型的系统监控日志进行解析，通过 OML 进行数据转换，并支持多种输出格式（JSON、KV 等）。适用于错误数据的收集、分析与报表生成。
 
