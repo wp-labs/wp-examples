@@ -1,0 +1,148 @@
+[sources.file_input]
+type = "file"
+include = ["../data/in_dat/gen.dat"]
+read_from = "beginning"
+data_dir = "../data/"
+
+
+[transforms.route_logs]
+type = "route"
+inputs = ["file_input"]
+route.aws = 'exists(.message) && starts_with(string!(.message), "http")'  
+route.nginx = 'exists(.message) && is_ipv4(to_string(split(string!(.message), " ")[0]))' 
+route.apt = 'exists(.message) && starts_with(string!(.message), "#")'  
+route.firewall = "exists(.message) && match(string!(.message), r'^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} \\S+ [+-]\\d{2}:\\d{2} (Block|Allow|Drop|Reject): ')" 
+
+[transforms.parse_aws]
+type = "remap"
+inputs = ["route_logs.aws"]
+source = '''
+  . |= parse_aws_alb_log!(.message)
+  del(.message)
+  .symbol = .type
+  del(.type)
+  .elb_status_code    = to_int!(.elb_status_code)
+  .target_status_code = to_int!(.target_status_code)
+  .sent_bytes         = to_int!(.sent_bytes)
+
+  if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+  } else {
+    .match_chars = "attack_ip"
+  }
+
+  if .elb_status_code == 200 {
+    .str_elb_status = "ok"
+  } else if .elb_status_code == 404 {
+    .str_elb_status = "error"
+  }
+
+  .extends = {
+    "ssl_cipher": .ssl_cipher,
+    "ssl_protocol": .ssl_protocol,
+  }
+'''
+
+[transforms.parse_nginx]
+type = "remap"
+inputs = ["route_logs.nginx"]
+source = '''
+  . |= parse_nginx_log!(.message, format: "combined")
+  .http_agent = .agent
+  del(.agent)
+  .http_request = .request
+  del(.request)
+  .sip = .client
+  del(.client)
+  .status = to_int!(.status)
+  .size = to_int!(.size)
+if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+} else if .host != "127.0.0.1" {
+    .match_chars = "attack_ip"
+}  
+if .status == 500 {
+    .str_status = "Internal Server Error"
+} else if .status == 404 {
+    .str_status = "Not Found"
+}  
+  del(.message)
+'''
+
+[transforms.parse_apt]
+type = "remap"
+inputs = ["route_logs.apt"]
+source = '''
+  .|= parse_regex!(.message, r'(?s)^#(?P<timestamp>\w+\s+\d+\s+\d{4}\s+\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})\s+(?P<Hostname>\S+)\s+%%(?P<ModuleName>\d+[^/]+)/(?P<SeverityHeader>\d+)/(?P<symbol>[^(]+)\((?P<type>[^)]+)\)\[(?P<Count>\d+)\]:\s*(?P<Content>[^()]+?)\s*\(SyslogId=(?P<SyslogId>[^,]+),\s+VSys="(?P<VSys>[^"]+)",\s+Policy="(?P<Policy>[^"]+)",\s+SrcIp=(?P<SrcIp>[^,]+),\s+DstIp=(?P<DstIp>[^,]+),\s+SrcPort=(?P<SrcPort>[^,]+),\s+DstPort=(?P<DstPort>[^,]+),\s+SrcZone=(?P<SrcZone>[^,]+),\s+DstZone=(?P<DstZone>[^,]+),\s+User="(?P<User>[^"]+)",\s+Protocol=(?P<Protocol>[^,]+),\s+Application="(?P<Application>[^"]+)",\s+Profile="(?P<Profile>[^"]+)",\s+Direction=(?P<Direction>[^,]+),\s+ThreatType=(?P<ThreatType>[^,]+),\s+ThreatName=(?P<ThreatName>[^,]+),\s+Action=(?P<Action>[^,]+),\s+FileType=(?P<FileType>[^,]+),\s+Hash=(?P<Hash>.*)\)$')
+  del(.message)
+.severity = to_int!(.SeverityHeader)
+.Count = to_int!(.Count)
+if .host == "127.0.0.1" {
+    .match_chars = "localhost"
+} else if .host != "127.0.0.1" {
+    .match_chars = "attack_ip"
+}  
+if .type == "l" {
+.src_system_log_type = "日志信息"
+} else if .type == "s" {
+.src_system_log_type = "安全日志信息"
+}
+.extends_ip = {
+    "DstIp": .DstIp,
+    "SrcIp": .SrcIp,
+}
+.extends_info = {
+    "hostname": .Hostname,
+    "source_type": .source_type,
+}
+.num_range = if .Count >= 0 && .Count <= 1000 {
+    .Count
+} else {
+    0
+}
+'''
+
+[transforms.parse_firewall]
+type = "remap"
+inputs = ["route_logs.firewall"]
+source = '''
+raw = to_string!(.message)
+m = parse_regex!(raw,r'^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<severity>\S+)\s+(?P<tz>[+-]\d{2}:\d{2})\s+(?P<label>Block|Allow|Drop|Reject):\s+(?P<kv>.*)$')
+.timestamp = m.ts
+. |= parse_key_value!(m.kv,field_delimiter: "|",key_value_delimiter: "=")
+
+.ipVersion = to_int!(.ipVersion)
+.packetCount = to_int!(.packetCount)           
+if .proto == "UDP" {
+    .enrich_level = "0"
+} else if .host != "TCP" {
+    .enrich_level = "1"
+}   
+.extends = {
+    "srcIP": .srcIP,
+    "srcPort": .srcPort,
+}
+.extends_dir = {
+    "url": .url,
+    "urlCategory": .urlCategory,
+}
+if .srcIP == "10.17.34.12" {
+    .match_chars = "internal"
+} else if .srcIP != "10.17.34.12"{
+    .match_chars = "external"
+} 
+.num_range = if .ipVersion >= 0 && .ipVersion <= 1000 {
+    .ipVersion
+} else {
+    0
+}
+
+del(.message)
+'''
+
+[sinks.blackhole_output]
+type = "blackhole"
+inputs = ["parse_aws", "parse_nginx", "parse_apt", "parse_firewall"]
+
+[api]
+    enabled = true

@@ -1,47 +1,72 @@
 # mixed_file_to_blackhole
 
-本测试用于验证 **mixed_file_to_blackhole** 场景下的引擎性能（Mac M4 Mini，日志解析+转换）。
+## Case Metadata
+- **Case ID**: mixed_file_to_blackhole
+- **Category**: file
+- **Capability**: parse_trans
+- **Topology**: file -> blackhole
+- **Platforms**: Mac M4 Mini / Linux (AWS EC2)
 
-## 场景描述
+## Scenario Definition
+- **日志类型**: Mixed Log (平均日志大小：886B)
+- **平均大小**: 平均日志大小：886B
+- **能力**: parse_trans
+- **输入/输出**: File -> BlackHole
+- **说明**: Mixed Log 场景，File 输入到 BlackHole 输出，执行 日志解析+转换 能力。
 
-本场景覆盖两类混合日志：
+## Dataset Contract
+- **输入数据**: benchmark/case_file/parse_to_blackhole/data/in_dat/gen.dat（数据文件） / benchmark/case_file/parse_to_blackhole/conf/wpgen.toml（生成器配置）
+- **事件数**: 支持 `-m`（中等规模）与 `-c`（指定条数），事件含义与生成器配置保持一致
+- **编码/分隔**: UTF-8 / LF
+- **混合比例**: 3:2:1:1（nginx:aws:firewall:apt）
 
-- **Mixed-1295B**：四类日志 1:1:1:1 混合，平均 1295B。
-- **Mixed-867B**：四类日志 3:2:1:1 混合，平均 867B。
+## Configuration Binding
+- **WarpParse**: benchmark/case_file/parse_to_blackhole/conf/wparse.toml（规则目录：benchmark/models/wpl/mixed；解析+转换使用 benchmark/models/oml）
+- **Vector-VRL**: benchmark/vector/vector-vrl_transform/mixed_file_to_blackhole.toml
+- **Vector-Fixed**: benchmark/vector/vector-fixed_transform/mixed_file_to_blackhole.toml
+- **Logstash**: benchmark/logstash/logstash_trans/mixed_file_to_blackhole.conf
 
-链路为 File 输入到 BlackHole 输出，执行日志解析 + 转换。
+## Execution Contract
+- **结束条件**: 消费完等量事件（或按数据集规模），如需按时间结束请补充
+- **并发/Worker**: 默认配置（wparse 的 parse_workers 以配置为准）
+- **重复次数**: 默认单次；建议 N=3 取 median
 
-本测试旨在评估 **WarpParse** 与 **Vector** 两款引擎在 Mixed 日志 处理场景下的表现。
+## Metrics
+- **EPS**: Events Per Second
+- **MPS**: MiB/s，公式：`MPS = EPS * AvgEventSize / 1024 / 1024`
+- **CPU**: 多核累计百分比（例如 800% ≈ 8 个逻辑核满载）
+- **MEM**: 进程内存占用（Avg/Peak）
+- **Rule Size**: 规则配置体积
 
-## 设计
+## Performance Data
 
-1. **测试目标:** 对比两引擎在该日志场景下的吞吐、延迟、CPU/内存使用。
-2. **输入配置:** File 输入，覆盖高并发/大吞吐压测场景。
-3. **输出配置:** BlackHole 输出，用于验证管线解析+转换能力。
-4. **预期行为:**
-* 高频日志稳定消费，不丢失、不乱序，字段提取正确，转换链路正确执行。
-* 在对应输入/输出链路下持续跑满数据源，不出现明显 backpressure。
-* 监控指标可正常采集，用于后续性能对比。
+### Linux (AWS EC2)
+| 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| WarpParse | 204,400 | 172.71 | 566% / 663% | 196 MB / 265 MB | 4.45x |
+| Vector-VRL | 45,909 | 38.79 | 469% / 683% | 204 MB / 225 MB | 1.00x |
+| Vector-Fixed | 48,484 | 40.97 | 541% / 714% | 178 MB / 209 MB | 1.06x |
+| Logstash | 32,967 | 27.86 | 573% / 685% | 1150 MB / 1172 MB | 0.72x |
 
+### macOS (Mac M4 Mini)
+| 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| WarpParse | 659,700 | 557.42 | 889% / 940% | 170 MB / 184 MB | 3.80x |
+| Vector-VRL | 173,750 | 146.81 | 784% / 860% | 278 MB / 299 MB | 1.0x |
+| Vector-Fixed | 178,261 | 150.62 | 772% / 836% | 273 MB / 298 MB | 1.03x |
+| Logstash | 50,505 | 42.67 | 911% / 939% | 1249 MB / 1276 MB | 0.29x |
 
-## Results（Parse + Transform，Mac M4 Mini）
+## Correctness Check
+- **对齐说明**: 参见 `benchmark/report/test_sample.md`
+- **抽样方式**: 运行 file 输出链路进行抽样对比，检查关键字段与 Golden 输出一致
+- **输出路径约定**: `benchmark/case_file/parse_to_file/data/out_dat/`（如需校验可切换到 file 输出）
 
-| 配比/平均大小 | 引擎      | EPS     | MPS    |
-| :------------ | :-------- | :------ | :----- |
-| 1:1:1:1 / 1295B | WarpParse | 396,300 | 489.43 |
-|                | Vector    | 98,704  | 121.90 |
-| 3:2:1:1 / 867B  | WarpParse | 560,600 | 463.52 |
-|                | Vector    | 138,157 | 114.23 |
+## Notes
+- **实例规格**: 若为 TBD，不影响 file 场景口径，但建议补齐以便复现
+- **限制**: 单机测试，未覆盖分布式/HA
 
-## 结论
-
-在本测试场景（Mixed 日志，File 输入到 BlackHole 输出，执行 日志解析 + 转换 能力）中，对比 **WarpParse** 与 **Vector** 的性能表现，得出以下结论：
-
-1. **吞吐性能**: **WarpParse** 在两种混合配比下均显著领先。
-    * 1:1:1:1 配比：396,300 EPS（MPS 489.43），约为 Vector 的 4.0x。
-    * 3:2:1:1 配比：560,600 EPS（MPS 463.52），约为 Vector 的 4.1x。
-
-2. **系统资源开销**: 资源详情见报告主表，WarpParse 在吞吐提升的同时保持资源优势。
-
-**总结**:
-两种混合配比下，WarpParse 在解析+转换场景依旧显著领先，适合高吞吐的 file→blackhole 混合日志处理。
+## References
+- **Mac 报告**: benchmark/report/report_mac.md#325-mixed-log-平均日志大小886b（章节 3.2.5）
+- **Linux 报告**: benchmark/report/report_linux.md#325-mixed-log-平均日志大小886b（章节 3.2.5）
+- **规则说明**: benchmark/report/test_rule.md
+- **样本对齐**: benchmark/report/test_sample.md

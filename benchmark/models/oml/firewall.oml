@@ -1,0 +1,26 @@
+name : /oml/firewall
+rule : /firewall/*
+---
+ipVersion:digit = take(ipVersion) ;
+packetCount:digit = take(packetCount) ;
+enrich_level = match read(option:[proto]) {
+    chars(UDP) => chars(0);
+    chars(TCP) => chars(1);
+};
+extends : obj = object {
+    srcIP = read(srcIP);
+    srcPort = read(srcPort);
+};
+extends_dir = object {
+    url = read(url);
+    urlCategory = read(urlCategory);
+};
+match_chars = match read(option:[srcIP]) {
+    chars(10.17.34.12) => chars(internal); 
+    !chars(10.17.34.12) => chars(external); 
+};
+num_range = match read(option:[ipVersion]) {
+    in ( digit(0), digit(1000) ) => read(ipVersion) ;
+    _ => digit(0) ;
+};
+* : auto = read();
