@@ -1,30 +1,30 @@
-# apt_tcp_to_file
+# 测试场景：firewall_tcp_to_blackhole
 
 ## Case Metadata
-- **Case ID**: apt_tcp_to_file
+- **Case ID**: firewall_tcp_to_blackhole
 - **Category**: tcp
-- **Capability**: parse_only
-- **Topology**: tcp -> file
+- **Capability**: parse_trans
+- **Topology**: tcp -> blackhole
 - **Platforms**: Mac M4 Mini / Linux (AWS EC2)
 
 ## Scenario Definition
-- **日志类型**: APT Threat Log (3K)
-- **平均大小**: 3K
-- **能力**: parse_only
-- **输入/输出**: TCP -> File
-- **说明**: APT Threat Log 场景，TCP 输入到 File 输出，执行 日志解析 能力。
+- **日志类型**: Firewall Log (1K)
+- **平均大小**: 1K
+- **能力**: parse_trans
+- **输入/输出**: TCP -> BlackHole
+- **说明**: Firewall Log 场景，TCP 输入到 BlackHole 输出，执行 日志解析+转换 能力。
 
 ## Dataset Contract
-- **输入数据**: benchmark/case_tcp/parse_to_blackhole/data/in_dat/gen.dat（数据文件） / benchmark/case_tcp/parse_to_file/conf/wpgen.toml（生成器配置）
+- **输入数据**: benchmark/case_tcp/parse_to_blackhole/data/in_dat/gen.dat（数据文件） / benchmark/case_tcp/parse_to_blackhole/conf/wpgen.toml（生成器配置）
 - **事件数**: 支持 `-m`（中等规模）与 `-c`（指定条数），事件含义与生成器配置保持一致
 - **编码/分隔**: UTF-8 / LF
 - **混合比例**: 不适用
 
 ## Configuration Binding
-- **WarpParse**: benchmark/case_tcp/parse_to_file/conf/wparse.toml（规则目录：benchmark/models/wpl/apt；解析场景不启用 OML）
-- **Vector-VRL**: benchmark/vector/vector-vrl/apt_tcp_to_file.toml
-- **Vector-Fixed**: benchmark/vector/vector-fixed/apt_tcp_to_file.toml
-- **Logstash**: benchmark/logstash/logstash_parse/apt_tcp_to_file.conf
+- **WarpParse**: benchmark/case_tcp/parse_to_blackhole/conf/wparse.toml（规则目录：benchmark/models/wpl/firewall；解析+转换使用 benchmark/models/oml）
+- **Vector-VRL**: benchmark/vector/vector-vrl_transform/firewall_tcp_to_blackhole.toml
+- **Vector-Fixed**: benchmark/vector/vector-fixed_transform/firewall_tcp_to_blackhole.toml
+- **Logstash**: benchmark/logstash/logstash_trans/firewall_tcp_to_blackhole.conf
 
 ## Execution Contract
 - **结束条件**: 消费完等量事件（或按数据集规模），如需按时间结束请补充
@@ -43,16 +43,16 @@
 ### Linux (AWS EC2)
 | 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| WarpParse | 55,000 | 186.04 | 362% / 368% | 197 MB / 224 MB | 5.91x |
-| Vector | 9,300 | 31.46 | 412% / 450% | 211 MB / 218 MB | 1.0x |
-| Logstash | 8,928 | 30.20 | 672% / 726% | 1305 MB / 1369 MB | 0.96x |
+| WarpParse | 125,500 | 134.29 | 614% / 747% | 130 MB / 304 MB | 2.22x |
+| Vector | 56,600 | 60.56 | 630% / 702% | 257 MB / 272 MB | 1.00x |
+| Logstash | 16,528 | 17.69 | 664% / 720% | 1228 MB / 1262 MB | 0.29x |
 
 ### macOS (Mac M4 Mini)
 | 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| WarpParse | 99,900 | 337.94 | 336% / 352% | 333 MB / 508 MB | 2.69x |
-| Vector-VRL | 37,200 | 125.84 | 652% / 837% | 411 MB / 424 MB | 1.0x |
-| Logstash | 30,120 | 101.89 | 840% / 897% | 1060 MB / 1232 MB | 0.81x |
+| WarpParse | 288,300 | 308.49 | 679% / 696% | 238 MB / 242 MB | 1.77x |
+| Vector-VRL | 163,300 | 174.73 | 683% / 757% | 416 MB / 432 MB | 1.0x |
+| Logstash | 51,546 | 55.16 | 879% / 922% | 1253 MB / 1281 MB | 0.32x |
 
 ## Correctness Check
 - **对齐说明**: 参见 `benchmark/report/test_sample.md`
@@ -65,7 +65,7 @@
 - **限制**: 单机测试，未覆盖分布式/HA
 
 ## References
-- **Mac 报告**: benchmark/report/report_mac.md#314-apt-threat-log-3K（章节 3.1.4）
-- **Linux 报告**: benchmark/report/report_linux.md#314-apt-threat-log-3K（章节 3.1.4）
+- **Mac 报告**: benchmark/report/report_mac.md#323-firewall-log-1k（章节 3.2.3）
+- **Linux 报告**: benchmark/report/report_linux.md#323-firewall-log-1k（章节 3.2.3）
 - **规则说明**: benchmark/report/test_rule.md
 - **样本对齐**: benchmark/report/test_sample.md

@@ -1,42 +1,71 @@
 # nginx_file_to_blackhole
 
-本测试用于验证 **nginx_file_to_blackhole** 场景下的引擎性能（Mac M4 Mini，日志解析）。
+## Case Metadata
+- **Case ID**: nginx_file_to_blackhole
+- **Category**: file
+- **Capability**: parse_only
+- **Topology**: file -> blackhole
+- **Platforms**: Mac M4 Mini / Linux (AWS EC2)
 
-## 场景描述
+## Scenario Definition
+- **日志类型**: Nginx Access Log (239B)
+- **平均大小**: 239B
+- **能力**: parse_only
+- **输入/输出**: File -> BlackHole
+- **说明**: Nginx Access Log 场景，File 输入到 BlackHole 输出，执行 日志解析 能力。
 
-本场景可概括为：**Nginx 访问日志，File 输入到 BlackHole 输出，执行 日志解析 能力**。
+## Dataset Contract
+- **输入数据**: benchmark/case_file/parse_to_blackhole/data/in_dat/gen.dat（数据文件） / benchmark/case_file/parse_to_blackhole/conf/wpgen.toml（生成器配置）
+- **事件数**: 支持 `-m`（中等规模）与 `-c`（指定条数），事件含义与生成器配置保持一致
+- **编码/分隔**: UTF-8 / LF
+- **混合比例**: 不适用
 
-本测试旨在评估 **WarpParse** 与 **Vector** 两款引擎在 Nginx 访问日志 处理场景下的表现。
+## Configuration Binding
+- **WarpParse**: benchmark/case_file/parse_to_blackhole/conf/wparse.toml（规则目录：benchmark/models/wpl/nginx；解析场景不启用 OML）
+- **Vector-VRL**: benchmark/vector/vector-vrl/nginx_file_to_blackhole.toml
+- **Vector-Fixed**: benchmark/vector/vector-fixed/nginx_file_to_blackhole.toml
+- **Logstash**: benchmark/logstash/logstash_parse/nginx_file_to_blackhole.conf
 
-## 设计
+## Execution Contract
+- **结束条件**: 消费完等量事件（或按数据集规模）
+- **并发/Worker**: 默认配置（wparse 的 parse_workers 以配置为准）
+- **重复次数**: 默认单次；建议 N=3 取 median
 
-1. **测试目标:** 对比两引擎在该日志场景下的吞吐、延迟、CPU/内存使用。
-2. **输入配置:** File 输入，覆盖高并发/大吞吐压测场景。
-3. **输出配置:** BlackHole 输出，用于验证链路吞吐能力。
-4. **预期行为:**
-* 高频日志稳定消费，不丢失、不乱序，字段提取正确。
-* 在对应输入/输出链路下持续跑满数据源，不出现明显 backpressure。
-* 监控指标可正常采集，用于后续性能对比。
+## Metrics
+- **EPS**: Events Per Second
+- **MPS**: MiB/s，公式：`MPS = EPS * AvgEventSize / 1024 / 1024`
+- **CPU**: 多核累计百分比（例如 800% ≈ 8 个逻辑核满载）
+- **MEM**: 进程内存占用（Avg/Peak）
+- **Rule Size**: 规则配置体积
 
+## Performance Data
 
-## Results（Mac M4 Mini）
+### Linux (AWS EC2)
+| 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| WarpParse | 810,100 | 184.65 | 626% / 639% | 115 MB / 314 MB | 3.83x |
+| Vector-VRL | 211,250 | 48.15 | 292% / 305% | 148 MB / 153 MB | 1.0x |
+| Vector-Fixed | 170,666 | 38.90 | 431% / 451% | 141 MB / 151 MB | 0.81x |
+| Logstash | 106,382 | 24.25 | 436% / 461% | 1144 MB / 1175 MB | 0.50x |
 
-| **引擎** | **输入模式** | **输出模式** | **消费速率(EPS)** | **MPS** | **CPU平均/峰值** | **内存平均/峰值** |
-| --- | --- | --- | --- | --- | --- | --- |
-| WarpParse | File | BlackHole | **2,456,100** | 559.81 | **684.40 % / 824.50 %** | **107.36 MB / 120.44 MB** |
-| Vector | File | BlackHole | **540,540** | 123.20 | **341.51 % / 404.50 %** | **230.67 MB / 251.14 MB** |
+### macOS (Mac M4 Mini)
+| 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| WarpParse | 2,789,800 | 635.86 | 768% / 858% | 126 MB / 130 MB | 4.88x |
+| Vector-VRL | 572,076 | 130.39 | 298% / 320% | 222 MB / 241 MB | 1.0x |
+| Vector-Fixed | 513,181 | 116.97 | 466% / 538% | 232 MB / 245 MB | 0.90x |
+| Logstash | 270,270 | 61.60 | 308% / 418% | 1092 MB / 1115 MB | 0.47x |
 
-## 结论
+## Correctness Check
+- **对齐说明**: 参见 `benchmark/report/test_sample.md`
+- **抽样方式**: 运行 file 输出链路进行抽样对比，检查关键字段与 Golden 输出一致
+- **输出路径约定**: `benchmark/case_file/parse_to_file/data/out_dat/`（如需校验可切换到 file 输出）
 
-在本测试场景（Nginx 访问日志，File 输入到 BlackHole 输出，执行 日志解析 能力）中，对比 **WarpParse** 与 **Vector** 的性能表现，得出以下结论：
+## Notes
+- **限制**: 单机测试，未覆盖分布式/HA
 
-1. **吞吐性能**: **WarpParse** 表现出显著优势。
-    * 消费速率达到 **2,456,100** EPS，约是 Vector (**540,540** EPS) 的 **4.54** 倍。
-    * 这意味着在相同硬件资源下，WarpParse 能够处理更大规模的数据流量。
-
-2. **系统资源开销**:
-    * **CPU**: WarpParse 的 CPU 使用率更高（**684.40 %** vs **341.51 %**）。
-    * **内存**: WarpParse 的内存占用更低（**107.36 MB** vs **230.67 MB**）。
-
-**总结**:
-WarpParse 在该场景下展现了卓越的吞吐性能（领先约 4.54 倍），同时保持了更低的内存占用。对于追求高吞吐量的日志处理场景，WarpParse 是更优的选择。
+## References
+- **Mac 报告**: benchmark/report/report_mac.md#311-nginx-access-log-239b（章节 3.1.1）
+- **Linux 报告**: benchmark/report/report_linux.md#311-nginx-access-log-239b（章节 3.1.1）
+- **规则说明**: benchmark/report/test_rule.md
+- **样本对齐**: benchmark/report/test_sample.md
