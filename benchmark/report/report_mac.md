@@ -61,7 +61,7 @@
     *   **AWS ELB Log** (411B): 云设施负载均衡日志，中等复杂度。
     *   **Firewall Log** (1K): 终端安全监控日志，JSON 结构，字段较多。
     *   **APT Threat Log** (3K): 模拟的高级持续性威胁日志，大体积、长文本。
-    *   **Mixed Log**  (867B): 上述四类日志混合起来形成的日志类型。
+    *   **Mixed Log** (886B): 上述四类日志混合起来形成的日志类型。
 *   **数据拓扑**:
     *   **File -> BlackHole**: 测算引擎极限 I/O 读取与处理能力 (基准)。
     *   **TCP -> BlackHole**: 测算网络接收与处理能力。
@@ -365,7 +365,7 @@
 
 #### 3.2.3 Firewall Log (1K)
 
-表 3.2.3-1： Firewall Log（Parse Only；File -> BlackHole / TCP -> BlackHole / TCP -> File）
+表 3.2.3-1：Firewall Log（Parse Only；File -> BlackHole / TCP -> BlackHole / TCP -> File）
 
 | 引擎          | 拓扑              | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数  |
 | :------------ | :---------------- | :---------- | :----- | :------------- | :---------------- | :-------- |
@@ -467,7 +467,7 @@
 
 **结果摘要**:
 
-1.  在 Mac 平台测试中，WarpParse 相对 Vector-VRL 的 EPS 倍数范围为：解析 **1.42x - 8.78x**，解析+转换 **1.35x - 8.44x**；峰值出现在 Nginx/Mixed 的 TCP -> File 拓扑。
+1.  在 Mac 平台测试中，WarpParse 相对 Vector-VRL 的 EPS 倍数范围为：解析 **1.42x - 8.78x**，解析+转换 **1.35x - 8.44x**；峰值出现在 Nginx 的 TCP -> File 拓扑。
 2.  在**同等事件量**下，WarpParse 场景的 CPU 使用率整体高于 Vector/Logstash（见各表）；吞吐提升与 CPU 占用同时出现。
 3.  APT (3K) 场景下，WarpParse 的 MPS 最高为 **1109.53 MiB/s**（File -> BlackHole）；Vector 在同场景的 EPS/MPS 相对更低（见 3.1.4/3.2.4）。
 
@@ -491,7 +491,7 @@
 ### 4.3 稳定性
 
 *   本报告未引入背压/队列深度等专用指标，稳定性判断仅基于运行期间吞吐与资源观测。
-*   **注意点**: TCP -> File 大包场景下内存随吞吐上升（APT 场景峰值约 508 MB；Mixed 约 432 MB），需结合容量规划。
+*   **注意点**: TCP -> File 大包场景下内存随吞吐上升（APT 场景峰值约 508 MB；Mixed 约 493 MB），需结合容量规划。
 
 ## 5. 阶段性总结与建议
 
@@ -505,7 +505,7 @@
 | **通用生态兼容**   | **WarpParse** | 关注生态与可扩展性 | 提供面向开发者的 API 与插件扩展机制，支持用户快速开发自定义输入 / 输出模块；在满足性能要求的同时，也具备良好的生态扩展能力。 |
 
 **阶段性结论**:
-基于本报告数据，WarpParse 与 Vector-VRL 的 EPS 倍数区间为：纯解析 **1.42x-8.78x**，解析+转换 **1.35x-8.44x**，端到端（TCP -> File）倍数更高。上述结果可作为同类场景的阶段性基线参考；在大包 TCP -> File 场景需关注内存随吞吐上升（约 400-500MB）。
+ 基于本报告数据，WarpParse 与 Vector-VRL 的 EPS 倍数区间为：纯解析 **1.42x-8.78x**，解析+转换 **1.35x-8.44x**，端到端（TCP -> File）倍数更高。上述结果可作为同类场景的阶段性基线参考；在大包 TCP -> File 场景需关注内存随吞吐上升（约 490-510MB）。
 
 ## 6. 已知限制与注意事项
 

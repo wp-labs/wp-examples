@@ -71,15 +71,15 @@
 *   **日志类型**:
     *   **Nginx Access Log** (239B): 典型 Web 访问日志，高吞吐场景。
     *   **AWS ELB Log** (411B): 云设施负载均衡日志，中等复杂度。
-    *   **Sysmon JSON** (1K): 终端安全监控日志，JSON 结构，字段较多。
+    *   **Firewall Log** (1K): 终端安全监控日志，JSON 结构，字段较多。
     *   **APT Threat Log** (3K): 模拟的高级持续性威胁日志，大体积、长文本。
-    *   **Mixed Log**: 上述四类日志混合形成的日志类型。
+    *   **Mixed Log** (886B): 上述四类日志混合形成的日志类型。
 *   **数据拓扑**:
     *   **File -> BlackHole**: 测算引擎极限 I/O 读取与处理能力 (基准)。
     *   **TCP -> BlackHole**: 测算网络接收与处理能力。
     *   **TCP -> File**: 测算端到端完整落地能力。
 *   **测试能力**:
-    *   **解析 (Parse)**: 仅进行正则提取/JSON解析与字段标准化。
+    *   **解析 (Parse)**: 仅进行正则提取/KV解析与字段标准化。
     *   **解析+转换 (Parse+Transform)**: 在解析基础上增加字段映射、富化、类型转换等逻辑。
 
 ### 2.3 评估指标
@@ -158,7 +158,7 @@
 | :-- | :-- | :-- |
 | Nginx Access Log (239B) | 见 3.1.1 | 见 3.2.1 |
 | AWS ELB Log (411B) | 见 3.1.2 | 见 3.2.2 |
-| Sysmon JSON Log (1K) | 见 3.1.3 | 见 3.2.3 |
+| Firewall Log (1K) | 见 3.1.3 | 见 3.2.3 |
 | APT Threat Log (3K) | 见 3.1.4 | 见 3.2.4 |
 | Mixed Log (平均日志大小：867B) | 见 3.1.5 | 见 3.2.5 |
 
@@ -221,21 +221,21 @@
 >
 > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
-#### 3.1.3 Sysmon JSON Log (1K)
+#### 3.1.3 Firewall Log (1K)
 
-表 3.1.3-1：Sysmon JSON Log（Parse Only；File -> BlackHole / TCP -> BlackHole / TCP -> File）
+表 3.1.3-1： Firewall Log（Parse Only；File -> BlackHole / TCP -> BlackHole / TCP -> File）
 
 | 引擎          | 拓扑              | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
 | :------------ | :---------------- | :---------- | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | File -> BlackHole | **153,000** | 143.87 | 700% / 749%    | 217 MB / 338 MB | **4.01x** |
-| Vector  | File -> BlackHole | 38,196      | 35.92  | 482% / 518%    | 167 MB / 175 MB | 1.0x |
-| Logstash | File -> BlackHole | 48,076 | 45.21 | 612% / 709% | 1184 MB / 1197 MB | 1.26x |
-| **WarpParse** | TCP -> BlackHole  | **149,800** | 140.86 | 724% / 766%    | 180 MB / 431 MB | **3.19x** |
-| Vector  | TCP -> BlackHole  | 47,000      | 44.20  | 576% / 646%    | 208 MB / 221 MB | 1.0x |
-| Logstash | TCP -> BlackHole | 54,347 | 51.10 | 661% / 722% | 1340 MB / 1390 MB | 1.16x |
-| **WarpParse** | TCP -> File       | **104,900** | 98.64  | 732% / 764%    | 138 MB / 288 MB | **6.77x** |
-| Vector  | TCP -> File       | 15,500      | 14.58  | 288% / 342%    | 187 MB / 196 MB | 1.0x |
-| Logstash | TCP -> File | 52,083 | 48.98 | 654% / 709% | 1277 MB / 1315 MB | 3.36x |
+| **WarpParse** | File -> BlackHole | **163,700** | 175.16 | 672% / 761% | 272 MB / 441 MB | **2.88x** |
+| Vector  | File -> BlackHole | 56,760 | 60.73 | 513% / 693% | 176 MB / 204 MB | 1.00x |
+| Logstash | File -> BlackHole | 17,391 | 18.61 | 675% / 724% | 1201 MB / 1228 MB | 0.31x |
+| **WarpParse** | TCP -> BlackHole  | **154,900** | 165.75 | 665% / 735% | 128 MB / 353 MB | **2.38x** |
+| Vector  | TCP -> BlackHole  | 65,200 | 69.77 | 648% / 768% | 240 MB / 253 MB | 1.00x |
+| Logstash | TCP -> BlackHole | 19,157 | 20.50 | 722% / 745% | 1283 MB / 1298 MB | 0.29x |
+| **WarpParse** | TCP -> File       | **99,700** | 106.68 | 659% / 746% | 89 MB / 280 MB | **5.09x** |
+| Vector  | TCP -> File       | 19,600 | 20.97 | 293% / 328% | 243 MB / 253 MB | 1.00x |
+| Logstash | TCP -> File | 18,018 | 19.28 | 654% / 709% | 1292 MB / 1364 MB | 0.92x |
 
 > 解析规则大小：
 >
@@ -269,24 +269,24 @@
 > 
 >在同一日志类型 + 同一拓扑下，以 Vector 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
-#### 3.1.5 Mixed Log (平均日志大小：867B)
+#### 3.1.5 Mixed Log (平均日志大小：886B)
 
 表 3.1.5-1：Mixed Log（Parse Only；File -> BlackHole / TCP -> BlackHole / TCP -> File）
 
 | 引擎          | 拓扑              | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
 | :------------ | :---------------- | :---------- | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | File -> BlackHole | **270,000** | 223.25 | 726% / 757%    | 240 MB / 348 MB | **3.35x** |
-| Vector-VRL    | File -> BlackHole | 80,555      | 66.61  | 780% / 796%    | 177 MB / 187 MB | 1.0x     |
-| Vector-Fixed  | File -> BlackHole | 74,418      | 61.54  | 790% / 797%    | 161 MB / 166 MB | 0.92x    |
-| Logstash | File -> BlackHole | 34,482 | 28.51 | 573% / 652% | 1159 MB / 1209 MB | 0.43x |
-| **WarpParse** | TCP -> BlackHole  | **259,900** | 214.90 | 688% / 697%    | 141 MB / 206 MB | **2.99x** |
-| Vector-VRL    | TCP -> BlackHole  | 86,800      | 71.77  | 762% / 774%    | 199 MB / 207 MB | 1.0x     |
-| Vector-Fixed  | TCP -> BlackHole  | 78,200      | 64.66  | 777% / 783%    | 183 MB / 190 MB | 0.90x    |
-| Logstash | TCP -> BlackHole | 43,103 | 35.64 | 664% / 722% | 1306 MB / 1343 MB | 0.50x |
-| **WarpParse** | TCP -> File       | **159,700** | 132.05 | 704% / 719%    | 133 MB / 202 MB | **10.44x** |
-| Vector-VRL    | TCP -> File       | 15,300      | 12.65  | 223% / 255%    | 203 MB / 213 MB | 1.0x     |
-| Vector-Fixed  | TCP -> File       | 16,500      | 13.64  | 248% / 264%    | 183 MB / 189 MB | 1.08x    |
-| Logstash | TCP -> File | 40,000 | 33.07 | 612% / 676% | 1316 MB / 1377 MB | 2.61x |
+| **WarpParse** | File -> BlackHole | **286,000** | 241.66 | 632% / 736% | 271 MB / 374 MB | **5.56x** |
+| Vector-VRL    | File -> BlackHole | 51,446 | 43.47 | 494% / 692% | 228 MB / 249 MB | 1.00x     |
+| Vector-Fixed  | File -> BlackHole | 52,530 | 44.39 | 500% / 696% | 182 MB / 201 MB | 1.02x |
+| Logstash | File -> BlackHole | 21,505 | 18.17 | 400% /444% | 1136 MB / 1163 MB | 0.42x |
+| **WarpParse** | TCP -> BlackHole  | **258,600** | 218.51 | 532% / 709% | 189 MB / 483 MB | **3.10x** |
+| Vector-VRL    | TCP -> BlackHole  | 83,300 | 70.38 | 516% / 781% | 208 MB / 222 MB | 1.00x     |
+| Vector-Fixed  | TCP -> BlackHole  | 81,700 | 69.03 | 518% / 784% | 181 MB / 191 MB | 0.98x |
+| Logstash | TCP -> BlackHole | 35,087 | 29.65 | 629% / 697% | 1222 MB / 1282 MB | 0.42x |
+| **WarpParse** | TCP -> File       | **149,400** | 126.24 | 546% / 623% | 111 MB / 221 MB | **7.82x** |
+| Vector-VRL    | TCP -> File       | 19,100 | 16.14 | 315% / 332% | 275 MB / 287 MB | 1.00x     |
+| Vector-Fixed  | TCP -> File       | 19,200 | 16.22 | 276% / 293% | 190 MB / 195 MB | 1.01x |
+| Logstash | TCP -> File | 32,786 | 27.70 | 593% / 670% | 1317 MB / 1428 MB | 1.72x |
 
 > 解析规则大小：
 >
@@ -364,21 +364,21 @@
 >
 > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
-#### 3.2.3 Sysmon JSON Log (1K)
+#### 3.2.3 Firewall Log (1K)
 
-表 3.2.3-1：Sysmon JSON Log（Parse + Transform；File -> BlackHole / TCP -> BlackHole / TCP -> File）
+表 3.2.3-1：Firewall Log（Parse Only；File -> BlackHole / TCP -> BlackHole / TCP -> File）
 
 | 引擎          | 拓扑              | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
 | :------------ | :---------------- | :---------- | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | File -> BlackHole | **129,400** | 121.68 | 759% / 789%    | 272 MB / 332 MB | **3.61x** |
-| Vector  | File -> BlackHole | 35,862      | 33.73  | 469% / 531%    | 183 MB / 191 MB | 1.00x |
-| Logstash | File -> BlackHole | 34,883 | 32.80 | 570% / 685% | 1150 MB / 1170 MB | 0.99x |
-| **WarpParse** | TCP -> BlackHole  | **120,000** | 112.84 | 705% / 765%    | 143 MB / 382 MB | **2.64x** |
-| Vector  | TCP -> BlackHole  | 45,500      | 42.79  | 589% / 683%    | 232 MB / 245 MB | 1.00x |
-| Logstash | TCP -> BlackHole | 38,961 | 36.64 | 646% / 713% | 1218 MB / 1251 MB | 0.86x |
-| **WarpParse** | TCP -> File       | **84,900**  | 79.83  | 734% / 763%    | 137 MB / 303 MB | **5.21x** |
-| Vector  | TCP -> File       | 16,300      | 15.33  | 284% / 343%    | 208 MB / 220 MB | 1.00x |
-| Logstash | TCP -> File | 37,974 | 35.71 | 417% / 544% | 1323 MB / 1359 MB | 2.33x |
+| **WarpParse** | File -> BlackHole | **132,500** | 141.78 | 693% / 786% | 348 MB / 430 MB | **2.49x** |
+| Vector  | File -> BlackHole | 53,258 | 56.99 | 482% / 692% | 198 MB / 225 MB | 1.00x |
+| Logstash | File -> BlackHole | 15,873 | 16.98 | 579% / 680% | 1111 MB / 1127 MB | 0.30x |
+| **WarpParse** | TCP -> BlackHole  | **125,500** | 134.29 | 614% / 747% | 130 MB / 304 MB | **2.22x** |
+| Vector  | TCP -> BlackHole  | 56,600 | 60.56 | 630% / 702% | 257 MB / 272 MB | 1.00x |
+| Logstash | TCP -> BlackHole | 16,528 | 17.69 | 664% / 720% | 1228 MB / 1262 MB | 0.29x |
+| **WarpParse** | TCP -> File       | **69,800** | 74.69 | 620% / 760% | 129 MB / 175 MB | **3.31x** |
+| Vector  | TCP -> File       | 21,100 | 22.58 | 315% / 332% | 275 MB / 287 MB | 1.00x |
+| Logstash | TCP -> File | 16,393 | 17.54 | 660% / 716% | 1210 MB / 1236 MB | 0.78x |
 
 > 解析+转换规则大小：
 >
@@ -412,31 +412,31 @@
 > 
 >在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
-#### 3.2.5 Mixed Log (平均日志大小：867B)
+#### 3.2.5 Mixed Log (平均日志大小：886B)
 
 表 3.2.5-1：Mixed Log（Parse + Transform；File -> BlackHole / TCP -> BlackHole / TCP -> File）
 
 | 引擎          | 拓扑              | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
 | :------------ | :---------------- | :---------- | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | File -> BlackHole | **221,300** | 182.99 | 741% / 760%    | 213 MB / 278 MB | **2.80x** |
-| Vector-VRL    | File -> BlackHole | 78,965      | 65.29  | 787% / 797%    | 183 MB / 189 MB | 1.0x     |
-| Vector-Fixed  | File -> BlackHole | 70,000      | 57.88  | 793% / 799%    | 164 MB / 169 MB | 0.89x    |
-| Logstash | File -> BlackHole | 32,967 | 27.26 | 573% / 685% | 1150 MB / 1172 MB | 0.42x |
-| **WarpParse** | TCP -> BlackHole  | **209,900** | 173.56 | 696% / 723%    | 128 MB / 228 MB | **2.51x** |
-| Vector-VRL    | TCP -> BlackHole  | 83,600      | 69.13  | 776% / 784%    | 209 MB / 222 MB | 1.0x     |
-| Vector-Fixed  | TCP -> BlackHole  | 73,400      | 60.69  | 778% / 782%    | 194 MB / 203 MB | 0.88x    |
-| Logstash | TCP -> BlackHole | 35,714 | 29.53 | 649% / 712% | 1342 MB / 1401MB | 0.43x |
-| **WarpParse** | TCP -> File       | **134,900** | 111.55 | 724% / 741%    | 122 MB / 164 MB | **8.65x** |
-| Vector-VRL    | TCP -> File       | 15,600      | 12.90  | 225% / 256%    | 209 MB / 221 MB | 1.0x     |
-| Vector-Fixed  | TCP -> File       | 17,000      | 14.06  | 265% / 278%    | 192 MB / 199 MB | 1.09x    |
-| Logstash | TCP -> File | 32,258 | 26.67 | 646% / 706% | 1337 MB / 1391MB | 2.07x |
+| **WarpParse** | File -> BlackHole | **204,400** | 172.71 | 566% / 663% | 196 MB / 265 MB | **4.45x** |
+| Vector-VRL    | File -> BlackHole | 45,909 | 38.79 | 469% / 683% | 204 MB / 225 MB | 1.00x     |
+| Vector-Fixed  | File -> BlackHole | 48,484      | 40.97 | 541% / 714%    | 178 MB / 209 MB   | 1.06x |
+| Logstash | File -> BlackHole | 32,967 | 27.86 | 573% / 685% | 1150 MB / 1172 MB | 0.72x |
+| **WarpParse** | TCP -> BlackHole  | **190,300** | 160.80 | 603% / 623% | 119 MB / 190 MB | **2.40x** |
+| Vector-VRL    | TCP -> BlackHole  | 79,400 | 67.09 | 776% / 782% | 204 MB / 211 MB | 1.00x     |
+| Vector-Fixed  | TCP -> BlackHole  | 76,500 | 64.64 | 776% / 781% | 190 MB / 203 MB | 0.96x |
+| Logstash | TCP -> BlackHole | 30,303 | 25.60 | 656% / 719% | 1258 MB / 1287MB | 0.38x |
+| **WarpParse** | TCP -> File       | **120,100** | 101.48 | 648% / 727% | 121 MB / 183 MB | **6.19x** |
+| Vector-VRL    | TCP -> File       | 19,400 | 16.39 | 268% / 300% | 201 MB / 216 MB | 1.00x     |
+| Vector-Fixed  | TCP -> File       | 20,000 | 16.90 | 273% / 303% | 195 MB / 207 MB | 1.03x |
+| Logstash | TCP -> File | 26,666 | 22.53 | 612% / 689% | 1218 MB / 1253 MB | 1.37x |
 
 > 解析+转换规则大小：
 >
-> - WarpParse：6102B
-> - Vector-VRL：6573B
-> - Vector-Fixed：4796B
-> - Logstash：8391B
+> - WarpParse：3864B
+> - Vector-VRL：4723B
+> - Vector-Fixed：1733B
+> - Logstash：3984B
 >
 > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 >
