@@ -1,0 +1,11 @@
+version = "2.0"
+
+[sink_group]
+name = "all"
+oml = ["/oml/*"]
+parallel = 10
+[[sink_group.sinks]]
+name = "main"
+connect = "file_json_sink"
+#connect = "fast_file_sink"
+params = { file = "all.dat" }
