@@ -1,0 +1,7 @@
+[[connectors]]
+allow_override = ["capacity" ]
+id = "channel_src"
+type = "channel"
+
+[connectors.params]
+capacity = 1000
