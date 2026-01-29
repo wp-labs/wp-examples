@@ -1,0 +1,4 @@
+name : /oml/nginx_raw
+rule : /nginx/raw
+---
+* : auto = take() ;

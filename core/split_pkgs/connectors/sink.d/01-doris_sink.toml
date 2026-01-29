@@ -1,0 +1,13 @@
+[[connectors]]
+allow_override = ["endpoint", "database", "user", "password", "table", "create_table", "pool", "pool_size", "batch", "batch_size"]
+id = "doris_sink"
+type = "doris"
+
+[connectors.params]
+batch = 64
+database = "wp_data"
+endpoint = "mysql://localhost:9030"
+password = ""
+pool = 4
+table = "wp_events"
+user = "root"

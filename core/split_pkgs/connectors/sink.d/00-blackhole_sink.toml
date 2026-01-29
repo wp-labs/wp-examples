@@ -1,0 +1,6 @@
+[[connectors]]
+id = "blackhole_sink"
+type = "blackhole"
+
+[connectors.params]
+sleep_ms = 0

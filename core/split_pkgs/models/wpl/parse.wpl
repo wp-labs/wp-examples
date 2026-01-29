@@ -1,0 +1,10 @@
+package /nginx {
+   rule raw {
+        (ip:sip,2*_,time/clf:recv_time<[,]>,http/request",http/status,digit,chars",http/agent",_")
+   }
+   rule pkg {
+        (
+            json | take(log) | json_unescape() | send_to_src()
+        )
+    }
+}

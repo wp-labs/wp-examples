@@ -1,0 +1,4 @@
+name : /oml/nginx_pkg
+rule : /nginx/pkg
+---
+* : auto = take() ;

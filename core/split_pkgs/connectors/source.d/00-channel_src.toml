@@ -1,0 +1,8 @@
+[[connectors]]
+allow_override = ["capacity", "batch_lines"]
+id = "channel_src"
+type = "channel"
+
+[connectors.params]
+batch_lines = 128
+capacity = 1000
