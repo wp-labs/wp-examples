@@ -1,12 +1,5 @@
 [[sources]]
-enable =  true
-key = "syslog_1"
+enable = true
+key = "syslog_udp"
 connect = "syslog_udp_src"
-params = { header_mode = "skip",  port =1524}
-
-
-[[sources]]
-enable = false
-key = "syslog_2"
-connect = "syslog_udp_src"
-params = { header_mode = "skip", port = 1525}
+params = { header_mode = "skip", port = 1524,  }

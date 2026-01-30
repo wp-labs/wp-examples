@@ -9,7 +9,7 @@ sources = "../sources"
 sinks = "../../sinks/parse_to_blackhole"
 
 [performance]
-parse_workers = 2
+parse_workers = 6
 rate_limit_rps =  0
 
 [rescue]
