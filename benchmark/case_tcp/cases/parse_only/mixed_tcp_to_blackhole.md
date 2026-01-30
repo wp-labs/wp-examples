@@ -1,47 +1,73 @@
 # mixed_tcp_to_blackhole
 
-本测试用于验证 **mixed_tcp_to_blackhole** 场景下的引擎性能（Mac M4 Mini，日志解析）。
+## Case Metadata
+- **Case ID**: mixed_tcp_to_blackhole
+- **Category**: tcp
+- **Capability**: parse_only
+- **Topology**: tcp -> blackhole
+- **Platforms**: Mac M4 Mini / Linux (AWS EC2)
 
-## 场景描述
+## Scenario Definition
+- **日志类型**: Mixed Log (平均日志大小：886B)
+- **平均大小**: 平均日志大小：886B
+- **能力**: parse_only
+- **输入/输出**: TCP -> BlackHole
+- **说明**: Mixed Log 场景，TCP 输入到 BlackHole 输出，执行 日志解析 能力。
 
-本场景覆盖两类混合日志：
+## Dataset Contract
+- **输入数据**: benchmark/case_tcp/parse_to_blackhole/data/in_dat/gen.dat（数据文件） / benchmark/case_tcp/parse_to_blackhole/conf/wpgen.toml（生成器配置）
+- **事件数**: 支持 `-m`（中等规模）与 `-c`（指定条数），事件含义与生成器配置保持一致
+- **编码/分隔**: UTF-8 / LF
+- **混合比例**: 3:2:1:1（nginx:aws:firewall:apt）
 
-- **Mixed-1295B**：四类日志 1:1:1:1 混合，平均 1295B。
-- **Mixed-867B**：四类日志 3:2:1:1 混合，平均 867B。
+## Configuration Binding
+- **WarpParse**: benchmark/case_tcp/parse_to_blackhole/conf/wparse.toml（规则目录：benchmark/models/wpl/mixed；解析场景不启用 OML）
+- **Vector-VRL**: benchmark/vector/vector-vrl/mixed_tcp_to_blackhole.toml
+- **Vector-Fixed**: benchmark/vector/vector-fixed/mixed_tcp_to_blackhole.toml
+- **Logstash**: benchmark/logstash/logstash_parse/mixed_tcp_to_blackhole.conf
 
-链路为 TCP 输入到 BlackHole 输出，仅做日志解析。
+## Execution Contract
+- **结束条件**: 消费完等量事件（或按数据集规模），如需按时间结束请补充
+- **并发/Worker**: 默认配置（wparse 的 parse_workers 以配置为准）
+- **重复次数**: 默认单次；建议 N=3 取 median
 
-本测试旨在评估 **WarpParse** 与 **Vector** 两款引擎在 Mixed 日志 处理场景下的表现。
+## Metrics
+- **EPS**: Events Per Second
+- **MPS**: MiB/s，公式：`MPS = EPS * AvgEventSize / 1024 / 1024`
+- **CPU**: 多核累计百分比（例如 800% ≈ 8 个逻辑核满载）
+- **MEM**: 进程内存占用（Avg/Peak）
+- **Rule Size**: 规则配置体积
 
-## 设计
+## Performance Data
 
-1. **测试目标:** 对比两引擎在该日志场景下的吞吐、延迟、CPU/内存使用。
-2. **输入配置:** TCP 输入，覆盖高并发/大吞吐压测场景。
-3. **输出配置:** BlackHole 输出，用于验证链路吞吐能力。
-4. **预期行为:**
-* 高频日志稳定消费，不丢失、不乱序，字段提取正确。
-* 在对应输入/输出链路下持续跑满数据源，不出现明显 backpressure。
-* 监控指标可正常采集，用于后续性能对比。
+### Linux (AWS EC2)
+| 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| WarpParse | 258,600 | 218.51 | 532% / 709% | 189 MB / 483 MB | 3.10x |
+| Vector-VRL | 83,300 | 70.38 | 516% / 781% | 208 MB / 222 MB | 1.00x |
+| Vector-Fixed | 81,700 | 69.03 | 518% / 784% | 181 MB / 191 MB | 0.98x |
+| Logstash | 35,087 | 29.65 | 629% / 697% | 1222 MB / 1282 MB | 0.42x |
 
+### macOS (Mac M4 Mini)
+| 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| WarpParse | 586,900 | 495.90 | 697% / 706% | 299 MB / 322 MB | 2.69x |
+| Vector-VRL | 218,600 | 184.71 | 891% / 930% | 351 MB / 369 MB | 1.0x |
+| Vector-Fixed | 220,100 | 185.98 | 894% / 935% | 293 MB / 312 MB | 1.01x |
+| Logstash | 128,205 | 108.33 | 893% / 957% | 1258 MB / 1289 MB | 0.66x |
 
-## Results（Parse Only，Mac M4 Mini）
+## Correctness Check
+- **对齐说明**: 参见 `benchmark/report/test_sample.md`
+- **抽样方式**: 运行 file 输出链路进行抽样对比，检查关键字段与 Golden 输出一致
+- **输出路径约定**: `benchmark/case_tcp/parse_to_file/data/out_dat/`（如需校验可切换到 file 输出）
 
-| 配比/平均大小 | 引擎      | EPS     | MPS    |
-| :------------ | :-------- | :------ | :----- |
-| 1:1:1:1 / 1295B | WarpParse | 446,300 | 551.18 |
-|                | Vector    | 110,200 | 136.10 |
-| 3:2:1:1 / 867B  | WarpParse | 613,000 | 506.85 |
-|                | Vector    | 161,000 | 133.12 |
+## Notes
+- **Loopback TCP**: TCP 场景均使用 127.0.0.1 回环，不受物理网卡限制
+- **实例规格**: 若为 TBD，loopback TCP 口径不受实例带宽/ENI 影响
+- **限制**: 单机测试，未覆盖分布式/HA
 
-## 结论
-
-在本测试场景（Mixed 日志，TCP 输入到 BlackHole 输出，执行 日志解析 能力）中，对比 **WarpParse** 与 **Vector** 的性能表现，得出以下结论：
-
-1. **吞吐性能**: **WarpParse** 在两种混合配比下均显著领先。
-    * 1:1:1:1 配比：446,300 EPS（MPS 551.18），约为 Vector 的 4.0x。
-    * 3:2:1:1 配比：613,000 EPS（MPS 506.85），约为 Vector 的 3.8x。
-
-2. **系统资源开销**: 资源详情见报告主表。
-
-**总结**:
-两种混合配比下，WarpParse 在 TCP→BlackHole 解析场景都保持明显吞吐优势。
+## References
+- **Mac 报告**: benchmark/report/report_mac.md#315-mixed-log-平均日志大小886b（章节 3.1.5）
+- **Linux 报告**: benchmark/report/report_linux.md#315-mixed-log-平均日志大小886b（章节 3.1.5）
+- **规则说明**: benchmark/report/test_rule.md
+- **样本对齐**: benchmark/report/test_sample.md
