@@ -1,7 +1,7 @@
 [[connectors]]
 id = "file_raw_sink"
 type = "file"
-allow_override = ["base","file"]
+allow_override = ["base","file","sync"]
 [connectors.params]
 fmt  = "raw"
 base = "./data/out_dat"

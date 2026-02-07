@@ -7,7 +7,7 @@ oml = []
 [[sink_group.sinks]]
 name = "miss_output"
 connect = "file_raw_sink"
-params = {  file = "miss.dat" }
+params = {  file = "miss.dat", sync = "true" }
 tags = ["sink:miss", "format:raw"]
 
 [sink_group.sinks.expect]
