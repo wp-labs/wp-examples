@@ -1,4 +1,4 @@
-name : /oml/aws
+name : /oml/normal/aws
 rule : /aws/*
 enable : false
 ---

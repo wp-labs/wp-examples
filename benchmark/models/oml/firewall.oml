@@ -1,4 +1,4 @@
-name : /oml/firewall
+name : /oml/normal/firewall
 rule : /firewall/*
 ---
 ipVersion:digit = take(ipVersion) ;
@@ -16,8 +16,8 @@ extends_dir = object {
     urlCategory = read(urlCategory);
 };
 match_chars = match read(option:[srcIP]) {
-    chars(10.17.34.12) => chars(internal); 
-    !chars(10.17.34.12) => chars(external); 
+    chars(10.17.34.12) => chars(internal);
+    !chars(10.17.34.12) => chars(external);
 };
 num_range = match read(option:[ipVersion]) {
     in ( digit(0), digit(1000) ) => read(ipVersion) ;

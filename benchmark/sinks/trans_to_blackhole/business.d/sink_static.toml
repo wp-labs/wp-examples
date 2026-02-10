@@ -1,10 +1,10 @@
 version = "2.0"
 
 [sink_group]
-name = "all_normal"
+name = "all_static"
 #parallel = 2
 parallel =  ${WORK_CNT:6}
-oml= ["/oml/normal/*"]
+oml= ["/oml/static/*"]
 #tags = ["group:benchmark", "type:business"]
 
 # Null sink 用于性能基准测试
