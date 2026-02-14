@@ -1,5 +1,5 @@
 ## Doris用例描述
-本doris用例构建了一个从: 文件->wparse->doris的场景。
+本doris用例构建了一个从: tcp->wparse->doris的场景。
 
 
 ## 前提

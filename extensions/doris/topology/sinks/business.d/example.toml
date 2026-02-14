@@ -4,14 +4,14 @@ version = "2.0"
 name = "doris"
 oml = ["example2"]
 
-[[sink_group.sinks]]
-name = "file_proto_sink"
-connect = "file_proto_sink"
-[sink_group.sinks.params]
-file = "events.parsed.prototext"
-[sink_group.sinks.expect]
-ratio = 0.50
-tol   = 0.01
+# [[sink_group.sinks]]
+# name = "file_proto_sink"
+# connect = "file_proto_sink"
+# [sink_group.sinks.params]
+# file = "events.parsed.prototext"
+# [sink_group.sinks.expect]
+# ratio = 0.50
+# tol   = 0.01
 
 [[sink_group.sinks]]
 name = "doris_stream_load"

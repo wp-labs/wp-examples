@@ -20,4 +20,4 @@ DISTRIBUTED BY HASH(wp_event_id) BUCKETS 8
 PROPERTIES (
     "replication_num" = "1"
 );
-select * from wp_test.events_parsed
+select count(*) from wp_test.events_parsed
