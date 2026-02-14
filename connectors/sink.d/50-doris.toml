@@ -8,13 +8,26 @@ allow_override = [
   "password",
   "database",
   "table",
-  "create_table",
+  "timeout_secs",
+  "max_retries",
+  "headers",
+  "batch_size"
 ]
 
 [connectors.params]
 
-# endpoint="mysql://localhost:9030/test_db?charset=utf8mb4&connect_timeout=10"
-# user = "root"
-# password = ""
-# database="test_db"
-# table = "events_parsed"
+# Stream Load API 配置（新版）
+endpoint = "http://localhost:8040"  # 使用 BE 的 HTTP 端口（推荐）
+user = "root"
+password = ""
+database = "test_db"
+table = "events_parsed"
+timeout_secs = 30
+max_retries = 3
+batch_size = 100_0000
+
+# 可选：自定义 Stream Load 参数
+[connectors.params.headers]
+strip_outer_array = "false"
+max_filter_ratio = "0.1"
+strict_mode = "false"

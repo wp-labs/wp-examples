@@ -15,10 +15,12 @@ rate_limit_rps = 500000
 
 [rescue]
 path = "./data/rescue"
+[buffer_conf]
+flush_interval="3s"
 
 [log_conf]
-level = "debug,ctrl=debug,data=trace"
-# level = "warn,ctrl=info,dfx=info"
+#level = "debug,ctrl=debug,data=trace"
+ level = "warn,ctrl=info,dfx=info"
 output = "File"
 [log_conf.file]
 path = "./data/logs/"
