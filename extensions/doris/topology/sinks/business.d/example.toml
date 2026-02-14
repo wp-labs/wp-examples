@@ -3,6 +3,8 @@ version = "2.0"
 [sink_group]
 name = "doris"
 oml = ["example2"]
+batch_timeout_ms=5000
+
 
 # [[sink_group.sinks]]
 # name = "file_proto_sink"
@@ -25,7 +27,7 @@ user = "root"
 password = ""
 timeout_secs = 30
 max_retries = 1
-batch_size = 1000_000
+batch_size = 1024
 
 # 可选：自定义 Stream Load 参数
 [sink_group.sinks.params.headers]

@@ -2,8 +2,8 @@ version = ""
 
 [generator]
 mode = "sample"
-count = 100
-speed = 100
+count = 3000
+speed = 3000
 parallel = 2
 
 

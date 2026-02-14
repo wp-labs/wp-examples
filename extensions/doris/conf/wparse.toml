@@ -15,8 +15,7 @@ rate_limit_rps = 500000
 
 [rescue]
 path = "./data/rescue"
-[buffer_conf]
-flush_interval="2s"
+
 
 [log_conf]
 #level = "debug,ctrl=debug,data=trace"
