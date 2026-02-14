@@ -3,43 +3,38 @@ version = "2.0"
 [sink_group]
 name = "doris"
 oml = ["example2"]
-[[sink_group.sinks]]
-name = "file_proto_sink"
-connect = "file_proto_sink"
-[sink_group.sinks.params]
-file = "events.parsed.prototext"
-[sink_group.sinks.expect]
-ratio = 0.50
-tol   = 0.01
+batch_timeout_ms=5000
+
+
+# [[sink_group.sinks]]
+# name = "file_proto_sink"
+# connect = "file_proto_sink"
+# [sink_group.sinks.params]
+# file = "events.parsed.prototext"
+# [sink_group.sinks.expect]
+# ratio = 0.50
+# tol   = 0.01
 
 [[sink_group.sinks]]
 name = "doris_stream_load"
 connect = "doris_sink"
 [sink_group.sinks.params]
-endpoint = "mysql://localhost:9030?charset=utf8mb4&connect_timeout=10"
+# 新版 Doris Sink 使用 HTTP Stream Load API
+endpoint = "http://localhost:8040"  # BE 的 HTTP 端口（推荐使用 8040 而非 FE 的 8030）
 database = "wp_test"
 table = "events_parsed"
-create_table = """
-CREATE DATABASE IF NOT EXISTS wp_test;
-CREATE TABLE events_parsed (
-    sn           VARCHAR(64) COMMENT '设备序列号',
-    dev_name     VARCHAR(128) COMMENT '设备名称',
-    sip          VARCHAR(45) COMMENT '源 IP',
-    from_zone    VARCHAR(32) COMMENT '来源区域',
-    from_ip      VARCHAR(45) COMMENT '来源 IP',
-    requ_uri     VARCHAR(512) COMMENT '请求 URI',
-    requ_status  SMALLINT COMMENT '请求状态码',
-    resp_len     INT COMMENT '响应长度',
-    src_city     VARCHAR(32) COMMENT '源城市'
-)
-    ENGINE=OLAP
-    DUPLICATE KEY(sn)
-COMMENT '设备请求事件解析表'
-DISTRIBUTED BY HASH(sn) BUCKETS 8
-PROPERTIES (
-    "replication_num" = "1"
-);
-"""
 user = "root"
 password = ""
-# mapping = ["src_ip", "occur_time", "from_ip", "src_ip"]
+timeout_secs = 30
+max_retries = 1
+batch_size = 1024
+
+# 可选：自定义 Stream Load 参数
+[sink_group.sinks.params.headers]
+strip_outer_array = "false"
+max_filter_ratio = "0.1"
+
+# 注意：新版不再支持以下参数
+# - create_table: 请手动在 Doris 中创建表
+# - pool_size: HTTP 客户端自动管理连接
+# - mapping: 字段映射由模型层处理
