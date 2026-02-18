@@ -7,6 +7,7 @@ data
 .report
 out
 getting_started/conf
+getting_started/*
 gen*.dat
 *.gz
 record.md

@@ -17,4 +17,4 @@ str_elb_status = match read(option:[elb_status_code]) {
     digit(200) => chars(ok);
     digit(404) => chars(error);
 };
-* : auto = read();
+//* : auto = read();
