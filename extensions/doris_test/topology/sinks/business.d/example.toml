@@ -1,0 +1,35 @@
+version = "2.0"
+
+[sink_group]
+name = "doris"
+oml = ["/oml/nginx"]
+
+[[sink_group.sinks]]
+name = "doris_stream_load"
+connect = "doris_sink"
+[sink_group.sinks.params]
+endpoint = "mysql://localhost:9030?charset=utf8mb4&connect_timeout=10"
+database = "wp_presstest"
+table = "events_parsed3"
+create_table = """
+CREATE DATABASE IF NOT EXISTS wp_presstest;
+CREATE TABLE events_parsed3 (
+    wp_event_id  VARCHAR(64) COMMENT '事件ID',
+    size         VARCHAR(128) COMMENT '大小',
+    status          VARCHAR(45) COMMENT '状态码',
+    str_status    VARCHAR(32) COMMENT '状态码映射',
+    sip           VARCHAR(30)  COMMENT  '源ip',
+    timestamp      VARCHAR(30)  COMMENT  '时间戳',
+    referer         VARCHAR(30)  COMMENT  ' referer',
+)
+    ENGINE=OLAP
+    DUPLICATE KEY(wp_event_id)
+COMMENT 'nginx日志解析表'
+DISTRIBUTED BY HASH(wp_event_id) BUCKETS 8
+PROPERTIES (
+    "replication_num" = "1"
+);
+"""
+user = "root"
+password = ""
+# mapping = ["src_ip", "occur_time", "from_ip", "src_ip"]
