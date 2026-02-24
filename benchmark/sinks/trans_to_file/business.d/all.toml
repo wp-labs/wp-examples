@@ -6,6 +6,6 @@ oml = ["/oml/*"]
 parallel =  ${WORK_CNT:6}
 [[sink_group.sinks]]
 name = "main"
-connect = "file_proto_sink"
+connect = "file_json_sink"
 #connect = "fast_file_sink"
 params = { file = "all.dat" }
