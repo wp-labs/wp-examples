@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS test_db;
 
+
 DROP TABLE IF EXISTS test_db.wp_nginx;
 CREATE TABLE test_db.wp_nginx (
     wp_event_id BIGINT COMMENT '事件唯一ID',
@@ -39,6 +40,33 @@ PROPERTIES (
     "replication_num" = "1"
 );
 
+delete from test_db.wp_nginx where status is not null;
+select COUNT(*) from test_db.wp_nginx;
 
-select COUNT(*) from test_db.wp_nginx;
-select COUNT(*) from test_db.wp_nginx;
+delete from test_db.wp_jnginx where status is not null;
+select COUNT(*) from test_db.wp_jnginx;
+
+
+CREATE DATABASE IF NOT EXISTS wp_test;
+CREATE TABLE IF NOT EXISTS wp_test.events_parsed (
+    wp_event_id  BIGINT COMMENT '事件唯一ID',
+    wp_src_key   VARCHAR(64) COMMENT '数据来源标识',
+    sn           VARCHAR(64) COMMENT '设备序列号',
+    dev_name     VARCHAR(128) COMMENT '设备名称',
+    sip          VARCHAR(45) COMMENT '源 IP',
+    from_zone    VARCHAR(32) COMMENT '来源区域',
+    from_ip      VARCHAR(45) COMMENT '来源 IP',
+    requ_uri     VARCHAR(512) COMMENT '请求 URI',
+    requ_status  SMALLINT COMMENT '请求状态码',
+    resp_len     INT COMMENT '响应长度',
+    src_city     VARCHAR(32) COMMENT '源城市'
+)
+ENGINE=OLAP
+DUPLICATE KEY(wp_event_id)
+COMMENT '设备请求事件解析表'
+DISTRIBUTED BY HASH(wp_event_id) BUCKETS 8
+PROPERTIES (
+    "replication_num" = "1"
+);
+
+select count(*) from test_db.wp_nginx

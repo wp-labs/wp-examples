@@ -23,6 +23,11 @@ rule = ["/nginx/nginx","version:1"]
 # tags = ["log_type:nginx","version:1"]
 
 
+# file
+#[[sink_group.sinks]]
+#connect = "blackhole_sink"
+#name = "file-1-nginx"
+
 # # file
 # [[sink_group.sinks]]
 # connect = "file_json_sink"
@@ -45,13 +50,26 @@ rule = ["/nginx/nginx","version:1"]
 # tags = ["log_type:nginx","version:1"]
 
 # doris
+#[[sink_group.sinks]]
+#name = "doris-1-nginx"
+#connect = "doris_sink"
+#tags = ["log_type:nginx","version:1"]
+#[sink_group.sinks.params]
+#endpoint="mysql://localhost:9030/?charset=utf8mb4&connect_timeout=10"
+#user = "root"
+#password = ""
+#database="test_db"
+#table = "wp_nginx"
+
+
 [[sink_group.sinks]]
-name = "doris-1-nginx"
+name = "doris_stream_load"
 connect = "doris_sink"
-tags = ["log_type:nginx","version:1"]
 [sink_group.sinks.params]
-endpoint="mysql://localhost:9030/?charset=utf8mb4&connect_timeout=10"
+# 新版 Doris Sink 使用 HTTP Stream Load API
+endpoint = "http://localhost:8040"  # BE 的 HTTP 端口（推荐使用 8040 而非 FE 的 8030）
 user = "root"
 password = ""
 database="test_db"
 table = "wp_nginx"
+batch_size = 1000_000

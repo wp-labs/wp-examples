@@ -2,9 +2,9 @@ version = "1.0"
 
 [generator]
 mode = "sample"
-count = 200000
-speed = 10000
-parallel = 2
+count = 3000000
+speed = 1000000
+parallel = 32
 
 [output]
 # 仅当存在 connect 时，其他 output 字段和旧式 [output.*] 子块将被忽略
