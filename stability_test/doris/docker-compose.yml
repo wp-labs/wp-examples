@@ -2,7 +2,7 @@ services:
 
   # Doris-1 集群
   doris-1-fe:
-    image: apache/doris:fe-2.1.9
+    image: apache/doris:fe-4.0.1
     hostname: doris-1-fe
     ports:
       - "8030:8030"  # 宿主机8030映射到容器8030
@@ -16,7 +16,7 @@ services:
         ipv4_address: 172.30.80.2
 
   doris-1-be:
-    image: apache/doris:be-2.1.9
+    image: apache/doris:be-4.0.1
     hostname: doris-1-be
     ports:
       - "8040:8040"

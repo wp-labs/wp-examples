@@ -1,21 +1,4 @@
 package /nginx {
-
-  rule flb_nginx {
-        (
-            json | take(log) | json_unescape() | (
-                ip:sip,
-                2*_,
-                chars:timestamp<[,]>,
-                http/request",
-                chars:status,
-                chars:size,
-                chars:referer",
-                http/agent",
-                *_
-            )
-        )
-  }
-
    rule nginx {
         (
             ip:sip,
