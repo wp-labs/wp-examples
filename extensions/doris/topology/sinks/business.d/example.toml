@@ -3,19 +3,11 @@ version = "2.0"
 [sink_group]
 name = "doris"
 rule = ["*"]
-batch_timeout_ms=1000
-parallel = 1
+batch_timeout_ms=5000
+parallel = 4
 
-# [[sink_group.sinks]]
-# name = "file_proto_sink"
-# connect = "file_proto_sink"
-# [sink_group.sinks.params]
-# file = "events.parsed.prototext"
-# # [sink_group.sinks.expect]
-# # ratio = 0.50
-# # tol   = 0.01
 
-# # Null sink 用于性能基准测试
+# Null sink 用于性能基准测试
 # [[sink_group.sinks]]
 # name = "blackhole"
 # connect = "blackhole_sink"
@@ -32,10 +24,10 @@ user = "root"
 password = ""
 timeout_secs = 30
 max_retries = 1
-batch_size = 40_0000
+batch_size = 10_0000
 
-# # 可选：自定义 Stream Load 参数
-# [sink_group.sinks.params.headers]
-# strip_outer_array = "false"
-# max_filter_ratio = "0.1"
-# columns="wp_event_id,wp_src_key,sip,timestamp,`http/request`,size,referer,`http/agent`"
+# 可选：自定义 Stream Load 参数
+[sink_group.sinks.params.headers]
+strip_outer_array = "false"
+max_filter_ratio = "0.1"
+columns="wp_event_id,wp_src_key,sip,timestamp,`http/request`,size,referer,`http/agent`"

@@ -1,4 +1,4 @@
-package /nginx/ {
+package Nginx {
    rule nginx {
         (ip:sip,2*_,chars:timestamp<[,]>,http/request",chars:status,chars:size,chars:referer",http/agent",_")
    }

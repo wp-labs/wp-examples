@@ -19,3 +19,4 @@ DISTRIBUTED BY HASH(wp_event_id) BUCKETS 8
 PROPERTIES (
     "replication_num" = "1"
 );
+select count(*) from test_db.wp_nginx
