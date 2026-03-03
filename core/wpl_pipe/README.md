@@ -1,4 +1,56 @@
-# wpl_pipe 
+# WPL Pipe
+
+This example demonstrates WPL pipeline preprocessing for handling encoded or escaped data before parsing.
+
+## Purpose
+
+Validate the ability to:
+- Preprocess input data with pipeline operations before parsing
+- Decode Base64 encoded content
+- Handle quoted and escaped strings
+- Chain multiple preprocessing operations
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Pipeline Syntax | `\|操作\|` prefix for preprocessing |
+| Base64 Decoding | `decode/base64` operation |
+| Unquote/Unescape | `unquote/unescape` for quoted strings |
+| Trim | `trim` for whitespace removal |
+| Operation Chaining | Left-to-right operation execution |
+
+## Pipeline Operations
+
+| Operation | Input | Output |
+|-----------|-------|--------|
+| `decode/base64` | `eyJhIjogMX0=` | `{"a": 1}` |
+| `unquote/unescape` | `"{ \"a\": 1 }"` | `{ "a": 1 }` |
+| `trim` | `  data  ` | `data` |
+
+## WPL Syntax Example
+
+```wpl
+package /pipe_demo {
+    rule fmt_from_base64 {
+        // 1) Base64 decode
+        // 2) Unquote and unescape
+        // 3) Parse JSON
+        |decode/base64|unquote/unescape|(json(_@_origin))
+    }
+}
+```
+
+## Quick Start
+
+```bash
+cd core/wpl_pipe
+./run.sh
+```
+
+---
+
+# wpl_pipe (中文)
 
 本用例演示"WPL 管道预处理"的场景：在正式解析前，通过管道操作对输入数据进行预处理（如 Base64 解码、引号转义还原等），然后再进行 JSON 或其他格式的解析。适用于处理编码、转义等复杂格式的日志数据。
 

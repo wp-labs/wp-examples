@@ -1,4 +1,59 @@
-# file_blackhole 说明
+# File Parse to Blackhole
+
+Benchmark for "File Source → Blackhole Sink" batch processing scenario: uses wpgen to generate test data files, wparse reads and parses in batch mode, outputs to blackhole to test pure parsing throughput performance.
+
+## Purpose
+
+Validate the ability to:
+- Read data from files in batch mode
+- Apply WPL parsing rules
+- Measure pure parsing throughput (no I/O overhead from output)
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| File Source | Reading from pre-generated data files |
+| Batch Processing | wparse batch mode execution |
+| Blackhole Sink | Discarding output to measure pure parsing |
+| Multi-file Input | Dual file sources (gen.dat, gen1.dat) |
+
+## Quick Start
+
+```bash
+cd benchmark/case_file/parse_to_blackhole
+
+# Default test (20M lines, 6 workers)
+./run.sh
+
+# Medium dataset (200K lines)
+./run.sh -m
+
+# Custom configuration
+./run.sh -w 8 -f nginx
+```
+
+## Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `-m` | Medium dataset | 20M → 200K lines |
+| `-f` | Force regenerate data | Smart detection |
+| `-w <cnt>` | Worker count | 6 |
+| `wpl_dir` | WPL rule directory | nginx |
+| `speed` | Generation rate limit | 0 (unlimited) |
+
+## Data Flow
+
+```
+wpgen 1 → gen.dat  ─┐
+                    ├→ wparse batch → blackhole sink
+wpgen 2 → gen1.dat ─┘
+```
+
+---
+
+# file_blackhole 说明 (中文)
 
 本用例演示"文件源 → Blackhole 汇"的批处理性能基准测试场景：使用 wpgen 生成测试数据文件，wparse 通过批处理模式读取并解析，输出到 blackhole 以测试纯解析吞吐性能。
 

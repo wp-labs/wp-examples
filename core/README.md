@@ -1,125 +1,147 @@
-# Core用例
+# Core Examples
+
+This directory contains core end-to-end examples and scenario-based configurations for quickly validating parsing, routing, filtering, metrics, and verification capabilities.
+
+## Case List
+
+| Case | Purpose | Validated Features |
+|------|---------|-------------------|
+| **confvars_case** | Configuration variables usage | Variable substitution, environment overrides |
+| **error_reporting** | Error data reporting with multi-format output | Error routing, JSON/KV output, OML transformation |
+| **file_source** | File-based data source ingestion | File source, batch processing |
+| **knowdb_case** | Knowledge database queries and data association | SQL-like OML queries, CSV knowledge bases, dynamic lookup |
+| **oml_examples** | Comprehensive OML transformation | Conditional matching, range matching, tuple matching, knowledge base queries |
+| **prometheus_metrics** | Prometheus metrics export | HTTP `/metrics` endpoint, counters, gauges, histograms |
+| **sink_filter** | Sink-level filtering and data splitting | Filter rules, multi-path routing, expectation validation |
+| **sink_recovery** | Sink failure handling and data recovery | Rescue files, interruption/recovery cycle, replay pipeline |
+| **syslog_udp** | UDP Syslog source integration | UDP syslog reception, parsing, routing |
+| **tcp_roundtrip** | TCP input/output end-to-end link | TCP source/sink, data flow validation |
+| **wpl_missing** | WPL field missing and fault tolerance | Optional fields, miss group handling, data completeness |
+| **wpl_pipe** | WPL pipeline preprocessing | Base64 decoding, unquote/unescape, trim operations |
+| **wpl_success** | Successful full-chain WPL parsing | Multi-rule parsing, data_type tags, routing validation |
+| **stat_test** | Statistical testing | Statistics validation, test scenarios |
+
+## Common Directory Structure
+
+Each case typically follows this structure:
+```
+case_name/
+├── README.md                 # Documentation
+├── run.sh                    # Execution script
+├── conf/
+│   ├── wparse.toml          # Main WarpParse configuration
+│   └── wpgen.toml           # Data generator configuration (optional)
+├── models/
+│   ├── wpl/                 # WPL parsing rules
+│   ├── oml/                 # OML transformation models
+│   ├── knowledge/           # Knowledge base data (CSV/SQL)
+│   └── sinks/               # Sink routing configuration
+├── data/
+│   ├── in_dat/              # Input data
+│   ├── out_dat/             # Output data
+│   └── logs/                # Processing logs
+└── topology/                # Alternative structure for some cases
+```
+
+## Quick Start
+
+```bash
+# Enter case directory
+cd core/<case_name>
+
+# Run the case
+./run.sh
+
+# Check statistics
+wproj data stat
+
+# Validate output
+wproj data validate
+```
+
+## FAQ
+
+- **Filter not working**:
+  - Paths are resolved relative to current working directory; ensure `filter.conf` is accessible from `sink_root`
+  - Expressions must be parseable by TCondParser; test with simple expressions first
+- **Prometheus not started**:
+  - Without configuring Prometheus connector and switching `monitor` group to it, no `/metrics` endpoint will be available
+- **Parameter override failed**:
+  - `params` keys must be in the connector's `allow_override` whitelist
+
+> **Convention over configuration**: Always explicitly set `name` for each sink to get stable `full_name` and more readable validation reports; for filter-based cases, put filter conditions in `filter.conf` for reuse and review.
+
+---
+
+# Core用例 (中文)
 
 本目录收录核心端到端用例与场景化配置，便于快速验证解析、路由、过滤、度量与校验能力。
 
-## 目录规范（V2）
-- 每个用例的标准布局（已逐步迁移）：
-  - `conf/`：引擎与工具配置（`wparse.toml` 等）
-  - `connectors/source.d/`、`connectors/sink.d/`：源/汇连接器（file/syslog/kafka/DB 等）
-  - `models/`：规则与路由（`models/wpl`、`models/oml`、`models/sources/wpsrc.toml`、`models/sinks/{business.d,infra.d,defaults.toml}`）
-  - `data/`：运行数据目录（`data/in_dat`、`data/out_dat`、`data/rescue`、`logs/`）
-  - 其它：脚本与 README 按各场景自述
-
-## 常用命令（wproj / wparse）
-- 初始化 & 校验
-  - `wproj conf clean|init|check` 生成与校验 `conf/`、`connectors/`、`models/`（源配置默认写入 `models/sources/wpsrc.toml`）
-  - `wproj data clean|check` 清理输出或校验/构建源（v2）
-- 数据生成
-  - `wpgen conf init` 生成生成器配置
-  - `wpgen sample -n N --stat S` 生成样本到 `data/in_dat/`
-- 解析运行
-  - `wparse batch --stat S -p [-n N]` 批处理运行
-- 统计与校验
-  - `wproj stat file|src-file|sink-file [--json]`
-  - `wproj validate sink-file [-v] [--input-cnt N] [--json]`
-
-## 全局约定
-- sink 命名
-  - `name`：单个 sink 的名称，需在同一 `sink_group` 内唯一；未显式提供时按索引回退为 `[0]`、`[1]`…
-  - `full_name = sink_group.name + "/" + name`，CLI 展示与运行期内部标识统一使用 `full_name`。
-- filter 语义
-  - `filter` 是“拦截条件”：表达式为 `true` 时该 sink 丢弃本条数据并转发至基础组 `intercept`；为 `false` 时才写入该 sink。
-- 校验（validate）
-  - 三层期望：`defaults.expect`（全局默认）→ `sink_group.expect`（组级）→ `sink.expect`（单项）
-  - `ratio±tol` 或 `[min,max]` 二选一；`min_samples` 控制分母阈值。
-- CLI 展示
-  - `wproj stat file` 与 `wproj validate sink-file` 的 Sink 列统一显示 `full_name`。
-
-## 快速开始（完整指南）
-- 文档入口：`docs/README.md`
-- 快速入门：`docs/getting-started/quickstart.md`
-
-## 快速开始（命令摘要）
-- 构建：`cargo build --workspace --all-features`
-- 进入用例目录并运行：`./case_verify.sh`
-- 单步：
-  - 统计：`wproj stat file`
-  - 校验：`wproj validate sink-file -v`
-
----
-
 ## 用例清单
 
-### 1) getting_started（初始化示例）
-- 目的：最小可运行工程模板，初始化 source/oml/sink 与基础组。
-- 入口：`usecase/core/getting_started/case_verify.sh`
-- 业务组：`sink/business.d/benchmark.toml` → `/sink/benchmark`
-- 基础组：`sink/infra.d/*.toml`（default/miss/residue/intercept/error/monitor）
+| 用例 | 目的 | 验证特性 |
+|------|------|----------|
+| **confvars_case** | 配置变量使用 | 变量替换、环境变量覆盖 |
+| **error_reporting** | 错误数据报表与多格式输出 | 错误路由、JSON/KV 输出、OML 转换 |
+| **file_source** | 基于文件的数据源输入 | 文件源、批处理 |
+| **knowdb_case** | 知识库查询与数据关联 | SQL 风格 OML 查询、CSV 知识库、动态查找 |
+| **oml_examples** | 综合 OML 转换示例 | 条件匹配、范围匹配、元组匹配、知识库查询 |
+| **prometheus_metrics** | Prometheus 指标导出 | HTTP `/metrics` 端点、计数器、仪表、直方图 |
+| **sink_filter** | Sink 级过滤与数据分流 | 过滤规则、多路径路由、期望值校验 |
+| **sink_recovery** | Sink 故障处理与数据恢复 | 救急文件、中断/恢复流程、回放管道 |
+| **syslog_udp** | UDP Syslog 源集成 | UDP syslog 接收、解析、路由 |
+| **tcp_roundtrip** | TCP 输入/输出端到端链路 | TCP 源/汇、数据流验证 |
+| **wpl_missing** | WPL 字段缺失与容错 | 可选字段、miss 组处理、数据完整性 |
+| **wpl_pipe** | WPL 管道预处理 | Base64 解码、unquote/unescape、trim 操作 |
+| **wpl_success** | WPL 成功解析全链路 | 多规则解析、data_type 标签、路由验证 |
+| **stat_test** | 统计测试 | 统计验证、测试场景 |
 
-### 2) multi_sink（多汇与占比）
-- 目的：同一 `sink_group` 下多种输出格式与占比校验。
-- 入口：`usecase/core/multi_sink/case_verify.sh`
-- 业务组：`sink/business.d/simple.toml`
-  - 组名：`/sink/simple`
-  - sinks：`dat/json/kv`（各 1/3 占比）
+## 通用目录结构
 
-### 3) wpl_success / wpl_missing（规则成功/缺失场景）
-- wpl_success：成功解析全链路
-- wpl_missing：字段缺失容错；已统一 `sink_group` 为 `/sink/simple`，sinks 命名为 `dat/json/kv`
-- 入口：`usecase/core/wpl_success|wpl_missing/case_verify.sh`
+每个用例通常遵循以下结构：
+```
+case_name/
+├── README.md                 # 文档说明
+├── run.sh                    # 执行脚本
+├── conf/
+│   ├── wparse.toml          # WarpParse 主配置
+│   └── wpgen.toml           # 数据生成器配置（可选）
+├── models/
+│   ├── wpl/                 # WPL 解析规则
+│   ├── oml/                 # OML 转换模型
+│   ├── knowledge/           # 知识库数据（CSV/SQL）
+│   └── sinks/               # Sink 路由配置
+├── data/
+│   ├── in_dat/              # 输入数据
+│   ├── out_dat/             # 输出数据
+│   └── logs/                # 处理日志
+└── topology/                # 部分用例的替代结构
+```
 
-### 4) source_file（多文件源与对半分流）
-- 目的：演示 `Benchmark1/Benchmark2` 两路对半分流（KV 输出）
-- 业务组：`sink/business.d/benchmark1.toml` → `/sink/benchmark1`，`benchmark2.toml` → `/sink/benchmark2`
-- 建议：如需更直观，可改为 `/sink/benchmark/kv1`、`/sink/benchmark/kv2`
+## 快速开始
 
-### 5) sink_filter（按 sink 过滤/拦截）
-- 目的：按规则将数据划分为全量与安全两路；命中过滤条件的样本进入 `intercept`
-- 业务组：`sink/business.d/filter.toml` → `/sink/filter`
-  - `all`：不设置 `filter`，收全量
-  - `safe`：`filter = "./sink/business.d/filter.conf"`（请在文件中写“非安全”条件，命中则拦截）
-- 入口：`usecase/core/sink_filter/case_verify.sh`
+```bash
+# 进入用例目录
+cd core/<case_name>
 
-### 6) prometheus_metrics（Prometheus 指标导出）
-- 目的：经 Prometheus sink 导出内部指标，curl `/metrics` 拉取
-- 业务组：`sink/business.d/benchmark.toml`（样本）
-- 基础组：`sink/infra.d/monitor.toml` → 建议改为 Prometheus 连接器
-  - 添加连接器：`usecase/core/connectors/sink.d/10-prometheus.toml`
-  - 修改 `monitor.toml`，`connect = "prometheus_sink"`（或覆盖 endpoint 为 `127.0.0.1:35666`）
-- 验证：`curl -s http://127.0.0.1:35666/metrics`
+# 运行用例
+./run.sh
 
-### 7) sink_recovery（故障切换与救援）
-- 目的：写入失败时使用 rescue；可在 `logs/wparse.log` 中观察 fallback/repair
-- 业务组：`sink/business.d/benchmark.toml`、`example.toml`（可为 sinks 添加 `primary/backup` 等更语义化名称）
+# 查看统计
+wproj data stat
 
-### 8) oml_examples（OML 转换示例）
-- 目的：多种 OML 转换与输出格式
-- 业务组：`sink/business.d/skyeye_stat.toml`、`work_case.toml`、`csv_example.toml`
-- 建议：给 sinks 显式命名（如 `skyeye_adm/skyeye_pdm`），便于 `full_name` 识别
-
-### 9) error_reporting（错误数据报表）
-- 目的：针对错误数据路径输出多格式报表
-- 业务组：`sink/business.d/skyeye_stat.toml`（json/kv 两路）
-
-### 10) config_errors（配置错误场景）
-- no_source/less_dvadm 两个子场景；用于校验 CLI 诊断输出与错误处理
-
----
-
-## 命名建议（可按需逐步收敛）
-- 业务组名：短小、语义明确，如 `/sink/simple`、`/sink/filter`、`/sink/benchmark`
-- sink 名：描述输出内容或用途，如 `dat/json/kv`、`all/safe`、`primary/backup`、`adm/pdm`
-- 已调整：`wpl_missing/sink/business.d/simple.toml` 统一为 `/sink/simple`，并为 sinks 增加 `dat/json/kv` 名称
+# 校验输出
+wproj data validate
+```
 
 ## 常见问题
-- filter 未生效：
+
+- **filter 未生效**：
   - 路径基于当前工作目录解析；确保 `filter.conf` 相对 `sink_root` 可访问
-  - 表达式需能被 TCondParser 解析；可先用简单表达式烟囱测试
-- Prometheus 未启动：
+  - 表达式需能被 TCondParser 解析；可先用简单表达式测试
+- **Prometheus 未启动**：
   - 未配置 Prometheus 连接器并将 `monitor` 组切换到该连接器时，不会有 `/metrics` 端点
-- 覆盖参数失败：
+- **覆盖参数失败**：
   - `params` 的键必须在连接器 `allow_override` 白名单中
 
----
-
-> 约定优于配置：尽量为每个 sink 显式给出 `name`，以获得稳定的 `full_name` 与更可读的校验报表；对过滤型用例，请把拦截条件放在 `filter.conf` 文件，便于复用与审阅。
+> **约定优于配置**：尽量为每个 sink 显式给出 `name`，以获得稳定的 `full_name` 与更可读的校验报表；对过滤型用例，请把拦截条件放在 `filter.conf` 文件，便于复用与审阅。

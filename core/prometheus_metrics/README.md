@@ -1,4 +1,58 @@
-# prometheus_metrics
+# Prometheus Metrics
+
+This example demonstrates Prometheus metrics export for monitoring system integration and performance observation.
+
+## Purpose
+
+Validate the ability to:
+- Export internal WarpParse metrics via Prometheus sink
+- Expose HTTP `/metrics` endpoint for scraping
+- Support Grafana integration for visualization
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Prometheus Sink | Exporting metrics via Prometheus protocol |
+| HTTP Endpoint | `/metrics` endpoint at configurable port |
+| Counter Metrics | Input/output counts, error counts |
+| Gauge Metrics | Queue depth, active connections |
+| Histogram Metrics | Parse duration, processing latency |
+
+## Metrics Types
+
+| Type | Examples |
+|------|----------|
+| Counter | `wparse_input_total`, `wparse_output_total` |
+| Gauge | Queue depth, active connections |
+| Histogram | `wparse_parse_duration_seconds` |
+
+## Quick Start
+
+```bash
+cd core/prometheus_metrics
+./run.sh
+
+# Fetch metrics
+curl -s http://localhost:35666/metrics
+```
+
+## Grafana Integration
+
+```promql
+# Input rate
+rate(wparse_input_total[1m])
+
+# Output distribution by sink
+sum by (sink) (wparse_output_total)
+
+# P99 latency
+histogram_quantile(0.99, wparse_parse_duration_seconds_bucket)
+```
+
+---
+
+# prometheus_metrics (中文)
 
 本用例演示"Prometheus 指标导出"的场景：通过 Prometheus sink 导出 warp-flow 的内部运行指标，支持通过 HTTP `/metrics` 端点拉取指标数据。适用于监控系统集成与性能观测。
 

@@ -1,0 +1,23 @@
+[sources.file_source_1]
+type = "file"
+include = ["../data/in_dat/gen.dat"]
+read_from = "beginning"
+data_dir = "../data/"
+
+[transforms.parse_barracuda_activity]
+type = "remap"
+inputs = ["file_source_1"]
+source = '''
+raw = to_string!(.message)
+m = parse_regex!(raw,r'^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<severity>\S+)\s+(?P<tz>[+-]\d{2}:\d{2})\s+(?P<label>Block|Allow|Drop|Reject):\s+(?P<kv>.*)$')
+.timestamp = m.ts
+. |= parse_key_value!(m.kv,field_delimiter: "|",key_value_delimiter: "=")
+del(.message)
+'''
+
+[sinks.file_out]
+type = "blackhole"
+inputs = ["parse_barracuda_activity"]
+
+[api]
+    enabled = true

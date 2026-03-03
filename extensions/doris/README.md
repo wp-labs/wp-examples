@@ -1,7 +1,3 @@
-## Doris用例描述
-本doris用例构建了一个从: tcp->wparse->doris的场景。
-
-
 ## 前提
 1. 启动docker compose：`docker compose up -d`
 2. 等待doris启动后，创建test.sql中的库表

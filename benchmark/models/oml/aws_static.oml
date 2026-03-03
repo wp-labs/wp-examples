@@ -1,0 +1,29 @@
+name : /oml/static/aws
+rule : /aws/*
+//enable : false
+---
+static {
+    localhost = chars("localhost");
+    attack_ip = chars("attack_ip");
+    status_ok = chars("ok");
+    status_err = chars("error");
+    ip_127     = ip(127.0.0.1);
+    dgt_200    = digit(200);
+    dgt_400    = digit(400);
+}
+sent_bytes:digit = take(sent_bytes) ;
+target_status_code:digit = take(target_status_code) ;
+elb_status_code:digit = take(elb_status_code) ;
+extends : obj = object {
+    ssl_cipher = read(ssl_cipher);
+    ssl_protocol = read(ssl_protocol);
+};
+match_chars = match read(option:[wp_src_ip]) {
+    ip_127 =>  localhost;
+    !ip(127.0.0.1) => attack_ip;
+};
+str_elb_status = match read(option:[elb_status_code]) {
+    digit(200) => status_ok ;
+    digit(404) => status_err ;
+};
+//* : auto = read();

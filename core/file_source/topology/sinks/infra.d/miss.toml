@@ -4,7 +4,7 @@ version = "2.0"
 name = "miss"
 [[sink_group.sinks]]
 connect = "file_raw_sink"
-params = {  file = "miss.dat" }
+params = {  file = "miss.dat", sync = true }
 [sink_group.sinks.expect]
 max = 0.1
 min = 0.0

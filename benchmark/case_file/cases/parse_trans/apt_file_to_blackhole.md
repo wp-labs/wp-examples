@@ -1,42 +1,70 @@
 # apt_file_to_blackhole
 
-本测试用于验证 **apt_file_to_blackhole** 场景下的引擎性能（Mac M4 Mini，日志解析+转换）。
+## Case Metadata
+- **Case ID**: apt_file_to_blackhole
+- **Category**: file
+- **Capability**: parse_trans
+- **Topology**: file -> blackhole
+- **Platforms**: Mac M4 Mini / Linux (AWS EC2)
 
-## 场景描述
+## Scenario Definition
+- **日志类型**: APT Threat Log (3K)
+- **平均大小**: 3K
+- **能力**: parse_trans
+- **输入/输出**: File -> BlackHole
+- **说明**: APT Threat Log 场景，File 输入到 BlackHole 输出，执行 日志解析+转换 能力。
 
-本场景可概括为：**APT 3K 威胁日志，File 输入到 BlackHole 输出，执行 日志解析+转换 能力**。
+## Dataset Contract
+- **输入数据**: benchmark/case_file/parse_to_blackhole/data/in_dat/gen.dat（数据文件） / benchmark/case_file/parse_to_blackhole/conf/wpgen.toml（生成器配置）
+- **事件数**: 支持 `-m`（中等规模）与 `-c`（指定条数），事件含义与生成器配置保持一致
+- **编码/分隔**: UTF-8 / LF
+- **混合比例**: 不适用
 
-本测试旨在评估 **WarpParse** 与 **Vector** 两款引擎在 APT 3K 威胁日志 处理场景下的表现。
+## Configuration Binding
+- **WarpParse**: benchmark/case_file/parse_to_blackhole/conf/wparse.toml（规则目录：benchmark/models/wpl/apt；解析+转换使用 benchmark/models/oml）
+- **Vector-VRL**: benchmark/vector/vector-vrl_transform/apt_file_to_blackhole.toml
+- **Vector-Fixed**: benchmark/vector/vector-fixed_transform/apt_file_to_blackhole.toml
+- **Logstash**: benchmark/logstash/logstash_trans/apt_file_to_blackhole.conf
 
-## 设计
+## Execution Contract
+- **结束条件**: 消费完等量事件（或按数据集规模），如需按时间结束请补充
+- **并发/Worker**: 默认配置（wparse 的 parse_workers 以配置为准）
+- **重复次数**: 默认单次；建议 N=3 取 median
 
-1. **测试目标:** 对比两引擎在该日志场景下的吞吐、延迟、CPU/内存使用。
-2. **输入配置:** File 输入，覆盖高并发/大吞吐压测场景。
-3. **输出配置:** BlackHole 输出，用于验证链路吞吐能力。
-4. **预期行为:**
-* 解析与转换链路正确执行，字段映射/增强结果与规则期望一致。
-* 高负载下转换不成为瓶颈，整体吞吐稳定，延迟可控。
-* 性能与资源指标可正常采集，用于后续对比与回归。
+## Metrics
+- **EPS**: Events Per Second
+- **MPS**: MiB/s，公式：`MPS = EPS * AvgEventSize / 1024 / 1024`
+- **CPU**: 多核累计百分比（例如 800% ≈ 8 个逻辑核满载）
+- **MEM**: 进程内存占用（Avg/Peak）
+- **Rule Size**: 规则配置体积
 
+## Performance Data
 
-## Results（Mac M4 Mini）
+### Linux (AWS EC2)
+| 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| WarpParse | 123,100 | 416.38 | 599% / 607% | 199 MB / 265 MB | 7.65x |
+| Vector | 16,093 | 54.43 | 674% / 742% | 188 MB / 199 MB | 1.0x |
+| Logstash | 7,633 | 25.82 | 657% / 732% | 1174 MB / 1197 MB | 0.47x |
 
-| **引擎** | **输入模式** | **输出模式** | **消费速率(EPS)** | **MPS** | **CPU平均/峰值** | **内存平均/峰值** |
-| --- | --- | --- | --- | --- | --- | --- |
-| WarpParse | File | BlackHole | **280,000** | 947.15 | **768.50 %/868.90 %** | **172.72 MB/178.23 MB** |
-| Vector | File | BlackHole | **30,612** | 103.55 | **560.94 %/654.40 %** | **248.00 MB/273.02 MB** |
+### macOS (Mac M4 Mini)
+| 引擎 | EPS | MPS | CPU (Avg/Peak) | MEM (Avg/Peak) | 性能倍数 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| WarpParse | 299,400 | 1012.79 | 763% / 855% | 155 MB / 162 MB | 8.12x |
+| Vector-VRL | 36,857 | 124.68 | 567% / 654% | 268 MB / 286 MB | 1.0x |
+| Logstash | 26,315 | 89.02 | 852% / 901% | 1256 MB / 1305 MB | 0.71x |
 
-## 结论
+## Correctness Check
+- **对齐说明**: 参见 `benchmark/report/test_sample.md`
+- **抽样方式**: 运行 file 输出链路进行抽样对比，检查关键字段与 Golden 输出一致
+- **输出路径约定**: `benchmark/case_file/parse_to_file/data/out_dat/`（如需校验可切换到 file 输出）
 
-在本测试场景（APT 3K 威胁日志，File 输入到 BlackHole 输出，执行 日志解析+转换 能力）中，对比 **WarpParse** 与 **Vector** 的性能表现，得出以下结论：
+## Notes
+- **实例规格**: 若为 TBD，不影响 file 场景口径，但建议补齐以便复现
+- **限制**: 单机测试，未覆盖分布式/HA
 
-1. **吞吐性能**: **WarpParse** 表现出显著优势。
-    * 消费速率达到 **280,000** EPS，约是 Vector (**30,612** EPS) 的 **9.15** 倍。
-    * 这意味着在相同硬件资源下，WarpParse 能够处理更大规模的数据流量。
-
-2. **系统资源开销**:
-    * **CPU**: WarpParse 的 CPU 使用率更高（**768.50 %** vs **560.94 %**）。
-    * **内存**: WarpParse 的内存占用更低（**172.72 MB** vs **248.00 MB**）。
-
-**总结**:
-WarpParse 在该场景下展现了卓越的吞吐性能（领先约 9.15 倍），同时保持了更低的内存占用。对于追求高吞吐量的日志处理场景，WarpParse 是更优的选择。
+## References
+- **Mac 报告**: benchmark/report/report_mac.md#324-apt-threat-log-3K（章节 3.2.4）
+- **Linux 报告**: benchmark/report/report_linux.md#324-apt-threat-log-3K（章节 3.2.4）
+- **规则说明**: benchmark/report/test_rule.md
+- **样本对齐**: benchmark/report/test_sample.md

@@ -1,7 +1,7 @@
 [[connectors]]
 id = "file_kv_sink"
 type = "file"
-allow_override = ["base","file"]
+allow_override = ["base","file","sync"]
 [connectors.params]
 fmt  = "kv"
 base = "./data/out_dat"
