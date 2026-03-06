@@ -1,0 +1,23 @@
+version = "2.0"
+
+[sink_group]
+name = "http"
+rule = ["*"]
+batch_timeout_ms=100
+parallel = 4
+
+[[sink_group.sinks]]
+name = "http_sink_demo"
+connect = "http_sink"
+[sink_group.sinks.params]
+endpoint= "http://localhost:8080/auth/ingest/ndjson"
+username = "root"
+password = "root"
+fmt = "ndjson"  # ndjson 格式,每行一个 JSON 对象
+compression = "none"
+timeout_secs = 30
+max_retries = 3
+batch_size = 1024
+
+[connectors.params.headers]
+# content-type = "application/ndjson"

@@ -1,0 +1,5 @@
+[[sources]]
+enable = true
+key = "tcp_1"
+connect = "tcp_src"
+params = { prefer_newline = true, port = 19001 }
