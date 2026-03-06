@@ -10,8 +10,7 @@ parallel = 4
 name = "ck_stream_load"
 connect = "clickhouse_sink"
 [sink_group.sinks.params]
-host = "localhost"
-port = "8123"
+endpoint= "http://localhost:8123"
 username = "default"
 password = "default"
 database = "default"

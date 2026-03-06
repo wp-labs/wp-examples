@@ -4,8 +4,7 @@ type = "clickhouse"
 
 # 允许通过 sink 的 params 覆盖 Doris 连接和 Stream Load 关键参数
 allow_override = [
-  "host",
-  "port",
+  "endpoint",
   "username",
   "password",
   "database",
@@ -16,8 +15,7 @@ allow_override = [
 ]
 
 [connectors.params]
-host = "localhost"
-port = "8123"
+endpoint= "http://localhost:8123"
 username = ""
 password = ""
 database = ""
