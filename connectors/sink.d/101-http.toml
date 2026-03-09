@@ -1,0 +1,30 @@
+[[connectors]]
+id = "http_sink"
+type = "http"
+# 允许通过 sink 的 params 覆盖 Doris 连接和 Stream Load 关键参数
+allow_override = [
+  "endpoint",
+  "username",   # HTTP Basic 认证
+  "password",   # HTTP Basic 认证
+  "fmt",        # 输出格式：`json`、`ndjson`、`csv`、`kv`、`raw`、`proto-text`（默认 `json`）
+  "compression", # 数据压缩：`none`、`gzip`（默认 `none`）
+  "headers",
+  "timeout_secs",
+  "max_retries",
+  "batch_size"
+]
+
+[connectors.params]
+
+endpoint = ""
+username = ""
+password = ""
+fmt = "json"
+compression = "none"
+timeout_secs = 30
+max_retries = 3
+batch_size = 1024
+
+# 可选：自定义 header 参数
+[connectors.params.headers]
+# content-type = "application/json"

@@ -2,9 +2,9 @@ version = ""
 
 [generator]
 mode = "sample"
-count = 3000
-speed = 3000
-parallel = 2
+count = 100000000
+speed = 100_0000
+parallel = 4
 
 
 [output]
