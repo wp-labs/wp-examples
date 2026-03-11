@@ -8,14 +8,15 @@ sources = "./topology/sources"
 sinks = "./topology/sinks"
 
 [performance]
-parse_workers = 1
-rate_limit_rps = 30000
+#rate_limit_rps = 200000
+rate_limit_rps = 0
+parse_workers = 4
 
 [rescue]
 path = "./data/rescue"
 
 [log_conf]
-level = "warn,ctrl=debug,launch=info,klib=info"
+level = "warn,ctrl=warn,launch=info,klib=info"
 output = "File"
 [log_conf.file]
 path = "./data/logs"
