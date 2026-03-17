@@ -1,0 +1,6 @@
+[[connectors]]
+id = "postgres_sink"
+type = "postgres"
+allow_override = ["endpoint", "username", "password","database","table","columns","batch","batch_size"]
+[connectors.params]
+batch = 1

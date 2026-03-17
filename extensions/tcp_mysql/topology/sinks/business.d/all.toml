@@ -5,7 +5,7 @@ name = "all"
 rule = ["/*"]
 parallel = 8
 [[sink_group.sinks]]
-name = "main"
+name = "database"
 connect = "mysql_sink"
 [sink_group.sinks.params]
 endpoint = "localhost:3306"
@@ -14,4 +14,4 @@ password = "123456"
 database = "wparse"
 table = "nginx_logs"
 columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
-batch = 20
+batch_size = 10240
