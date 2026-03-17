@@ -1,0 +1,8 @@
+[[connectors]]
+id = "count_sink"
+type = "count"
+# 允许通过 sink 的 params 覆盖 Doris 连接和 Stream Load 关键参数
+allow_override = ["batch_size"]
+
+[connectors.params]
+batch_size = 100_0000

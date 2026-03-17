@@ -1,5 +1,4 @@
 version = "1.0"
-robust = "normal"
 
 [models]
 wpl = "./models/wpl"
@@ -10,21 +9,22 @@ sources = "./topology/sources"
 sinks = "./topology/sinks"
 
 [performance]
-parse_workers = 2
-rate_limit_rps = 500000
+parse_workers = 8
+rate_limit_rps = 0
 
 [rescue]
 path = "./data/rescue"
 
+
 [log_conf]
-level = "debug,ctrl=debug,data=trace"
-# level = "warn,ctrl=info,dfx=info"
+# level = "warn,ctrl=warn,data=info"
+level = "error,ctrl=error"
 output = "File"
 [log_conf.file]
 path = "./data/logs/"
 
 [stat]
-window_sec = 60
+# window_sec = 60
 
 [[stat.pick]]
 key = "pick_stat"
@@ -37,3 +37,5 @@ target = "*"
 [[stat.sink]]
 key = "sink_stat"
 target = "*"
+
+
