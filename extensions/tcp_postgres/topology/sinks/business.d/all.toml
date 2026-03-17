@@ -2,16 +2,16 @@ version = "2.0"
 
 [sink_group]
 name = "all"
-rule = ["/*"]
+oml = ["/*"]
 parallel = 8
 [[sink_group.sinks]]
-name = "database"
-connect = "mysql_sink"
+name = "main"
+connect = "postgres_sink"
 [sink_group.sinks.params]
-endpoint = "localhost:3306"
-username = "root"
+endpoint = "localhost:5432"
+username = "postgres"
 password = "123456"
 database = "wparse"
 table = "nginx_logs"
 columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
-batch_size = 10240
+batch_size = 10
