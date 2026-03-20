@@ -11,8 +11,8 @@ name = "ck_stream_load"
 connect = "clickhouse_sink"
 [sink_group.sinks.params]
 endpoint= "http://localhost:8123"
-username = "default"
-password = "default"
+username = "${SEC_SINK_USERNAME}"
+password = "${SEC_SINK_PASSWORD}"
 database = "default"
 table = "wp_nginx"
 timeout_secs = 30

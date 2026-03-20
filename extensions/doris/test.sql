@@ -1,6 +1,5 @@
 CREATE DATABASE IF NOT EXISTS test_db;
 
-
 DROP TABLE IF EXISTS test_db.wp_nginx;
 CREATE TABLE test_db.wp_nginx (
     wp_event_id BIGINT COMMENT '事件唯一ID',

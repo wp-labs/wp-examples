@@ -1,5 +1,7 @@
-drop table default.wp_nginx;
-CREATE TABLE wp_nginx
+CREATE DATABASE IF NOT EXISTS test_db;
+
+DROP TABLE IF EXISTS default.wp_nginx;
+CREATE TABLE default.wp_nginx
 (
     wp_event_id        Int64              COMMENT '事件唯一ID',
     wp_src_key         LowCardinality(String) COMMENT '数据来源表示',
@@ -12,7 +14,6 @@ CREATE TABLE wp_nginx
     `http/agent`       String             COMMENT 'User-Agent'
 )
     ENGINE = MergeTree
-    ORDER BY (wp_src_key)
-    SETTINGS index_granularity = 8192;
-
-select count(*) from wp_nginx;
+        ORDER BY (wp_src_key)
+        SETTINGS index_granularity = 8192;
+select count(*) from default.wp_nginx
