@@ -15,16 +15,14 @@ allow_override = [
 ]
 
 [connectors.params]
-
-# Stream Load API 配置（新版）
 endpoint = "http://localhost:8040"  # 使用 BE 的 HTTP 端口（推荐）
-user = "root"
-password = ""
-database = "test_db"
-table = "events_parsed"
-timeout_secs = 30
-max_retries = 3
-batch_size = 100_0000
+user = "root"                       # 用户名
+password = ""                       # 密码
+database = ""                       # 数据库
+table = ""                          # 表名
+timeout_secs = 30                   # 请求超时时间
+max_retries = 3                     # 请求重试次数
+batch_size = 1_0000                 # 请求批量大小
 
 # 可选：自定义 Stream Load 参数
 [connectors.params.headers]

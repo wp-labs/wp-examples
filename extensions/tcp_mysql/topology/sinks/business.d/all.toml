@@ -9,8 +9,8 @@ name = "database"
 connect = "mysql_sink"
 [sink_group.sinks.params]
 endpoint = "localhost:3306"
-username = "root"
-password = "123456"
+username = "${SEC_SINK_USERNAME}"
+password = "${SEC_SINK_PASSWORD}"
 database = "wparse"
 table = "nginx_logs"
 columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]

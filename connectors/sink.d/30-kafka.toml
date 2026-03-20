@@ -9,3 +9,4 @@ topic = "wparse_output"
 num_partitions = 1
 replication = 1
 #config = ["compression.type=snappy", "acks=all"]
+[connectors.params.config]

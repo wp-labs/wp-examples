@@ -11,8 +11,8 @@ name = "http_sink_demo"
 connect = "http_sink"
 [sink_group.sinks.params]
 endpoint= "http://localhost:8080/auth/ingest/ndjson"
-username = "root"
-password = "root"
+username = "${SEC_SINK_USERNAME}"
+password = "${SEC_SINK_PASSWORD}"
 fmt = "ndjson"  # ndjson 格式,每行一个 JSON 对象
 compression = "none"
 timeout_secs = 30

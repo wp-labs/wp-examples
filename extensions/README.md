@@ -6,11 +6,17 @@ This directory contains extension connector examples demonstrating WarpParse int
 
 | Case | Purpose | Validated Features |
 |------|---------|-------------------|
-| **doris** | File Source → Doris Stream Load pipeline | Doris sink, Stream Load, batch processing |
+| **clickhouse** | File Source -> ClickHouse pipeline | ClickHouse sink, batch processing, credential injection |
+| **doris** | File Source -> Doris Stream Load pipeline | Doris sink, Stream Load, batch processing |
+| **elasticsearch** | File Source -> Elasticsearch pipeline | Elasticsearch sink, index write, credential injection |
+| **http** | File Source -> HTTP endpoint pipeline | HTTP sink, auth request, format output |
 | **kafka** | Kafka Source/Sink integration | Kafka consumer/producer, topic routing |
 | **practice** | Real-world multi-source monitoring scenario | Multi-source collection, Fluent-bit, Kafka, VictoriaLogs, Grafana |
-| **tcp_mysql** | TCP Source → MySQL Sink pipeline | TCP source, MySQL sink, data persistence |
-| **tcp_victorialogs** | TCP Source → VictoriaLogs Sink pipeline | TCP source, VictoriaLogs sink, log storage |
+| **syslog_postgres** | Syslog/TCP log -> Postgres pipeline | Postgres sink, structured storage, credential injection |
+| **tcp_count** | TCP input counting and test helper | TCP source, counting, statistics |
+| **tcp_mysql** | TCP Source -> MySQL Sink pipeline | TCP source, MySQL sink, data persistence |
+| **tcp_postgres** | TCP Source -> Postgres Sink pipeline | TCP source, Postgres sink, data persistence |
+| **tcp_victorialogs** | TCP Source -> VictoriaLogs Sink pipeline | TCP source, VictoriaLogs sink, log storage |
 | **victoriametrics** | Internal metrics push to VictoriaMetrics | VictoriaMetrics sink, metrics export, monitoring |
 
 ## Common Structure
@@ -54,11 +60,17 @@ docker compose up -d
 
 | 用例 | 目的 | 验证特性 |
 |------|------|----------|
-| **doris** | 文件源 → Doris Stream Load 管道 | Doris sink、Stream Load、批处理 |
+| **clickhouse** | 文件源 -> ClickHouse 管道 | ClickHouse sink、批处理、安全变量注入 |
+| **doris** | 文件源 -> Doris Stream Load 管道 | Doris sink、Stream Load、批处理 |
+| **elasticsearch** | 文件源 -> Elasticsearch 管道 | Elasticsearch sink、索引写入、安全变量注入 |
+| **http** | 文件源 -> HTTP 端点管道 | HTTP sink、认证请求、格式输出 |
 | **kafka** | Kafka 源/汇集成 | Kafka 消费者/生产者、topic 路由 |
 | **practice** | 实战多源监控场景 | 多源采集、Fluent-bit、Kafka、VictoriaLogs、Grafana |
-| **tcp_mysql** | TCP 源 → MySQL Sink 管道 | TCP 源、MySQL sink、数据持久化 |
-| **tcp_victorialogs** | TCP 源 → VictoriaLogs Sink 管道 | TCP 源、VictoriaLogs sink、日志存储 |
+| **syslog_postgres** | Syslog/TCP 日志 -> Postgres 管道 | Postgres sink、结构化入库、安全变量注入 |
+| **tcp_count** | TCP 输入计数与测试辅助 | TCP source、计数、统计 |
+| **tcp_mysql** | TCP 源 -> MySQL Sink 管道 | TCP 源、MySQL sink、数据持久化 |
+| **tcp_postgres** | TCP 源 -> Postgres Sink 管道 | TCP 源、Postgres sink、数据持久化 |
+| **tcp_victorialogs** | TCP 源 -> VictoriaLogs Sink 管道 | TCP 源、VictoriaLogs sink、日志存储 |
 | **victoriametrics** | 内部指标推送到 VictoriaMetrics | VictoriaMetrics sink、指标导出、监控 |
 
 ## 通用结构

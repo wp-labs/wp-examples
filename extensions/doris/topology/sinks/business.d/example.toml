@@ -16,12 +16,11 @@ parallel = 4
 name = "doris_stream_load"
 connect = "doris_sink"
 [sink_group.sinks.params]
-# 新版 Doris Sink 使用 HTTP Stream Load API
 endpoint = "http://localhost:8040"  # BE 的 HTTP 端口（推荐使用 8040 而非 FE 的 8030）
 database = "test_db"
 table = "wp_nginx"
-user = "root"
-password = ""
+user = "${SEC_SINK_USERNAME}"
+password = "${SEC_SINK_PASSWORD}"
 timeout_secs = 30
 max_retries = 1
 batch_size = 10_0000
