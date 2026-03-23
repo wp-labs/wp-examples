@@ -1,11 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 1. 确认执行在当前目录
+# 进入脚本所在目录
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-echo "[1/2] 生成样例数据..."
-wpgen sample -n 100 --stat 2 -p
+wproj check
+wproj data clean
 
-echo "[2/2] 执行 wparse batch..."
-wparse batch --stat 2 -S 1 -p
+echo "start work (no print_stat)"
+wparse deamon --stat 2 -w 8 -p &
+# 等待 PID 文件出现
+for i in {1..50}; do
+    test -f ./.run/wparse.pid && break
+    sleep 0.1
+done
+sleep 3
+
+LINE_CNT=100
+SPEED_MAX=100
+echo "1> gen  sample data"
+wpgen sample  -n $LINE_CNT -s $SPEED_MAX --stat 2
+
+sleep 5
+if [ -f ./.run/wparse.pid ]; then
+    kill $(cat ./.run/wparse.pid) || true
+fi
+sleep 3
+
+wproj data stat
+wproj data validate

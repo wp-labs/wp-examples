@@ -4,9 +4,11 @@ data
 *.raw
 .run
 .*
+!.warp_parse
 .report
 out
 getting_started/conf
+getting_started/*
 gen*.dat
 *.gz
 record.md
