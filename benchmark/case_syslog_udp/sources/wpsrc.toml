@@ -1,0 +1,5 @@
+[[sources]]
+enable = true
+key = "syslog_udp"
+connect = "syslog_udp_src"
+params = { header_mode = "skip", port = 1524,  }

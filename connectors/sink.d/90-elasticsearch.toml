@@ -1,0 +1,26 @@
+[[connectors]]
+id = "elasticsearch_sink"
+type = "elasticsearch"
+# 允许通过 sink 的 params 覆盖 Doris 连接和 Stream Load 关键参数
+allow_override = [
+  "protocol",
+  "host",
+  "port",
+  "username",
+  "password",
+  "index",
+  "timeout_secs",
+  "max_retries",
+  "batch_size"
+]
+
+[connectors.params]
+protocol = "http"
+host = "localhost"
+port = "9200"
+username = "elastic"
+password = ""
+index = "wp_nginx"
+timeout_secs = 30
+max_retries = 3
+batch_size = 1_0000

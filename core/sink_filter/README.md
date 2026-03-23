@@ -1,6 +1,50 @@
-# sink_filter
+# Sink Filter
 
-本用例演示“按 sink 过滤/分流”的场景：依据业务规则将输入样本分发到不同的 sink 路径（all/safe/residue 等），并通过 defaults.expect 与单项 expect 对输出比例进行离线校验。适用于验证过滤逻辑正确性、残留/错误路径占比是否符合预期。
+This example demonstrates sink-level filtering and data splitting based on business rules.
+
+## Purpose
+
+Validate the ability to:
+- Route data to different sink paths (all/safe/residue) based on filter rules
+- Configure filter expressions for conditional routing
+- Validate output ratios using `defaults.expect` and per-sink `expect` settings
+- Ensure filter logic correctness and expected data distribution
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Filter Rules | Conditional data routing via `filter.conf` |
+| Multi-path Routing | Splitting data to all/safe/residue paths |
+| Expectation Validation | Ratio validation with `expect` settings |
+| Default Expectations | Group-level defaults in `defaults.toml` |
+| Tolerance Settings | `ratio`, `tol`, `min`, `max` constraints |
+
+## Filter Configuration
+
+```toml
+# sink/defaults.toml
+[defaults.expect]
+basis = "total_input"  # Denominator for ratio calculation
+min_samples = 1
+mode = "warn"
+```
+
+## Quick Start
+
+```bash
+cd core/sink_filter
+./run.sh
+
+# Validate output ratios
+wproj validate sink-file -v
+```
+
+---
+
+# sink_filter (中文)
+
+本用例演示"按 sink 过滤/分流"的场景：依据业务规则将输入样本分发到不同的 sink 路径（all/safe/residue 等），并通过 defaults.expect 与单项 expect 对输出比例进行离线校验。适用于验证过滤逻辑正确性、残留/错误路径占比是否符合预期。
 
 ## 目录结构
 - `conf/`：`wparse.toml`（主配置）、`wpsrc.toml`（v2 源配置）

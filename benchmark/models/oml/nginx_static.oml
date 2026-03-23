@@ -1,0 +1,22 @@
+name : /oml/static/nginx
+rule : /nginx/*
+//enable : false
+---
+static {
+    localhost = chars("localhost");
+    attack_ip = chars("attack_ip");
+    status_500 = chars("Internal Server Error");
+    status_404 = chars("Not Found");
+}
+size : digit = take(size);
+status : digit = take(status);
+
+str_status = match read(status) {
+    digit(500) =>  status_500 ;
+    digit(404) =>  status_404 ;
+};
+match_chars = match read(wp_src_ip) {
+    ip(127.0.0.1) => localhost ;
+    !ip(127.0.0.1) => attack_ip ;
+};
+//* : auto = read();

@@ -1,0 +1,26 @@
+[[sources]]
+enable = true
+key = "syslog_udp_1"
+connect = "syslog_udp_src"
+#connect = "syslog_tcp_src"
+#connect = "tcp_src"
+
+[sources.params]
+addr = "127.0.0.1"
+port = 1524
+udp_recv_buffer  = 8388608
+header_mode = "raw"
+
+
+[[sources]]
+enable = true
+key = "syslog_udp_2"
+connect = "syslog_udp_src"
+#connect = "syslog_tcp_src"
+#connect = "tcp_src"
+
+[sources.params]
+addr = "127.0.0.1"
+port = 1525
+udp_recv_buffer  = 8388608
+header_mode = "skip"

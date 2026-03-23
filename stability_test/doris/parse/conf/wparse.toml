@@ -2,14 +2,14 @@ version = "1.0"
 
 [models]
 wpl = "./models/wpl"
-oml = "./models/oml"
+# oml = "./models/oml"
 
 [topology]
 sources = "./topology/sources"
 sinks = "./topology/sinks"
 
 [performance]
-parse_workers = 1
+parse_workers = 8
 rate_limit_rps =  0
 
 [rescue]
@@ -17,7 +17,8 @@ path = "./data/rescue"
 
 [log_conf]
 level = "warn,ctrl=warn,data=warn"
-output = "Console"
+output = "File"
+#output = "Console"
 [log_conf.file]
 path = "./data/logs"
 

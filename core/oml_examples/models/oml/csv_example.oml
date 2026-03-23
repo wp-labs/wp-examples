@@ -25,15 +25,15 @@ level  = match  ( read(city) , read(count) ) {
 };
 
 vender = match  read(product)  {
-    chars(warp)   =>   chars(warp-rd)
+    chars(warp)   =>   chars('warp-rd')
     !chars(warp)   =>  chars(other)
 };
 
 severity: chars =  match take(option:[severity]) {
-    digit(0) => chars(未知);
-    digit(1) => chars(信息);
-    digit(2) => chars(低危);
-    digit(3) => chars(高危(漏洞));
+    digit(0) => chars('未知');
+    digit(1) => chars('信息');
+    digit(2) => chars('低危');
+    digit(3) => chars('高危(漏洞)');
 };
 math_score = select math  from example_score where id = read(sid) ;
 

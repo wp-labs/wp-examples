@@ -1,4 +1,53 @@
-# wpl_missing
+# WPL Missing
+
+This example demonstrates WPL field missing tolerance and fault handling.
+
+## Purpose
+
+Validate the ability to:
+- Handle missing required fields in input data
+- Process optional fields with `\|` syntax
+- Route incomplete data to the `miss` infrastructure group
+- Validate WPL rule fault tolerance
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Optional Field Syntax | Using `\|` to mark optional fields |
+| Miss Group Routing | Routing records with missing required fields |
+| Fault Tolerance | Continuing parsing when optional fields are absent |
+| Data Completeness | Validating expected miss/success ratios |
+
+## Field Handling
+
+| Field Type | Behavior When Missing |
+|------------|----------------------|
+| Required (no `\|`) | Record routes to `miss` group |
+| Optional (with `\|`) | Parsing continues, field is empty |
+| Parse Error | Record routes to `residue` or `error` group |
+
+## WPL Syntax Example
+
+```wpl
+package /benchmark {
+    rule benchmark_1 {
+        (digit:id, digit:len, time, sn, chars:dev_name\|, ...)
+        # dev_name is optional (marked with \|)
+    }
+}
+```
+
+## Quick Start
+
+```bash
+cd core/wpl_missing
+./run.sh
+```
+
+---
+
+# wpl_missing (中文)
 
 本用例演示"WPL 字段缺失容错"的场景：当输入数据中某些字段不存在或解析失败时，系统如何处理缺失字段并将数据路由到相应的基础组（miss）。适用于验证 WPL 规则的容错性与数据完整性校验。
 

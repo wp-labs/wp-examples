@@ -1,4 +1,50 @@
-# 中断与恢复
+# Sink Recovery
+
+This example demonstrates sink failure handling and data recovery workflows.
+
+## Purpose
+
+Validate the ability to:
+- Handle sink write failures gracefully
+- Store failed data in rescue files (`rescue/` directory)
+- Recover and replay rescue files to original target sinks
+- Manage `.lock` and `.dat` file lifecycle
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Rescue File Generation | Creating `<sink>-YYYY-MM-DD_HH:MM:SS.dat.lock` on failure |
+| File Lock Management | `.lock` suffix during write, removed on completion |
+| Recovery Daemon | `wprescue daemon` for replaying rescue files |
+| Checkpoint Tracking | `rescue/recover.lock` for resumption |
+| Ordered Replay | Time-sorted file processing |
+
+## Recovery Workflow
+
+1. **Interruption Phase**: Failed writes create rescue files
+2. **Recovery Phase**: `wprescue daemon` replays rescue files to sinks
+3. **Cleanup**: Successfully processed files are deleted
+
+## Quick Start
+
+```bash
+cd core/sink_recovery
+
+# Phase 1: Generate rescue files (interrupt simulation)
+./case_interrupt.sh
+
+# Phase 2: Recover and replay
+./case_recovery.sh
+
+# Validate
+wproj data stat
+wproj validate sink-file -v
+```
+
+---
+
+# 中断与恢复 (中文)
 
 本用例演示 sink 中断与恢复流程：当业务 sink 写入失败时，数据会落入 `rescue/` 目录；随后通过恢复流程（`wprescue daemon`）将救急文件回放到原目标 sink。
 

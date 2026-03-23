@@ -1,4 +1,202 @@
-# wp-extensions/tcp_victorialogs 使用说明
+# TCP to VictoriaLogs
+
+This directory provides an end-to-end TCP-based VictoriaLogs ingestion case to verify the unified TCP Source and VictoriaLogs Sink connectors work as expected.
+
+- Producer: `wpgen` sends sample data via TCP protocol to a specified port (default 19001)
+- Engine: `wparse` listens on TCP port to receive data, parses and routes to VictoriaLogs Sink for log storage
+- Verification: Verify data is correctly ingested via VictoriaLogs HTTP API queries
+
+## Data Flow
+
+The diagram below shows the tcp_victorialogs data flow and key components.
+
+```mermaid
+graph LR
+    subgraph P[Producer]
+        A[wpgen sample]
+    end
+    subgraph T[TCP]
+        B[Tcp19001]
+    end
+    subgraph E[Engine]
+        C[wparse daemon]
+        D[Sinks]
+    end
+    subgraph DB[Database]
+        E1[VictoriaLogs]
+        E2[File backup]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E1
+    D --> E2
+```
+
+If Mermaid is not supported, refer to the ASCII version:
+
+```
+wpgen(sample) --> TCP:19001 --> wparse(daemon) --> Sinks
+                                              ├──> VictoriaLogs
+                                              └──> all.dat
+```
+
+## Directory Structure
+
+- `conf/`
+  - `wparse.toml`: Engine main config (directories/concurrency/logging, etc.)
+  - `wpgen.toml`: Data generator config (points to TCP sink, configured with port)
+- `topology/sources/wpsrc.toml`: Source routing (contains `tcp_1` listening on port 19001)
+- `topology/sinks/business.d/all.toml`: Business sink routing (contains VictoriaLogs sink and file sink)
+- `models/oml/nginx.oml`: OML model (result field mapping/masking)
+- `models/wpl/nginx/`: WPL parsing rules and sample data
+- `run.sh`: One-click run script
+
+Note: Source and Sink connector IDs reference definitions in the repository root `connectors/` directory:
+
+- `connectors/source.d/20-tcp.toml`: id=`tcp_src` (allows overriding `port/prefer_newline`)
+- `connectors/sink.d/40-victorialogs.toml`: id=`victorialogs_sink` (allows overriding `endpoint/insert_path/flush_interval_secs/create_time_field`)
+
+Field descriptions:
+  - `endpoint`: VictoriaLogs HTTP address, default `http://127.0.0.1:9428`
+  - `insert_path`: Insert path, default `/insert/jsonline`
+  - `flush_interval_secs`: Interval for pushing parsed logs, default `3`
+  - `create_time_field`: Time field stored in VictoriaLogs (note: the field must be parsed using time functions in WPL), defaults to VictoriaLogs insertion timestamp when empty
+
+## Prerequisites
+
+- VictoriaLogs running locally, default address `http://127.0.0.1:9428` (or override via environment variables, see below)
+- Ensure VictoriaLogs HTTP service is accessible
+- You can use the `docker-compose.yml` provided in this project to start VictoriaLogs; note that the provided docker-compose.yml limits queryable data to the last 400 days
+
+## Quick Start
+
+Enter the case directory and run the script (default `debug`):
+
+```bash
+cd extensions/tcp_victorialogs
+./run.sh            # or ./run.sh release
+```
+
+Main script steps:
+
+1) `wproj check` for config self-check, clean data directory
+2) Start `wparse daemon` in background (listening on TCP port 19001)
+3) Run `wpgen sample` to generate sample data and send via TCP
+4) Wait for data ingestion, stop `wparse`
+5) Run `wproj data stat` and `wproj data validate` for verification
+
+## Parameters
+
+The script supports the following optional environment variables:
+
+- `LINE_CNT`: Number of sample records to generate/process, default `100`
+- `SPEED_MAX`: Maximum send rate (records/sec), default `5000`
+
+Example:
+
+```bash
+LINE_CNT=1000 SPEED_MAX=10000 ./run.sh
+```
+
+## Configuration
+
+### wpgen.toml (Data Generator Config)
+
+```toml
+[generator]
+mode = "sample"
+count = 1000        # Number of samples to generate
+speed = 0           # Send rate limit, 0 means unlimited
+parallel = 4        # Concurrency
+
+[output]
+name = "gen_out"
+connect = "tcp_sink"
+params = { port = 19001 }
+```
+
+### wparse.toml (Engine Config)
+
+```toml
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+
+[topology]
+sources = "./topology/sources"
+sinks = "./topology/sinks"
+
+[performance]
+parse_workers = 2   # Parse concurrency
+rate_limit_rps = 0  # Rate limit, 0 means unlimited
+```
+
+### topology/sinks/business.d/all.toml (Sink Config)
+
+```toml
+[sink_group]
+name = "all"
+rule = ["/*"]
+parallel = 8
+
+[[sink_group.sinks]]
+name = "victorialogs_output"
+connect = "victorialogs_sink"
+params = {
+    endpoint = "http://127.0.0.1:9428",
+    insert_path = "/insert/jsonline",
+    flush_interval_secs = 3,
+    create_time_field = "timestamp"
+}
+
+[[sink_group.sinks]]
+name = "main"
+connect = "file_proto_sink"
+params = { file = "all.dat" }
+```
+
+## Result Verification
+
+- VictoriaLogs ingestion verification: Query data via HTTP API
+
+```bash
+curl 'http://127.0.0.1:9428/api/ui/query?query={_any="*"}&limit=10'
+```
+
+- Data statistics: `wproj data stat` outputs processing statistics for each stage
+- Data validation: `wproj data validate` verifies input/output data consistency
+- File backup: `all.dat` file saves the original parsed data
+
+## VictoriaLogs Query Examples
+
+Query by time range (limit 100 records):
+
+```bash
+curl --location --request POST 'http://localhost:9428/select/logsql/query' \
+--header 'User-Agent: Apifox/1.0.0 (https://apifox.com)' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Accept: */*' \
+--header 'Host: localhost:9428' \
+--header 'Connection: keep-alive' \
+--data-urlencode 'query=*' \
+--data-urlencode 'start=2025-12-27T09:30:20.251Z' \
+--data-urlencode 'end=2025-12-29T09:30:20.251Z' \
+--data-urlencode 'limit=100'
+```
+
+## FAQ
+
+- **Connection failed**: Confirm VictoriaLogs service is running and HTTP port (default 9428) is accessible
+- **Port conflict**: Ensure port 19001 is not in use, or modify the port in `topology/sources/wpsrc.toml`
+- **No data ingested**: Check log files under `data/logs/` to confirm TCP connection and parsing are working
+- **No query results**: Verify `victorialogs_sink` `endpoint` and `insert_path` are correctly configured
+- **Time field issues**: For time-series functionality, confirm `create_time_field` is set to an existing time field name in the data
+
+---
+
+# TCP to VictoriaLogs (中文)
 
 本目录提供一套基于 TCP 传输的端到端 VictoriaLogs 入库用例，验证统一 TCP Source 与 VictoriaLogs Sink 连接器是否按预期工作。
 
@@ -143,11 +341,11 @@ parallel = 8
 [[sink_group.sinks]]
 name = "victorialogs_output"
 connect = "victorialogs_sink"
-params = { 
-    endpoint = "http://127.0.0.1:9428", 
-    insert_path = "/insert/jsonline", 
-    flush_interval_secs = 3, 
-    create_time_field = "timestamp" 
+params = {
+    endpoint = "http://127.0.0.1:9428",
+    insert_path = "/insert/jsonline",
+    flush_interval_secs = 3,
+    create_time_field = "timestamp"
 }
 
 [[sink_group.sinks]]

@@ -1,4 +1,176 @@
-# MySql
+# MySQL
+
+This directory provides an end-to-end TCP-based MySQL ingestion case to verify the unified TCP Source and MySQL Sink connectors work as expected.
+
+- Producer: `wpgen` sends sample data via TCP protocol to a specified port (default 19001)
+- Engine: `wparse` listens on TCP port to receive data, parses and routes to MySQL Sink for database ingestion
+- Verification: Verify data is correctly ingested by querying MySQL
+
+## Data Flow
+
+The diagram below shows the tcp_mysql data flow and key components.
+
+```mermaid
+flowchart LR
+    subgraph Producer
+      WPGEN["wpgen sample<br/>(sends TCP data per wpgen.toml)"]
+    end
+    subgraph TCP
+      TCP_PORT[(TCP Port<br/>19001)]
+    end
+    subgraph Engine
+      WPARSE["wparse daemon<br/>(listens on TCP port)"]
+      SINKS{{"Sink Group<br/>(models/sink)"}}
+      OML[OML Mapping]
+    end
+    subgraph Database
+      MYSQL[(MySQL<br/>nginx_logs table)]
+    end
+
+    WPGEN -- produce --> TCP_PORT
+    TCP_PORT -- consume --> WPARSE
+    WPARSE -- route --> OML --> SINKS
+    SINKS -- write --> MYSQL
+```
+
+If Mermaid is not supported, refer to the ASCII version:
+
+```
+wpgen(sample) --> TCP(TCP:19001) --> wparse(daemon) --> [OML/route] --> sinks{mysql}
+    sinks --> MySQL: nginx_logs table
+```
+
+## Directory Structure
+
+- `conf/`
+  - `wparse.toml`: Engine main config (directories/concurrency/logging, etc.)
+  - `wpgen.toml`: Data generator config (points to TCP sink, configured with port)
+- `topology/sources/wpsrc.toml`: Source routing (contains `tcp_1` listening on port 19001)
+- `topology/sinks/business.d/all.toml`: Business sink routing (contains MySQL sink with column configuration)
+- `models/oml/nginx.oml`: OML model (result field mapping/masking)
+- `models/wpl/nginx/`: WPL parsing rules and sample data
+- `preparatory_work.sql`: MySQL table schema definition
+- `run.sh`: One-click run script
+
+Note: Source and Sink connector IDs reference definitions in the repository root `connectors/` directory:
+- `connectors/source.d/20-tcp.toml`: id=`tcp_src` (allows overriding `port/prefer_newline`)
+- `connectors/sink.d/20-mysql.toml`: id=`mysql_sink` (allows overriding `table/columns/dsn`, etc.)
+
+## Prerequisites
+
+- MySQL running locally, default address `127.0.0.1:3306` (or override via environment variables, see below)
+- Ensure the `nginx_logs` table is created in the target database (execute `create_table.sql`)
+- Note: Custom database tables require a mandatory `wp_event_id` field as primary key with BIGINT type
+
+## Quick Start
+
+Enter the case directory and run the script (default `debug`):
+
+```bash
+cd extensions/tcp_mysql
+./run.sh            # or ./run.sh release
+```
+
+Main script steps:
+1) `wproj check` for config self-check, clean data directory
+2) Start `wparse daemon` in background (listening on TCP port 19001)
+3) Run `wpgen sample` to generate sample data and send via TCP
+4) Wait for data ingestion, stop `wparse`
+5) Run `wproj data stat` and `wproj data validate` for verification
+
+## Parameters
+
+The script supports the following optional environment variables:
+
+- `LINE_CNT`: Number of sample records to generate/process, default `100`
+- `SPEED_MAX`: Maximum send rate (records/sec), default `5000`
+
+Example:
+
+```bash
+LINE_CNT=1000 SPEED_MAX=10000 ./run.sh
+```
+
+## Configuration
+
+### wpgen.toml (Data Generator Config)
+
+```toml
+[generator]
+mode = "sample"
+count = 1000        # Number of samples to generate
+speed = 0           # Send rate limit, 0 means unlimited
+parallel = 4        # Concurrency
+
+[output]
+name = "gen_out"
+connect = "tcp_sink"
+params = { port = 19001 }
+```
+
+### wparse.toml (Engine Config)
+
+```toml
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+
+[topology]
+sources = "./topology/sources"
+sinks = "./topology/sinks"
+
+[performance]
+parse_workers = 2   # Parse concurrency
+rate_limit_rps = 0  # Rate limit, 0 means unlimited
+```
+
+### topology/sinks/business.d/all.toml (MySQL Sink Config)
+
+```toml
+[sink_group]
+name = "all"
+rule = ["/*"]
+parallel = 8
+
+[[sink_group.sinks]]
+name = "main"
+connect = "mysql_sink"
+params = {
+    columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent", "wp_event_id"]
+}
+```
+
+## Database Setup
+
+Execute the following SQL to create the target table:
+
+```bash
+mysql -h 127.0.0.1 -u root -p wparse < preparatory_work.sql
+```
+
+Or copy the contents of `preparatory_work.sql` directly into the MySQL client.
+
+## Result Verification
+
+- MySQL ingestion verification: Connect to the database and query the `nginx_logs` table to confirm record count and data
+
+```bash
+mysql -h 127.0.0.1 -u root -p your_database -e "SELECT COUNT(*) FROM nginx_logs; SELECT * FROM nginx_logs LIMIT 100;"
+```
+
+- Data statistics: `wproj data stat` outputs processing statistics for each stage
+- Data validation: `wproj data validate` verifies input/output data consistency
+
+## FAQ
+
+- **Connection failed**: Confirm MySQL service is running, user has access to the target database, and the table has been created
+- **Port conflict**: Ensure port 19001 is not in use, or modify the port in `topology/sources/wpsrc.toml`
+- **No data ingested**: Check log files under `data/logs/` to confirm TCP connection and parsing are working
+- **Field mismatch**: Verify that `columns` in `topology/sinks/business.d/all.toml` matches the `create_table.sql` table structure
+
+---
+
+# MySQL (中文)
 
 本目录提供一套基于 TCP 传输的端到端 MySQL 入库用例，验证统一 TCP Source 与 MySQL Sink 连接器是否按预期工作。
 
@@ -135,8 +307,8 @@ parallel = 8
 [[sink_group.sinks]]
 name = "main"
 connect = "mysql_sink"
-params = { 
-    columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent", "wp_event_id"] 
+params = {
+    columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent", "wp_event_id"]
 }
 ```
 

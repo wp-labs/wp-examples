@@ -13,7 +13,6 @@ package /pipe_demo {
         // 1) base64 decode
         // 2) strip outer quotes and unescape inner quotes
         // 3) parse JSON into fields
-        |decode/base64|unquote/unescape|(json(_@_origin))
+        |decode/base64| strip/bom | unquote/unescape|(json(_@_origin))
     }
 }
-

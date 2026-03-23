@@ -1,4 +1,61 @@
-# wpl_success
+# WPL Success
+
+This example validates successful full-chain WPL parsing with multiple security alert log formats.
+
+## Purpose
+
+Validate the ability to:
+- Parse multiple security alert types successfully
+- Apply `data_type` tags via rule annotations
+- Route parsed data to appropriate business sinks
+- Achieve high parsing success rates
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| Multi-Rule Parsing | Parsing 6+ security alert types |
+| Rule Annotations | `#[tag(data_type: "...")]` for tagging |
+| Data Type Routing | Routing based on data_type tags |
+| Success Rate Validation | Verifying high parsing success rates |
+
+## Supported Alert Types
+
+| Alert Type | data_type Tag | Description |
+|------------|---------------|-------------|
+| webids_alert | webids_alert | Web intrusion detection alerts |
+| webshell_alert | webshell_alert | Webshell detection alerts |
+| ips_alert | ips_alert | Intrusion prevention system alerts |
+| ioc_alert | ioc_alert | Threat intelligence alerts |
+| system | system | System logs |
+| audit | audit | Audit logs |
+
+## WPL Syntax Example
+
+```wpl
+package /qty {
+    #[tag(data_type: "webids_alert")]
+    rule webids_alert {
+        (symbol(webids_alert), chars:serialno, chars:rule_id, ...)
+    }
+
+    #[tag(data_type: "audit")]
+    rule audit {
+        (kv(chars@username), kv(chars@serialno), ...)
+    }
+}
+```
+
+## Quick Start
+
+```bash
+cd core/wpl_success
+./run.sh
+```
+
+---
+
+# wpl_success (中文)
 
 本用例演示"WPL 成功解析全链路"的场景：验证 WPL 规则能够成功解析多种安全告警日志格式（webids_alert、webshell_alert、ips_alert、ioc_alert、system、audit 等），并正确路由到业务 sink。适用于验证解析规则的正确性与完整性。
 

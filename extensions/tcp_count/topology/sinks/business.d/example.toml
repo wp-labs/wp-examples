@@ -1,0 +1,20 @@
+version = "2.0"
+
+[sink_group]
+name = "all"
+#parallel = 5
+parallel = 8
+rule= ["*"]
+#tags = ["group:benchmark", "type:business"]
+
+# Null sink 用于性能基准测试
+[[sink_group.sinks]]
+name = "blackhole"
+connect = "blackhole_sink"
+tags = ["sink:null", "purpose:benchmark"]
+
+# [[sink_group.sinks]]
+# name = "count_01"
+# connect = "count_sink"
+# [sink_group.sinks.params]
+# batch_size = 40_0000

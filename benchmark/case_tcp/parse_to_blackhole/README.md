@@ -1,4 +1,56 @@
-# tcp_blackhole 说明
+# TCP Parse to Blackhole
+
+Benchmark for "TCP Source → Blackhole Sink" daemon mode scenario: uses wpgen to send data via TCP, wparse receives in daemon mode and parses, outputs to blackhole to test TCP reception and parsing combined performance.
+
+## Purpose
+
+Validate the ability to:
+- Receive data via TCP in daemon mode
+- Apply WPL parsing rules to network data
+- Measure TCP + parsing throughput
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| TCP Source | Receiving data via TCP (port 19001) |
+| Daemon Mode | wparse daemon mode execution |
+| Blackhole Sink | Discarding output to measure throughput |
+| Network + Parse | Combined TCP reception and parsing |
+
+## Quick Start
+
+```bash
+cd benchmark/case_tcp/parse_to_blackhole
+
+# Default test (20M lines, 6 workers)
+./run.sh
+
+# Medium dataset (200K lines)
+./run.sh -m
+
+# Custom configuration
+./run.sh -w 8 sysmon 500000
+```
+
+## Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `-m` | Medium dataset | 20M → 200K lines |
+| `-w <cnt>` | Worker count | 6 |
+| `wpl_dir` | WPL rule directory | nginx |
+| `speed` | Generation rate limit | 0 (unlimited) |
+
+## Data Flow
+
+```
+wpgen → TCP (port 19001) → wparse daemon → blackhole sink
+```
+
+---
+
+# tcp_blackhole 说明 (中文)
 
 本用例演示"TCP 源 → Blackhole 汇"的性能基准测试场景：使用 wpgen 通过 TCP 协议发送数据，wparse 以 daemon 模式接收并处理，输出到 blackhole 以测试可靠传输与解析的综合性能。
 

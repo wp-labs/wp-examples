@@ -1,6 +1,48 @@
-# tcp_blackhole 说明
+# TCP Trans to Blackhole
 
-本用例演示"TCP 源 → Blackhole 汇"的性能基准测试场景：使用 wpgen 通过 TCP 协议发送数据，wparse 以 daemon 模式接收并处理，输出到 blackhole 以测试可靠传输与解析的综合性能。
+Benchmark for "TCP Source → Blackhole Sink" transformation daemon mode scenario: uses wpgen to send data via TCP, wparse receives in daemon mode with WPL parsing and OML transformation, outputs to blackhole to test TCP + parsing + transformation performance.
+
+## Purpose
+
+Validate the ability to:
+- Receive data via TCP in daemon mode
+- Apply WPL parsing rules to network data
+- Apply OML transformation models
+- Measure TCP + parsing + transformation throughput
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| TCP Source | Receiving data via TCP (port 19001) |
+| Daemon Mode | wparse daemon mode execution |
+| WPL Parsing | Applying parsing rules |
+| OML Transformation | Applying transformation models |
+| Blackhole Sink | Discarding output to measure throughput |
+
+## Quick Start
+
+```bash
+cd benchmark/case_tcp/trans_to_blackhole
+
+# Default test (20M lines, 6 workers)
+./run.sh
+
+# Medium dataset (200K lines)
+./run.sh -m
+```
+
+## Data Flow
+
+```
+wpgen → TCP (port 19001) → wparse daemon (parse + OML) → blackhole sink
+```
+
+---
+
+# tcp_trans_blackhole 说明 (中文)
+
+本用例演示"TCP 源 → Blackhole 汇"的转换性能基准测试场景：使用 wpgen 通过 TCP 协议发送数据，wparse 以 daemon 模式接收并进行 WPL 解析和 OML 转换，输出到 blackhole 以测试 TCP + 解析 + 转换的综合性能。
 
 ## 目录结构
 

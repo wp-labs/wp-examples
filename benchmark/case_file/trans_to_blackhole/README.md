@@ -1,6 +1,47 @@
-# file_blackhole
+# File Trans to Blackhole
 
-本用例演示"文件源 → Blackhole 汇"的批处理性能基准测试场景：使用 wpgen 生成测试数据文件，wparse 通过批处理模式读取并解析，输出到 blackhole 以测试纯解析吞吐性能。
+Benchmark for "File Source → Blackhole Sink" transformation scenario: uses wpgen to generate test data files, wparse reads in batch mode with WPL parsing and OML transformation, outputs to blackhole to test parsing + transformation throughput.
+
+## Purpose
+
+Validate the ability to:
+- Read data from files in batch mode
+- Apply WPL parsing rules
+- Apply OML transformation models
+- Measure parsing + transformation throughput
+
+## Features Validated
+
+| Feature | Description |
+|---------|-------------|
+| File Source | Reading from pre-generated data files |
+| WPL Parsing | Applying parsing rules |
+| OML Transformation | Applying transformation models |
+| Blackhole Sink | Discarding output to measure throughput |
+
+## Quick Start
+
+```bash
+cd benchmark/case_file/trans_to_blackhole
+
+# Default test (20M lines, 6 workers)
+./run.sh
+
+# Medium dataset (200K lines)
+./run.sh -m
+```
+
+## Data Flow
+
+```
+wpgen → gen.dat → wparse batch (parse + OML) → blackhole sink
+```
+
+---
+
+# file_trans_blackhole 说明 (中文)
+
+本用例演示"文件源 → Blackhole 汇"的转换性能基准测试场景：使用 wpgen 生成测试数据文件，wparse 通过批处理模式读取并进行 WPL 解析和 OML 转换，输出到 blackhole 以测试解析 + 转换吞吐性能。
 
 ## 目录结构
 

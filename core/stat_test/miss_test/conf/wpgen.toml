@@ -4,7 +4,7 @@ version = "1.0"
 mode = "sample"
 count = 10000
 speed = 5000
-parallel = 2
+parallel = 1
 
 [output]
 connect = "tcp_sink"
@@ -20,4 +20,3 @@ level = "warn"
 module_levels = ["ctrl=info", "launch=info"]
 output = "file"
 file_path = "./data/logs/"
-

@@ -1,0 +1,55 @@
+[sources.file_input]
+type = "file"
+include = ["../data/in_dat/gen.dat"]
+read_from = "beginning"
+data_dir = "../data/"     
+
+[transforms.route_logs]
+type = "route"
+inputs = ["file_input"]
+route.aws = 'exists(.message) && starts_with(string!(.message), "http")'  
+route.nginx = 'exists(.message) && is_ipv4(to_string(split(string!(.message), " ")[0]))' 
+route.apt = 'exists(.message) && starts_with(string!(.message), "#")'  
+route.firewall = "exists(.message) && match(string!(.message), r'^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} \\S+ [+-]\\d{2}:\\d{2} (Block|Allow|Drop|Reject): ')" 
+
+[transforms.parse_aws]
+type = "remap"
+inputs = ["route_logs.aws"]
+source = '''
+. |= parse_aws_alb_log!(.message)
+del(.message)
+'''
+
+[transforms.parse_nginx]
+type = "remap"
+inputs = ["route_logs.nginx"]
+source = '''
+  . |= parse_nginx_log!(.message, format: "combined")
+  del(.message)
+'''
+
+[transforms.parse_apt]
+type = "remap"
+inputs = ["route_logs.apt"]
+source = '''
+  .|= parse_regex!(.message, r'(?s)^#(?P<timestamp>\w+\s+\d+\s+\d{4}\s+\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})\s+(?P<Hostname>\S+)\s+%%(?P<ModuleName>\d+[^/]+)/(?P<SeverityHeader>\d+)/(?P<symbol>[^(]+)\((?P<type>[^)]+)\)\[(?P<Count>\d+)\]:\s*(?P<Content>[^()]+?)\s*\(SyslogId=(?P<SyslogId>[^,]+),\s+VSys="(?P<VSys>[^"]+)",\s+Policy="(?P<Policy>[^"]+)",\s+SrcIp=(?P<SrcIp>[^,]+),\s+DstIp=(?P<DstIp>[^,]+),\s+SrcPort=(?P<SrcPort>[^,]+),\s+DstPort=(?P<DstPort>[^,]+),\s+SrcZone=(?P<SrcZone>[^,]+),\s+DstZone=(?P<DstZone>[^,]+),\s+User="(?P<User>[^"]+)",\s+Protocol=(?P<Protocol>[^,]+),\s+Application="(?P<Application>[^"]+)",\s+Profile="(?P<Profile>[^"]+)",\s+Direction=(?P<Direction>[^,]+),\s+ThreatType=(?P<ThreatType>[^,]+),\s+ThreatName=(?P<ThreatName>[^,]+),\s+Action=(?P<Action>[^,]+),\s+FileType=(?P<FileType>[^,]+),\s+Hash=(?P<Hash>.*)\)$')
+  del(.message)
+'''
+
+[transforms.parse_firewall]
+type = "remap"
+inputs = ["route_logs.firewall"]
+source = '''
+raw = to_string!(.message)
+m = parse_regex!(raw,r'^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<severity>\S+)\s+(?P<tz>[+-]\d{2}:\d{2})\s+(?P<label>Block|Allow|Drop|Reject):\s+(?P<kv>.*)$')
+.timestamp = m.ts
+. |= parse_key_value!(m.kv,field_delimiter: "|",key_value_delimiter: "=")
+del(.message)
+'''
+
+[sinks.blackhole_output]
+type = "blackhole"
+inputs = ["parse_aws", "parse_nginx", "parse_apt", "parse_firewall"]
+
+[api]
+    enabled = true

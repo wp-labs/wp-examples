@@ -1,0 +1,13 @@
+[sink_group]
+name = "business"
+# 将 OML 命名空间路由到业务组：
+# - /oml/example/*  覆盖示例解析
+# - /oml/benchmark  覆盖基准解析
+oml = ["/oml/example/*", "/oml/benchmark"]
+
+[[sink_group.sinks]]
+name = "out_kv"
+connect = "file_kv_sink"
+[sink_group.sinks.params]
+base = "./data/out_dat"
+file = "demo.kv"

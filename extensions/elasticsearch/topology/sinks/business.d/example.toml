@@ -1,0 +1,27 @@
+version = "2.0"
+
+[sink_group]
+name = "es"
+rule = ["*"]
+batch_timeout_ms=5000
+parallel = 4
+
+
+# Null sink 用于性能基准测试
+# [[sink_group.sinks]]
+# name = "blackhole"
+# connect = "blackhole_sink"
+
+[[sink_group.sinks]]
+name = "es_stream_load"
+connect = "elasticsearch_sink"
+[sink_group.sinks.params]
+protocol = "http"
+host = "localhost"
+port = "9200"
+username = "${SEC_SINK_USERNAME}"
+password = "${SEC_SINK_PASSWORD}"
+index = "wp_nginx"
+timeout_secs = 30
+max_retries = 3
+batch_size = 100_0000

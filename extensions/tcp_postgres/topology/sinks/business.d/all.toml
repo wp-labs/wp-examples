@@ -1,0 +1,17 @@
+version = "2.0"
+
+[sink_group]
+name = "all"
+oml = ["/*"]
+parallel = 8
+[[sink_group.sinks]]
+name = "main"
+connect = "postgres_sink"
+[sink_group.sinks.params]
+endpoint = "localhost:5432"
+username = "${SEC_SINK_USERNAME}"
+password = "${SEC_SINK_PASSWORD}"
+database = "wparse"
+table = "nginx_logs"
+columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
+batch_size = 10

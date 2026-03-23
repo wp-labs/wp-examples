@@ -1,0 +1,25 @@
+[[connectors]]
+id = "clickhouse_sink"
+type = "clickhouse"
+
+# 允许通过 sink 的 params 覆盖 Doris 连接和 Stream Load 关键参数
+allow_override = [
+  "endpoint",
+  "username",
+  "password",
+  "database",
+  "table",
+  "timeout_secs",
+  "max_retries",
+  "batch_size"
+]
+
+[connectors.params]
+endpoint= "http://localhost:8123"
+username = ""
+password = ""
+database = ""
+table = ""
+timeout_secs = 30
+max_retries = 3
+batch_size = 10_0000
