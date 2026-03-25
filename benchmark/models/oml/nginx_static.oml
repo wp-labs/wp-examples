@@ -1,6 +1,6 @@
 name : /oml/static/nginx
 rule : /nginx/*
-//enable : false
+enable : false
 ---
 static {
     localhost = chars("localhost");

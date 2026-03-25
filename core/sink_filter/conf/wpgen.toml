@@ -4,7 +4,7 @@ version = ""
 mode = "sample"
 count = 1000
 speed = 1000
-parallel = 2
+parallel = 1
 
 [output]
 connect = "file_raw_sink"

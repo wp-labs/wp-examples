@@ -26,15 +26,13 @@ echo "2> gen sample data"
 wpgen sample -n "$LINE_CNT" --stat "$STAT_SEC"
 wpgen rule -n "$LINE_CNT" --stat "$STAT_SEC"
 
-echo "3> verify inputs"
-test -s "./data/in_dat/gen.dat" || { echo "missing ./data/in_dat/gen.dat"; exit 1; }
 
-echo "4> start wparse work"
+echo "3> start wparse work"
 if ! wparse batch --stat "$STAT_SEC" -p ; then
     echo "wparse work failed. check ./data/logs/wparse.log"
     exit 1
 fi
 
-echo "5> validate sinks"
+echo "4> validate sinks"
 wproj data stat
 wproj data validate
