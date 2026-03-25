@@ -1,6 +1,6 @@
 name : /oml/static/nginx
 rule : /nginx/*
-enable : false
+//enable : false
 ---
 static {
     localhost = chars("localhost");
@@ -10,12 +10,13 @@ static {
 }
 size : digit = take(size);
 status : digit = take(status);
-str_status = match read(option:[status]) {
+
+str_status = match read(status) {
     digit(500) =>  status_500 ;
     digit(404) =>  status_404 ;
 };
-match_chars = match read(option:[wp_src_ip]) {
+match_chars = match read(wp_src_ip) {
     ip(127.0.0.1) => localhost ;
     !ip(127.0.0.1) => attack_ip ;
 };
-* : auto = read();
+//* : auto = read();
