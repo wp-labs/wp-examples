@@ -8,6 +8,7 @@ This directory contains extension connector examples demonstrating WarpParse int
 |------|---------|-------------------|
 | **doris** | File Source → Doris Stream Load pipeline | Doris sink, Stream Load, batch processing |
 | **kafka** | Kafka Source/Sink integration | Kafka consumer/producer, topic routing |
+| **pg_knowledge** | File Source → PostgreSQL knowledge enrichment | PostgreSQL knowdb provider, OML SQL enrichment, batch validation |
 | **practice** | Real-world multi-source monitoring scenario | Multi-source collection, Fluent-bit, Kafka, VictoriaLogs, Grafana |
 | **tcp_mysql** | TCP Source → MySQL Sink pipeline | TCP source, MySQL sink, data persistence |
 | **tcp_victorialogs** | TCP Source → VictoriaLogs Sink pipeline | TCP source, VictoriaLogs sink, log storage |
@@ -56,6 +57,7 @@ docker compose up -d
 |------|------|----------|
 | **doris** | 文件源 → Doris Stream Load 管道 | Doris sink、Stream Load、批处理 |
 | **kafka** | Kafka 源/汇集成 | Kafka 消费者/生产者、topic 路由 |
+| **pg_knowledge** | 文件源 → PostgreSQL 知识库富化 | PostgreSQL knowdb provider、OML SQL 富化、批处理校验 |
 | **practice** | 实战多源监控场景 | 多源采集、Fluent-bit、Kafka、VictoriaLogs、Grafana |
 | **tcp_mysql** | TCP 源 → MySQL Sink 管道 | TCP 源、MySQL sink、数据持久化 |
 | **tcp_victorialogs** | TCP 源 → VictoriaLogs Sink 管道 | TCP 源、VictoriaLogs sink、日志存储 |

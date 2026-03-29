@@ -6,6 +6,8 @@ name = "all_static"
 parallel =  ${WORK_CNT:6}
 oml= ["/oml/static/*"]
 #tags = ["group:benchmark", "type:business"]
+batch_timeout_ms=5000
+batch_size = 1
 
 # Null sink 用于性能基准测试
 [[sink_group.sinks]]

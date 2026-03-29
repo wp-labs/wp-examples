@@ -1,0 +1,11 @@
+version = 2
+
+[cache]
+enabled = true
+capacity = 1024
+ttl_ms = 30000
+
+[provider]
+kind = "postgres"
+connection_uri = "postgres://demo:${SEC_PWD}@127.0.0.1:55432/knowdb_demo"
+pool_size = 8
