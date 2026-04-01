@@ -32,8 +32,8 @@ trap 'echo "Received stop signal, exiting loop..."; break' INT TERM
 
 # 循环执行 wpgen sample
 while true; do
-    wpgen sample -n "$LINE_CNT" --stat 1 -p
-    sleep "$STAT_SEC"
+    wpgen sample -n 2 --stat 1 -p
+    sleep 1
 done
 
 echo "4> stop wparse"

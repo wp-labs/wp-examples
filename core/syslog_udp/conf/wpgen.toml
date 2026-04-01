@@ -2,8 +2,8 @@ version = "1.0"
 
 [generator]
 mode = "sample"
-count = 10000
-speed = 5000
+count = 1000
+speed = 500
 parallel = 1
 
 [output]
@@ -14,7 +14,7 @@ name = "gen_out"
 
 [output.params]
 addr = "127.0.0.1"
-port =  1524
+port =  1514
 
 
 [logging]

@@ -1,0 +1,199 @@
+# 输出配置文件
+# 定义了多种数据输出目标的配置
+
+version = "2.0"
+
+# 输出组配置
+[sink_group]
+name = "all"             # 输出组名称
+oml = ["/*"]            # 输出匹配规则，匹配所有数据
+batch_size = 1024        # 批处理大小
+batch_timeout_ms = 300   # 批处理超时时间（毫秒）
+
+# 黑洞输出（丢弃数据）
+[[sink_group.sinks]]
+name = "blackhole"           # 输出名称
+connect = "blackhole_sink"    # 使用的连接器
+
+# Protocol Buffer 格式文件输出
+[[sink_group.sinks]]
+name = "file-proto"           # 输出名称
+connect = "file_proto_sink"   # 使用的连接器
+[sink_group.sinks.params]
+file = "file_proto.dat"       # 输出文件路径
+
+# JSON 格式文件输出
+[[sink_group.sinks]]
+name = "json"                 # 输出名称
+connect = "file_json_sink"    # 使用的连接器
+[sink_group.sinks.params]
+file = "file_json.json"       # 输出文件路径
+
+# 原始格式文件输出
+[[sink_group.sinks]]
+name = "raw"                  # 输出名称
+connect = "file_raw_sink"     # 使用的连接器
+[sink_group.sinks.params]
+file = "file_raw.raw"        # 输出文件路径
+
+# 键值对格式文件输出
+[[sink_group.sinks]]
+name = "kv"                   # 输出名称
+connect = "file_kv_sink"      # 使用的连接器
+[sink_group.sinks.params]
+file = "file_kv.kv"          # 输出文件路径
+
+# UDP Syslog 输出
+[[sink_group.sinks]]
+name = "syslog_udp"           # 输出名称
+connect = "syslog_udp_sink"   # 使用的连接器
+[sink_group.sinks.params]
+addr = "127.0.0.1"            # 目标地址
+port = 11514                  # 目标端口
+protocol = "udp"              # 协议类型
+
+# TCP Syslog 输出
+[[sink_group.sinks]]
+name = "syslog_tcp"           # 输出名称
+connect = "syslog_tcp_sink"   # 使用的连接器
+[sink_group.sinks.params]
+addr = "127.0.0.1"            # 目标地址
+port = 11515                  # 目标端口
+protocol = "tcp"              # 协议类型
+
+# TCP 输出
+[[sink_group.sinks]]
+name = "tcp_sink"             # 输出名称
+connect = "tcp_sink"          # 使用的连接器
+[sink_group.sinks.params]
+addr = "127.0.0.1"            # 目标地址
+port = 19001                  # 目标端口
+
+# 计数输出（统计数据量）
+[[sink_group.sinks]]
+name = "count"                # 输出名称
+connect = "count_sink"        # 使用的连接器
+
+# Kafka 输出
+[[sink_group.sinks]]
+name = "kafka_sink"           # 输出名称
+connect = "kafka_sink"        # 使用的连接器
+[sink_group.sinks.params]
+brokers = "localhost:9092"    # Kafka  broker 地址
+topic = "wparse_output"       # 目标主题
+num_partitions = 1            # 分区数
+replication = 1               # 复制因子
+
+# MySQL 数据库输出
+[[sink_group.sinks]]
+name = "database_mysql"       # 输出名称
+connect = "mysql_sink"        # 使用的连接器
+[sink_group.sinks.params]
+endpoint = "localhost:3306"   # MySQL 地址
+username = "root"             # 用户名
+password = "123456"           # 密码
+database = "wparse"           # 数据库名
+table = "nginx_logs"          # 表名
+columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]  # 列名
+batch_size = 10240             # 批处理大小
+
+# Kafka 输出（重复配置）
+[[sink_group.sinks]]
+name = "kafka_sink"           # 输出名称
+connect = "kafka_sink"        # 使用的连接器
+[sink_group.sinks.params]
+brokers = "localhost:9092"    # Kafka broker 地址
+topic = "wparse_output"       # 目标主题
+num_partitions = 1            # 分区数
+replication = 1               # 复制因子
+
+# Doris 数据库输出（使用 Stream Load）
+[[sink_group.sinks]]
+name = "doris_stream_load"    # 输出名称
+connect = "doris_sink"        # 使用的连接器
+[sink_group.sinks.params]
+# 新版 Doris Sink 使用 HTTP Stream Load API
+endpoint = "http://localhost:8040"  # BE 的 HTTP 端口（推荐使用 8040 而非 FE 的 8030）
+database = "test_db"          # 数据库名
+table = "wp_nginx"            # 表名
+user = "root"                 # 用户名
+password = ""                 # 密码
+timeout_secs = 30             # 超时时间（秒）
+max_retries = 1               # 最大重试次数
+batch_size = 10_0000          # 批处理大小
+
+# 可选：自定义 Stream Load 参数
+[sink_group.sinks.params.headers]
+strip_outer_array = "false"   # 是否去除外部数组
+max_filter_ratio = "0.1"      # 最大过滤比例
+columns="wp_event_id,wp_src_key,sip,timestamp,`http/request`,size,referer,`http/agent`"  # 列映射
+
+# PostgreSQL 数据库输出
+[[sink_group.sinks]]
+name = "postgres"             # 输出名称
+connect = "postgres_sink"     # 使用的连接器
+[sink_group.sinks.params]
+endpoint = "localhost:5432"   # PostgreSQL 地址
+username = "postgres"         # 用户名
+password = "123456"           # 密码
+database = "wparse"           # 数据库名
+table = "nginx_logs"          # 表名
+columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]  # 列名
+batch_size = 10000             # 批处理大小
+
+# VictoriaLogs 输出
+[[sink_group.sinks]]
+name = "victorialogs_output"  # 输出名称
+connect = "victorialogs_sink" # 使用的连接器
+params = { endpoint = "http://127.0.0.1:9428", insert_path = "/insert/jsonline", flush_interval_secs = 3}  # 参数配置
+
+# 主文件输出（Protocol Buffer 格式）
+[[sink_group.sinks]]
+name = "main"                 # 输出名称
+connect = "file_proto_sink"   # 使用的连接器
+#connect = "fast_file_sink"   # 备选连接器（已注释）
+params = { file = "all.dat" }  # 输出文件路径
+
+# Elasticsearch 输出
+[[sink_group.sinks]]
+name = "es_stream_load"       # 输出名称
+connect = "elasticsearch_sink" # 使用的连接器
+[sink_group.sinks.params]
+protocol = "http"             # 协议类型
+host = "localhost"            # 主机地址
+port = "9200"                # 端口
+username = "elastic"          # 用户名
+password = "zgVClXP2"         # 密码
+index = "wp_nginx"            # 索引名
+timeout_secs = 30             # 超时时间（秒）
+max_retries = 3               # 最大重试次数
+batch_size = 100_0000         # 批处理大小
+
+# ClickHouse 输出
+[[sink_group.sinks]]
+name = "ck_stream_load"       # 输出名称
+connect = "clickhouse_sink"   # 使用的连接器
+[sink_group.sinks.params]
+endpoint= "http://localhost:8123"  # ClickHouse HTTP 接口地址
+username = "default"          # 用户名
+password = "default"          # 密码
+database = "default"          # 数据库名
+table = "wp_nginx"            # 表名
+timeout_secs = 30             # 超时时间（秒）
+max_retries = 3               # 最大重试次数
+batch_size = 100_0000         # 批处理大小
+
+# Kafka 输出（重复配置）
+[[sink_group.sinks]]
+name = "http"           # 输出名称
+connect = "http_sink"        # 使用的连接器
+[sink_group.sinks.params]
+endpoint = ""
+username = ""
+password = ""
+fmt = "json"
+compression = "none"
+timeout_secs = 30
+max_retries = 3
+batch_size = 1024
+

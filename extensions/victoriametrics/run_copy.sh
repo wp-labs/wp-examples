@@ -8,7 +8,7 @@ wproj check
 wproj data clean
 
 echo "start work (no print_stat)"
-wparse deamon --stat 5 -w 8 -p &
+wparse deamon --stat 5 -w 8 &
 # 等待 PID 文件出现
 for i in {1..50}; do
     test -f ./.run/wparse.pid && break
@@ -16,12 +16,12 @@ for i in {1..50}; do
 done
 sleep 3
 
-LINE_CNT=1000
-SPEED_MAX=500
+LINE_CNT=10
+SPEED_MAX=5
 echo "1> gen  sample data"
 wpgen sample  -n $LINE_CNT -s $SPEED_MAX --stat 10
 
-sleep 3
+sleep 10
 if [ -f ./.run/wparse.pid ]; then
     kill $(cat ./.run/wparse.pid) || true
 fi

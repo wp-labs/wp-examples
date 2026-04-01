@@ -1,0 +1,54 @@
+# 数据源配置文件
+# 定义了多种数据源的连接和参数配置
+
+# 文件数据源
+# 通过 file_src 连接器读取文件数据
+[[sources]]
+key = "file"         # 数据源标识
+enable = true        # 启用此数据源
+connect = "file_src" # 使用的连接器
+params = { base = "./data/in_dat", file = "gen.dat"}
+
+# UDP Syslog 数据源
+# 通过 syslog_udp_src 连接器接收 UDP Syslog 数据
+[[sources]]
+enable = true           # 启用此数据源
+key = "syslog_udp"      # 数据源标识
+connect = "syslog_udp_src" # 使用的连接器
+
+# UDP Syslog 数据源参数配置
+[sources.params]
+addr = "127.0.0.1"         # 监听地址
+port = 1524                # 监听端口
+udp_recv_buffer = 8388608  # UDP 接收缓冲区大小（8MB）
+header_mode = "raw"         # 头部模式：raw（原始）
+
+# TCP Syslog 数据源
+# 通过 syslog_tcp_src 连接器接收 TCP Syslog 数据
+[[sources]]
+enable = true           # 启用此数据源
+key = "syslog_tcp"      # 数据源标识
+connect = "syslog_tcp_src" # 使用的连接器
+
+# TCP Syslog 数据源参数配置
+[sources.params]
+addr = "127.0.0.1"         # 监听地址
+port = 1525                # 监听端口
+tcp_recv_bytes = 8388608   # TCP 接收字节数（8MB）
+header_mode = "raw"         # 头部模式：raw（原始）
+
+# TCP 数据源
+# 通过 tcp_src 连接器接收 TCP 数据
+[[sources]]
+enable = true        # 启用此数据源
+key = "tcp"          # 数据源标识
+connect = "tcp_src"  # 使用的连接器
+params = { prefer_newline = true, port = 19001 }  # 参数配置：偏好换行符，端口 19001
+
+# Kafka 数据源
+# 通过 kafka_src 连接器从 Kafka 读取数据
+[[sources]]
+enable = true          # 启用此数据源
+key = "kafka_output"   # 数据源标识
+connect = "kafka_src"  # 使用的连接器
+params = { topic = "wp.testcase.events.parsed" }  # 参数配置：主题名称

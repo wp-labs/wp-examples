@@ -10,3 +10,10 @@ params = {  file = "miss.dat" }
 [sink_group.sinks.expect]
 max = 2.0
 rol = 0.1
+
+  [[sink_group.sinks]]
+  name = "victorialogs_output"
+  connect = "victorialogs_sink"
+  params = { endpoint = "http://127.0.0.1:9428", insert_path = "/insert/jsonline", tags = ["wp_stage:miss"] }
+
+
