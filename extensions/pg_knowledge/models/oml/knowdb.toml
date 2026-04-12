@@ -1,8 +1,0 @@
-# OML Knowledge Database Configuration
-# This file defines the OML models available for use
-
-[[models]]
-name = "pg_asset_enrich"
-file = "pg_asset_enrich.oml"
-description = "Enrich nginx access logs with PostgreSQL asset inventory"
-rule = "/nginx/*"
