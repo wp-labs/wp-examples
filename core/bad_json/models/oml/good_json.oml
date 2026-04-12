@@ -1,0 +1,4 @@
+name : /oml/good_json
+rule : /json_case/good_json
+---
+* : auto = take() ;

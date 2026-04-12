@@ -12,6 +12,7 @@ This directory contains core end-to-end examples and scenario-based configuratio
 | **knowdb_case** | Knowledge database queries and data association | SQL-like OML queries, CSV knowledge bases, dynamic lookup |
 | **oml_examples** | Comprehensive OML transformation | Conditional matching, range matching, tuple matching, knowledge base queries |
 | **prometheus_metrics** | Prometheus metrics export | HTTP `/metrics` endpoint, counters, gauges, histograms |
+| **remote_ctrl** | Remote bootstrap then reload updates to a target version | `wproj init --repo`, remote project bootstrap, versioned admin reload |
 | **sink_filter** | Sink-level filtering and data splitting | Filter rules, multi-path routing, expectation validation |
 | **sink_recovery** | Sink failure handling and data recovery | Rescue files, interruption/recovery cycle, replay pipeline |
 | **syslog_udp** | UDP Syslog source integration | UDP syslog reception, parsing, routing |
@@ -87,6 +88,7 @@ wproj data validate
 | **knowdb_case** | 知识库查询与数据关联 | SQL 风格 OML 查询、CSV 知识库、动态查找 |
 | **oml_examples** | 综合 OML 转换示例 | 条件匹配、范围匹配、元组匹配、知识库查询 |
 | **prometheus_metrics** | Prometheus 指标导出 | HTTP `/metrics` 端点、计数器、仪表、直方图 |
+| **remote_ctrl** | 远端初始化后通过管理面切换到目标版本 | `wproj init --repo`、远端工程引导、带版本参数的 admin reload |
 | **sink_filter** | Sink 级过滤与数据分流 | 过滤规则、多路径路由、期望值校验 |
 | **sink_recovery** | Sink 故障处理与数据恢复 | 救急文件、中断/恢复流程、回放管道 |
 | **syslog_udp** | UDP Syslog 源集成 | UDP syslog 接收、解析、路由 |

@@ -1,0 +1,5 @@
+name : pg_asset_enrich
+rule : /nginx/*
+---
+* : auto = take() ;
+asset_name, asset_env, asset_owner = select asset_name, asset_env, asset_owner from asset_inventory where ip = read(sip) ;

@@ -1,0 +1,17 @@
+version = ""
+
+[generator]
+mode = "sample"
+count = 100000
+speed = 20000
+parallel = 1
+
+[output]
+name = "gen_out"
+connect = "tcp_sink"
+params = { addr = "127.0.0.1", port = 19001 }
+
+[logging]
+level = "debug"
+output = "file"
+file_path = "./data/logs"

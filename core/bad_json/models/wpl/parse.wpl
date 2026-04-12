@@ -1,0 +1,8 @@
+package /json_case {
+   rule bad_json {
+       | json_like | ( bad_json : raw)
+   }
+   rule good_json {
+       (json)
+    }
+}
