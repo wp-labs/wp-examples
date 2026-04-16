@@ -7,5 +7,5 @@ oml = []
 connect = "file_raw_sink"
 params = { base = "./out", file = "miss.dat" }
 [sink_group.sinks.expect]
+min = 0.0
 max = 2.0
-rol = 0.1
