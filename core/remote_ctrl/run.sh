@@ -4,8 +4,8 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 REPO_URL="${REPO_URL:-https://github.com/wp-labs/editor-monitor-conf.git}"
-INIT_VERSION="${INIT_VERSION:-0.1.2}"
-TARGET_VERSION="${TARGET_VERSION:-0.1.3}"
+INIT_VERSION="${INIT_VERSION:-0.1.4}"
+TARGET_VERSION="${TARGET_VERSION:-0.1.5}"
 REQUESTED_VERSION="${INIT_VERSION#v}"
 REQUESTED_TARGET_VERSION="${TARGET_VERSION#v}"
 WORK_ROOT="${WORK_ROOT:-$PWD/.tmp-work}"
