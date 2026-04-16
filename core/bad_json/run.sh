@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # 可调参数：生成/采集规模与统计间隔
-LINE_CNT=${LINE_CNT:-3000}
+LINE_CNT=${LINE_CNT:-1000}
 STAT_SEC=${STAT_SEC:-1}
 
 
@@ -24,7 +24,6 @@ wpgen data clean || true
 
 echo "2> gen sample data"
 wpgen sample -n "$LINE_CNT" --stat "$STAT_SEC"
-wpgen rule -n "$LINE_CNT" --stat "$STAT_SEC"
 
 
 echo "3> start wparse work"
