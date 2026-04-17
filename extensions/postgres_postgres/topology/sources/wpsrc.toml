@@ -1,0 +1,5 @@
+[[sources]]
+enable = true
+key = "postgres_1"
+connect = "postgres_src"
+params = { endpoint = "localhost:5432", username = "postgres", password = "123456", database = "wparse", table = "http_request_logs", cursor_column = "create_time", cursor_type = "time"}

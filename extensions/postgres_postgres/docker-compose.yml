@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: bitnami/postgresql:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRESQL_PASSWORD=123456        # 必填：数据库密码
+      - POSTGRESQL_DATABASE=wparse        # 可选：初始数据库名（默认会创建与用户名同名的数据库）
+      - POSTGRESQL_USERNAME=postgres      # 可选：自定义用户名（默认用户是 postgres） - 移除了值前的空格
+    volumes:
+      - data:/bitnami/postgresql        # Bitnami 镜像专用数据目录
+    networks:
+      - network
+volumes:
+  data:
+networks:
+  network:
+    driver: bridge
