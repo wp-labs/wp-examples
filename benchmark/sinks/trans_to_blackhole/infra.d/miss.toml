@@ -12,3 +12,8 @@ tags = ["sink:miss", "format:raw"]
 
 [sink_group.sinks.expect]
 max = 2.0
+
+
+#[[sink_group.sinks]]
+#name = "victorialogs_output"
+#connect = "victorialogs_sink"
