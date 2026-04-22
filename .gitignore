@@ -4,6 +4,7 @@ data
 *.raw
 .run
 .*
+!.warp_parse
 .report
 out
 getting_started/conf

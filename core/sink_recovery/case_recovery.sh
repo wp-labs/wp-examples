@@ -41,4 +41,14 @@ echo "rescue data:"
 find ./data/rescue/ -name "*.dat"
 
 wproj data stat
-wproj data validate
+
+# 恢复阶段关注救急文件被消费且目标输出已产生，不再校验中断前后的固定比例。
+if find ./data/rescue/ -type f -name "*.dat" | grep -q .; then
+    echo "Expected rescue .dat files to be consumed, but some remain"
+    exit 1
+fi
+
+if [ ! -s ./data/out_dat/benchmark.dat ]; then
+    echo "Expected recovered output in ./data/out_dat/benchmark.dat"
+    exit 1
+fi

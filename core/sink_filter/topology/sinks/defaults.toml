@@ -1,5 +1,3 @@
-version = "2.0"
-
 [defaults]
 tags = ["sn:cust_001" ]
 [defaults.expect]

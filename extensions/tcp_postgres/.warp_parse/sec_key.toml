@@ -1,0 +1,2 @@
+SINK_USERNAME = "postgres"
+SINK_PASSWORD = "123456"

@@ -12,8 +12,8 @@ num_range = match read(option:[count]) {
     _ => digit(0) ;
 };
 src_system_log_type = match read(option:[type]) {
-    chars(l) => chars(日志信息);
-    chars(s) => chars(安全日志信息);
+    chars(l) => chars("日志信息");
+    chars(s) => chars("安全日志信息");
 };
 extends_ip : obj = object {
     DstIp = read(DstIp);
