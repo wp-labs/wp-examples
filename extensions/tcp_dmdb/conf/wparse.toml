@@ -9,7 +9,7 @@ sinks = "./topology/sinks"
 
 [performance]
 parse_workers = 2
-rate_limit_rps = 0
+rate_limit_rps = 30000
 
 [rescue]
 path = "./data/rescue"
@@ -26,35 +26,11 @@ window_sec = 60
 [[stat.pick]]
 key = "pick_stat"
 target = "*"
-fields = []
-top_n = 20
 
 [[stat.parse]]
 key = "parse_stat"
 target = "*"
-fields = []
-top_n = 20
 
 [[stat.sink]]
 key = "sink_stat"
 target = "*"
-fields = []
-top_n = 20
-
-[admin_api]
-enabled = true
-bind = "0.0.0.0:19090"
-request_timeout_ms = 15000
-max_body_bytes = 4096
-
-[admin_api.auth]    
-mode = "bearer_token"
-token_file = "./run/admin_api.token"
-
-[admin_api.tls]
-enabled = false
-
-[project_remote]
-enabled = false
-repo = "http://gitea:3000/gitea/project_root.git"
-init_version = "1.0.0"

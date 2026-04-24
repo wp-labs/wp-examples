@@ -1,12 +1,11 @@
 version = "2.0"
 
 [sink_group]
-name = "miss"
-oml = []
+name = "error"
 [[sink_group.sinks]]
-name = "miss"
 connect = "file_raw_sink"
-params = {  file = "miss1.dat" }
+params = {  file = "error.dat" }
+
 [sink_group.sinks.expect]
-max = 2.0
-min = 0.1
+ratio = 0.01
+tol   = 0.02

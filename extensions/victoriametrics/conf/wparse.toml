@@ -28,14 +28,29 @@ path = "./data/logs"
 [[stat.pick]]
 key = "pick_stat"
 target = "*"
-fields = ["wpl_tag","wp_src_key"]
 
 [[stat.parse]]
 key = "parse_stat"
 target = "*"
-fields = ["wpl_tag", "wp_src_key"]
 
 [[stat.sink]]
 key = "sink_stat"
 target = "*"
-fields = ["wpl_tag","wp_src_key", "sink_category"]
+
+[admin_api]
+enabled = true
+bind = "0.0.0.0:19090"
+request_timeout_ms = 15000
+max_body_bytes = 4096
+
+[admin_api.auth]
+mode = "bearer_token"
+token_file = ".run/admin_api.token"
+
+[admin_api.tls]
+enabled = false
+
+[project_remote]
+enabled = false
+repo = "http://gitea:3000/gitea/project_root.git"
+init_version = "1.0.0"
