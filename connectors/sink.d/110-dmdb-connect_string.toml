@@ -1,0 +1,10 @@
+[[connectors]]
+id = "dmdb_connect_string"
+type = "dmdb"
+allow_override = ["connection_string", "schema","table","columns","batch_size", "query_timeout_secs"]
+[connectors.params]
+connection_string = "Driver={DM8 ODBC DRIVER};SERVER=127.0.0.1;TCP_PORT=5236;UID=SYSDBA;PWD=SYSDBA;"
+table = "nginx_logs"
+columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
+batch_size = 2000
+query_timeout_secs = 15

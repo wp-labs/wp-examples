@@ -2,12 +2,9 @@
 
 ## 1. 使用前准备
 
-在使用 `dmdb` sink 之前，请先完成 ODBC 驱动安装与连接验证。
+在使用 `dmdb` sink 之前，请先完成 ODBC 驱动安装。之后再根据实际接入方式，分别执行 `connection_string`/`endpoint` 或 `dsn` 对应的配置与验证步骤。
 
-### 1.1 准备 ODBC 环境
-
-- 使用 `dsn` 或 `endpoint` 模式前，宿主机必须已经安装达梦 ODBC 驱动。
-- 使用 `dsn` 模式前，系统中必须先配置好对应的数据源名称。
+### 1.1 通用准备：安装 ODBC 环境与达梦驱动
 
 #### 安装系统依赖（Ubuntu 示例）
 
@@ -19,18 +16,19 @@ apt-get install -y unixodbc unixodbc-dev odbcinst
 执行以下命令验证安装结果：
 
 ```bash
-which isql
-isql --version
-odbcinst -j
-```
-
-预期输出示例：
-
-```text
-unixODBC 2.x.x
+root@ent-rdd-WarpParse-01:~/wp/dameng_odbc_linux# which isql
+/usr/bin/isql
+root@ent-rdd-WarpParse-01:~/wp/dameng_odbc_linux# isql --version
+unixODBC 2.3.12
+root@ent-rdd-WarpParse-01:~/wp/dameng_odbc_linux# odbcinst -j
+unixODBC 2.3.12
 DRIVERS............: /etc/odbcinst.ini
 SYSTEM DATA SOURCES: /etc/odbc.ini
-...
+FILE DATA SOURCES..: /etc/ODBCDataSources
+USER DATA SOURCES..: /root/.odbc.ini
+SQLULEN Size.......: 8
+SQLLEN Size........: 8
+SQLSETPOSIROW Size.: 8
 ```
 
 #### 安装达梦 ODBC 驱动
@@ -38,105 +36,120 @@ SYSTEM DATA SOURCES: /etc/odbc.ini
 - Windows 版：<https://dn.navicat.com/drivers/dameng_odbc_win.zip>
 - Linux 版：<https://dn.navicat.com/drivers/dameng_odbc_linux.tar.gz>
 
-以下示例假设压缩包下载到 `/root` 目录：
-
-```bash
-cd /root
-tar -xvf dameng_odbc_linux.tar.gz
-cd dameng_odbc_linux
-ls
-```
-
-预期输出示例：
-
-```text
-bin  install_odbc.sh  libcrypto.so  libdmdpi.so  libdmfldr.so  libdodbc.a  libdodbc.so  libssl.so
-```
+以下示例假设压缩包下载到 `/root/wp` 目录：
 
 #### 配置动态库路径
 
 ```bash
-echo "/root/dameng_odbc_linux" > /etc/ld.so.conf.d/dameng.conf
+echo "/root/wp/dameng_odbc_linux/libdodbc.so" > /etc/ld.so.conf.d/dameng.conf
 ldconfig
 ```
 
-执行以下命令验证动态库已生效：
+执行以下命令验证动态库是否加载成功：
 
 ```bash
-ldconfig -p | grep libdodbc
+root@ent-rdd-WarpParse-01:~/wp/dameng_odbc_linux# ldconfig -p | grep libdodbc
+        libdodbc.so (libc6,x86-64) => /root/wp/dameng_odbc_linux/libdodbc.so
 ```
 
-预期输出示例：
-
-```text
-libdodbc.so.2 => /root/dameng_odbc_linux/libdodbc.so
-```
-
-### 1.2 注册 ODBC 驱动
+### 1.2 通用准备：注册 ODBC 驱动
 
 编辑 `/etc/odbcinst.ini`。如果文件已存在，直接追加下面内容即可；如果文件不存在，可以直接创建后写入：
 
 ```ini
 [DM8 ODBC DRIVER]
 Description = DM8 ODBC DRIVER for DM8
-Driver = /root/dameng_odbc_linux/libdodbc.so
+Driver = /root/wp/dameng_odbc_linux/libdodbc.so
 FileUsage = 1
 ```
 
-配置完成后，执行以下命令验证驱动是否注册成功：
+配置完成后，执行以下命令验证驱动对比输出是否注册成功：
 
 ```bash
-odbcinst -q -d
-odbcinst -q -d -n "DM8 ODBC DRIVER"
-```
-
-预期输出示例：
-
-```text
+root@ent-rdd-WarpParse-01:~/wp/dameng_odbc_linux# odbcinst -q -d -n "DM8 ODBC DRIVER"
 [DM8 ODBC DRIVER]
+Description=ODBC DRIVER FOR DM8
+Driver=/root/wp/dameng_odbc_linux/libdodbc.so
+Setup=/root/wp/dameng_odbc_linux/libdodbc.so
 ```
 
-以及类似以下驱动详情：
+完成以上步骤后，表示宿主机已经具备达梦 ODBC 驱动能力。接下来请根据实际连接方式，选择下面两条路径之一继续配置。
+
+### 1.3 `connection_string` / `endpoint` 模式配置过程
+
+这两种模式都不依赖 `/etc/odbc.ini` 中的 DSN 名称，只要求前面的 ODBC 驱动已经安装并注册成功。
+
+- `connection_string` 模式：直接提供完整 ODBC 连接串。
+- `endpoint` 模式：由 `endpoint + driver + username + password` 自动拼接连接串。
+
+可以直接在 `wparse` 运行机器上执行以下命令验证驱动与直连参数是否可用，并将其中的地址、端口、用户名和密码替换为实际值：
+
+```bash
+root@ent-rdd-WarpParse-01:~/wp/dameng_odbc_linux# isql -v -k "Driver={DM8 ODBC DRIVER};Server=127.0.0.1;Port=5236;UID=SYSDBA;PWD=SYSDBA"
++---------------------------------------+
+| Connected!                            |
+|                                       |
+| sql-statement                         |
+| help [tablename]                      |
+| echo [string]                         |
+| quit                                  |
+|                                       |
++---------------------------------------+
+SQL>
+```
+
+如果上述命令可以正常连接，说明 `connection_string` 或 `endpoint` 方式所需的宿主机准备已完成。
+
+### 1.4 `dsn` 模式配置过程
+
+`dsn` 模式除了要求 ODBC 驱动已经安装并注册外，还需要在 `/etc/odbc.ini` 中额外配置一个数据源名称，且该名称必须与 sink 配置中的 `dsn` 参数保持一致。
+
+例如，可以在 `/etc/odbc.ini` 中补充一个达梦数据源：
 
 ```ini
-[DM8 ODBC DRIVER]
-Description=DM8 ODBC DRIVER for DM8
-Driver=/root/dameng_odbc_linux/libdodbc.so
-FileUsage=1
+[DM_DSN]
+Description = DM8 Database
+Driver = /root/wp/dameng_odbc_linux/libdodbc.so
+Server = 159.75.175.212
+Port = 5236
+User = SYSDBA
+Password = <请替换为实际密码>
 ```
 
-> 说明：如果使用 `dsn` 模式，还需要在系统中额外配置对应的数据源名称，并保证其与 `dsn` 参数值一致。
-
-### 1.3 验证数据库连接
-
-在 `wparse` 运行的机器上执行以下命令，并替换为实际的数据库地址、端口、用户名和密码：
+配置完成后，可执行以下命令验证 DSN 是否可用（其中的地址、用户名、密码需要替换为实际值）：
 
 ```bash
-isql -v -k "Driver={DM8 ODBC DRIVER};Server=localhost;Port=5236;UID=SYSDBA;PWD=password"
+root@ent-rdd-WarpParse-01:~/wp/dameng_odbc_linux# cat /etc/odbc.ini
+[DM_DSN]                          ; DSN 名称
+Description = DM8 Database
+Driver = /root/wp/dameng_odbc_linux/libdodbc.so
+Server = 127.0.0.1
+Port = 5236
+User = SYSDBA
+Password = Dayu@1234
+root@ent-rdd-WarpParse-01:~/wp/dameng_odbc_linux# isql DM_DSN SYSDBA SYSDBA
++---------------------------------------+
+| Connected!                            |
+|                                       |
+| sql-statement                         |
+| help [tablename]                      |
+| echo [string]                         |
+| quit                                  |
+|                                       |
++---------------------------------------+
+SQL> 
 ```
 
-### 1.4 准备目标表
+如果上述命令可以正常连接，说明 `dsn = "DM_DSN"` 对应的系统级数据源已经配置完成。
+
+### 1.5 准备目标表
 
 - 目标表需要预先存在。
 - `table` 和 `columns` 必须与目标表实际结构匹配，包括列名、列类型等。
 
 ## 2. 连接方式
 
-### 2.1 优先级
-
-当前实现按以下优先级选择连接方式：
-
-```text
-connection_string > endpoint > dsn
-```
-
-这意味着：
-
-- 只要配置了 `connection_string`，就优先使用它建连；`dsn`、`endpoint`、`driver`、`username`、`password` 即使同时出现也不会参与建连。
-- 未配置 `connection_string` 且配置了 `endpoint` 时，使用 `endpoint + driver + username + password` 自动拼接 ODBC 连接串。
-- 只有在前两者都未配置时，才会进入 `dsn` 模式，使用 `dsn + username + password` 建连。
-
-### 2.2 `connection_string` 模式
+### 2.1 `connection_string` 模式
 
 适合已经有完整 ODBC 连接串的场景。
 
@@ -147,20 +160,22 @@ connection_string > endpoint > dsn
 示例：
 
 ```toml
-[[sinks]]
-name = "dmdb_events"
-kind = "dmdb"
-
-[sinks.params]
-connection_string = "Driver={DM8 ODBC DRIVER};SERVER=127.0.0.1;TCP_PORT=5236;UID=SYSDBA;PWD=${DMDB_PASSWORD};"
-schema = "WP_DATA"
-table = "EVENTS"
-columns = ["event_id", "event_time", "source", "payload"]
+[sink_group]
+name = "database"
+rule = ["/*"]
+parallel = 8
+[[sink_group.sinks]]
+name = "dmdb_sink"
+connect = "dmdb_connect_string"
+[sink_group.sinks.params]
+connection_string = "Driver={DM8 ODBC DRIVER};SERVER=127.0.0.1;TCP_PORT=5236;UID=SYSDBA;PWD=Dayu@1234;"
+table = "nginx_logs"
+columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
 batch_size = 2000
 query_timeout_secs = 15
 ```
 
-### 2.3 `endpoint` 模式
+### 2.2 `endpoint` 模式
 
 适合不想预先配置 DSN，而是直接通过地址建连的场景。
 
@@ -171,15 +186,18 @@ query_timeout_secs = 15
 示例：
 
 ```toml
-[[sinks]]
-name = "dmdb_events"
-kind = "dmdb"
-
-[sinks.params]
+[sink_group]
+name = "database"
+rule = ["/*"]
+parallel = 8
+[[sink_group.sinks]]
+name = "dmdb_sink"
+connect = "dmdb_endpoint"
+[sink_group.sinks.params]
 endpoint = "127.0.0.1:5236"
 driver = "DM8 ODBC DRIVER"
 username = "SYSDBA"
-password = "${DMDB_PASSWORD}"
+password = "SYSDBA"
 schema = "WP_DATA"
 table = "EVENTS"
 columns = ["event_id", "event_time", "source", "payload"]
@@ -188,7 +206,7 @@ connect_timeout_secs = 8
 query_timeout_secs = 15
 ```
 
-### 2.4 `dsn` 模式
+### 2.3 `dsn` 模式
 
 适合宿主机已经配置好 ODBC DSN，且没有传入 `connection_string` 或 `endpoint` 的场景。
 
@@ -199,14 +217,17 @@ query_timeout_secs = 15
 示例：
 
 ```toml
-[[sinks]]
-name = "dmdb_events"
-kind = "dmdb"
-
-[sinks.params]
-dsn = "DM8_LOCAL"
+[sink_group]
+name = "database"
+rule = ["/*"]
+parallel = 8
+[[sink_group.sinks]]
+name = "dmdb_sink"
+connect = "dmdb_dsn"
+[sink_group.sinks.params]
+dsn = "DM_DSN"
 username = "SYSDBA"
-password = "${DMDB_PASSWORD}"
+password = "SYSDBA"
 schema = "WP_DATA"
 table = "EVENTS"
 columns = ["event_id", "event_time", "source", "payload"]
@@ -231,4 +252,3 @@ query_timeout_secs = 15
 | `batch_size`           | `integer`  | 否                        | 全部   | 单次 SQL 最多写入的记录数，必须大于 `0`。未配置时 sink 内部回落为 `1024`。                             |
 | `connect_timeout_secs` | `integer`  | 否                        | 全部   | ODBC 登录超时秒数，必须大于 `0`。配置后会传给 `ConnectionOptions.login_timeout_sec`；未配置时不显式设置。 |
 | `query_timeout_secs`   | `integer`  | 否                        | 全部   | 每批 SQL 的执行超时秒数，必须大于 `0`。未配置时不显式设置。                                           |
-
