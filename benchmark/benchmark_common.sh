@@ -135,9 +135,15 @@ benchmark_validate_wpl_path() {
     script_dir="$(cd "$(dirname "${0}")" && pwd)"
   fi
 
-  # 特殊处理：mix 使用 wpl 根目录
+  # 特殊处理：mix 使用独立白名单目录，避免被 benchmark/models/wpl 下新增 sample.dat 污染
   if [ "$wpl_dir" = "mix" ]; then
-    wpl_dir=""
+    WPL_PATH="../../models/wpl_mix"
+    if [ ! -d "$WPL_PATH" ]; then
+      echo "wpl dir not found: $WPL_PATH" >&2
+      exit 2
+    fi
+    echo "Using WPL path: $WPL_PATH"
+    return 0
   fi
 
   # 始终基于脚本所在目录计算相对路径
