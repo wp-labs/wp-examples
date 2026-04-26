@@ -1,0 +1,14 @@
+package /long_demo/business/ {
+   rule csv_order {
+       (
+           symbol(order),
+           chars:order_date,
+           chars:tenant,
+           chars:city,
+           chars:product,
+           digit:quantity,
+           digit:amount_cents,
+           digit:risk_level
+       )\,
+   }
+}

@@ -1,7 +1,6 @@
 version = "1.0"
 
 [generator]
-mode = "sample"
 count = 1000
 duration_secs = 0
 speed = 1000

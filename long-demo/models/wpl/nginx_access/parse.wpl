@@ -1,0 +1,15 @@
+package /long_demo/nginx/ {
+   rule access {
+        (
+            ip:sip,
+            2*_,
+            time/clf:recv_time<[,]>,
+            http/request:request",
+            http/status:status,
+            digit:resp_bytes,
+            chars:referer",
+            chars:user_agent",
+            chars:xff"
+        )
+   }
+}
