@@ -1,4 +1,4 @@
-version = ""
+version = "1.0"
 
 [generator]
 count = 1000

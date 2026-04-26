@@ -1,7 +1,6 @@
-version = ""
+version = "1"
 
 [generator]
-mode = "sample"
 count = 1000
 speed = 1000
 parallel = 2
@@ -14,8 +13,8 @@ base = "data/in_dat"
 file = "gen.dat"
 
 [logging]
-level = ""
-output = ""
+level = "debug"
+output = "file"
 file_path = "./data/logs"
 
 [presets]

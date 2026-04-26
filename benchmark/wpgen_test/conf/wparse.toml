@@ -3,8 +3,10 @@ version = "1.0"
 [models]
 wpl = "../models/wpl"
 oml = "../models/oml"
-sources = "./models/sources"
-sinks = "./models/sinks"
+
+[topology]
+sources = "../sources"
+sinks = "../sinks/parse_to_blackhole"
 
 [performance]
 parse_workers = 2
