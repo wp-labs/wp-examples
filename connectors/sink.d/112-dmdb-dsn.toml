@@ -1,5 +1,5 @@
 [[connectors]]
-id = "dmdb_dsn"
+id = "dmdb_dsn_sink"
 type = "dmdb"
 allow_override = ["dsn", "username", "password", "connection_string", "schema","table","columns","batch_size", "query_timeout_secs"]
 [connectors.params]

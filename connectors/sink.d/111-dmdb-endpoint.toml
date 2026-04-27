@@ -1,5 +1,5 @@
 [[connectors]]
-id = "dmdb_endpoint"
+id = "dmdb_endpoint_sink"
 type = "dmdb"
 allow_override = ["endpoint","driver", "username", "password", "connection_string", "schema","table","columns","batch_size", "query_timeout_secs"]
 [connectors.params]
