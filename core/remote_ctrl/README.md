@@ -8,7 +8,8 @@ Validates the following capabilities:
 - Dual-repo configuration (`[project_remote.models]` + `[project_remote.infra]`)
 - Per-group initialization with `wproj conf update --group`
 - Directory mapping: models group manages `models/`, infra group manages `conf/` + `topology/` + `connectors/`
-- Per-group runtime reload with `wproj engine reload --update --group` and result verification
+- Per-group runtime reload with `wproj engine reload --update --group` (CLI → Admin API)
+- Direct Admin API HTTP calls (curl): per-group update, per-group status response, dual-repo error rejection
 
 ## Remote Repositories
 
@@ -74,6 +75,10 @@ WORK_ROOT="$PWD/.tmp-work" \
     - Validates response: `accepted=true`, `group=infra`, `requested_version=0.1.7`
 13. Verify runtime status records infra reload completion
 14. Verify state file infra version updated to `0.1.7`
+15. `curl GET /admin/v1/runtime/status` — verify `project_version` is a per-group object (`models` + `infra` keys)
+16. `curl POST /admin/v1/reloads/model` with `{"update":true,"group":"models",...}` — direct HTTP API models update
+17. `curl POST /admin/v1/reloads/model` with `{"update":true,"group":"infra",...}` — direct HTTP API infra update
+18. `curl POST /admin/v1/reloads/model` with `{"update":true}` (no group) — verify 400 rejection in dual-repo mode
 
 ## Notes
 

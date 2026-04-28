@@ -256,4 +256,87 @@ fi
 echo "   infra version updated to $INFRA_TARGET_VERSION"
 echo "   final state: $(cat "$STATE_FILE")"
 
-echo "PASS: dual-repo models($MODELS_INIT_VERSION->$MODELS_TARGET_VERSION) + infra($INFRA_INIT_VERSION->$INFRA_TARGET_VERSION)"
+echo "15> verify per-group project_version via admin API status"
+STATUS_CURL="$(curl -sS \
+  -H "Authorization: Bearer test-token" \
+  "http://${ADMIN_BIND}/admin/v1/runtime/status")"
+echo "$STATUS_CURL"
+if ! printf '%s' "$STATUS_CURL" | grep -Eq '"project_version"[[:space:]]*:[[:space:]]*\{'; then
+  echo "Error: status response project_version is not an object (dual-repo mode)"
+  exit 1
+fi
+if ! printf '%s' "$STATUS_CURL" | grep -Eq '"models"[[:space:]]*:[[:space:]]*\{'; then
+  echo "Error: project_version missing models group"
+  exit 1
+fi
+if ! printf '%s' "$STATUS_CURL" | grep -Eq '"infra"[[:space:]]*:[[:space:]]*\{'; then
+  echo "Error: project_version missing infra group"
+  exit 1
+fi
+echo "   per-group project_version verified"
+
+echo "16> trigger models update via admin API (curl)"
+MODELS_CURL_RESP="$(curl -sS \
+  -X POST \
+  -H "Authorization: Bearer test-token" \
+  -H "Content-Type: application/json" \
+  -H "X-Request-Id: curl-models-001" \
+  "http://${ADMIN_BIND}/admin/v1/reloads/model" \
+  -d "{\"wait\": true, \"update\": true, \"group\": \"models\", \"version\": \"${MODELS_TARGET_VERSION}\", \"timeout_ms\": ${RELOAD_TIMEOUT_MS}, \"reason\": \"curl models update\"}")"
+echo "$MODELS_CURL_RESP"
+if ! printf '%s' "$MODELS_CURL_RESP" | grep -Eq '"accepted"[[:space:]]*:[[:space:]]*true'; then
+  echo "Error: curl reload not accepted"
+  exit 1
+fi
+if ! printf '%s' "$MODELS_CURL_RESP" | grep -Eq '"group"[[:space:]]*:[[:space:]]*"models"'; then
+  echo "Error: curl reload response missing group=models"
+  exit 1
+fi
+if ! printf '%s' "$MODELS_CURL_RESP" | grep -Eq '"result"[[:space:]]*:[[:space:]]*"reload_done"'; then
+  echo "Error: curl reload did not complete with reload_done"
+  exit 1
+fi
+echo "   models update via curl: OK"
+
+echo "17> trigger infra update via admin API (curl)"
+INFRA_CURL_RESP="$(curl -sS \
+  -X POST \
+  -H "Authorization: Bearer test-token" \
+  -H "Content-Type: application/json" \
+  -H "X-Request-Id: curl-infra-001" \
+  "http://${ADMIN_BIND}/admin/v1/reloads/model" \
+  -d "{\"wait\": true, \"update\": true, \"group\": \"infra\", \"version\": \"${INFRA_TARGET_VERSION}\", \"timeout_ms\": ${RELOAD_TIMEOUT_MS}, \"reason\": \"curl infra update\"}")"
+echo "$INFRA_CURL_RESP"
+if ! printf '%s' "$INFRA_CURL_RESP" | grep -Eq '"accepted"[[:space:]]*:[[:space:]]*true'; then
+  echo "Error: curl infra reload not accepted"
+  exit 1
+fi
+if ! printf '%s' "$INFRA_CURL_RESP" | grep -Eq '"group"[[:space:]]*:[[:space:]]*"infra"'; then
+  echo "Error: curl infra reload response missing group=infra"
+  exit 1
+fi
+if ! printf '%s' "$INFRA_CURL_RESP" | grep -Eq '"result"[[:space:]]*:[[:space:]]*"reload_done"'; then
+  echo "Error: curl infra reload did not complete with reload_done"
+  exit 1
+fi
+echo "   infra update via curl: OK"
+
+echo "18> verify dual-repo update without group is rejected"
+CURL_ERR="$(curl -sS \
+  -X POST \
+  -H "Authorization: Bearer test-token" \
+  -H "Content-Type: application/json" \
+  "http://${ADMIN_BIND}/admin/v1/reloads/model" \
+  -d '{"wait": false, "update": true}')"
+echo "$CURL_ERR"
+if ! printf '%s' "$CURL_ERR" | grep -Eq '"result"[[:space:]]*:[[:space:]]*"invalid_request"'; then
+  echo "Error: dual-repo update without group should be rejected"
+  exit 1
+fi
+if ! printf '%s' "$CURL_ERR" | grep -Eq '"error".*group'; then
+  echo "Error: error message should mention group"
+  exit 1
+fi
+echo "   dual-repo requires group: verified"
+
+echo "PASS: dual-repo models($MODELS_INIT_VERSION->$MODELS_TARGET_VERSION) + infra($INFRA_INIT_VERSION->$INFRA_TARGET_VERSION) + admin API curl"
