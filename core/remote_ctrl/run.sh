@@ -276,11 +276,12 @@ fi
 echo "   per-group project_version verified"
 
 echo "16> trigger models update via admin API (curl)"
+MODELS_CURL_REQ="curl-models-001"
 MODELS_CURL_RESP="$(curl -sS \
   -X POST \
   -H "Authorization: Bearer test-token" \
   -H "Content-Type: application/json" \
-  -H "X-Request-Id: curl-models-001" \
+  -H "X-Request-Id: ${MODELS_CURL_REQ}" \
   "http://${ADMIN_BIND}/admin/v1/reloads/model" \
   -d "{\"wait\": true, \"update\": true, \"group\": \"models\", \"version\": \"${MODELS_TARGET_VERSION}\", \"timeout_ms\": ${RELOAD_TIMEOUT_MS}, \"reason\": \"curl models update\"}")"
 echo "$MODELS_CURL_RESP"
@@ -292,18 +293,33 @@ if ! printf '%s' "$MODELS_CURL_RESP" | grep -Eq '"group"[[:space:]]*:[[:space:]]
   echo "Error: curl reload response missing group=models"
   exit 1
 fi
-if ! printf '%s' "$MODELS_CURL_RESP" | grep -Eq '"result"[[:space:]]*:[[:space:]]*"reload_done"'; then
-  echo "Error: curl reload did not complete with reload_done"
+if ! printf '%s' "$MODELS_CURL_RESP" | grep -Eq '"result"[[:space:]]*:[[:space:]]*"(reload_done|running)"'; then
+  echo "Error: curl reload response is neither reload_done nor running"
+  exit 1
+fi
+
+# Poll until the reload completes
+for _ in $(seq 1 60); do
+  STATUS_CHECK="$(wproj engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
+  if printf '%s' "$STATUS_CHECK" | grep -Eq "\"last_reload_request_id\"[[:space:]]*:[[:space:]]*\"$MODELS_CURL_REQ\"" \
+    && printf '%s' "$STATUS_CHECK" | grep -Eq '"reloading"[[:space:]]*:[[:space:]]*false'; then
+    break
+  fi
+  sleep 0.25
+done
+if ! printf '%s' "$STATUS_CHECK" | grep -Eq '"last_reload_result"[[:space:]]*:[[:space:]]*"reload_done"'; then
+  echo "Error: curl models reload did not finish with reload_done"
   exit 1
 fi
 echo "   models update via curl: OK"
 
 echo "17> trigger infra update via admin API (curl)"
+INFRA_CURL_REQ="curl-infra-001"
 INFRA_CURL_RESP="$(curl -sS \
   -X POST \
   -H "Authorization: Bearer test-token" \
   -H "Content-Type: application/json" \
-  -H "X-Request-Id: curl-infra-001" \
+  -H "X-Request-Id: ${INFRA_CURL_REQ}" \
   "http://${ADMIN_BIND}/admin/v1/reloads/model" \
   -d "{\"wait\": true, \"update\": true, \"group\": \"infra\", \"version\": \"${INFRA_TARGET_VERSION}\", \"timeout_ms\": ${RELOAD_TIMEOUT_MS}, \"reason\": \"curl infra update\"}")"
 echo "$INFRA_CURL_RESP"
@@ -315,8 +331,22 @@ if ! printf '%s' "$INFRA_CURL_RESP" | grep -Eq '"group"[[:space:]]*:[[:space:]]*
   echo "Error: curl infra reload response missing group=infra"
   exit 1
 fi
-if ! printf '%s' "$INFRA_CURL_RESP" | grep -Eq '"result"[[:space:]]*:[[:space:]]*"reload_done"'; then
-  echo "Error: curl infra reload did not complete with reload_done"
+if ! printf '%s' "$INFRA_CURL_RESP" | grep -Eq '"result"[[:space:]]*:[[:space:]]*"(reload_done|running)"'; then
+  echo "Error: curl infra reload response is neither reload_done nor running"
+  exit 1
+fi
+
+# Poll until the reload completes
+for _ in $(seq 1 60); do
+  STATUS_CHECK="$(wproj engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
+  if printf '%s' "$STATUS_CHECK" | grep -Eq "\"last_reload_request_id\"[[:space:]]*:[[:space:]]*\"$INFRA_CURL_REQ\"" \
+    && printf '%s' "$STATUS_CHECK" | grep -Eq '"reloading"[[:space:]]*:[[:space:]]*false'; then
+    break
+  fi
+  sleep 0.25
+done
+if ! printf '%s' "$STATUS_CHECK" | grep -Eq '"last_reload_result"[[:space:]]*:[[:space:]]*"reload_done"'; then
+  echo "Error: curl infra reload did not finish with reload_done"
   exit 1
 fi
 echo "   infra update via curl: OK"
