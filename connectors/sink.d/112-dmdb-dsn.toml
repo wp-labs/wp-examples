@@ -9,6 +9,6 @@ password = "SYSDBA"
 schema = "WP_DATA"
 table = "EVENTS"
 columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
-batch_size = 2000
+batch_size = 512
 connect_timeout_secs = 8
 query_timeout_secs = 15

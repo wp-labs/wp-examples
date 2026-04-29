@@ -1,0 +1,27 @@
+version = "2.0"
+
+# [sink_group]
+# name = "database"
+# rule = ["/*"]
+# parallel = 8
+# [[sink_group.sinks]]
+# name = "dmdb_sink"
+# connect = "dmdb_connect_string_sink"
+# [sink_group.sinks.params]
+# connection_string = "Driver={DM8 ODBC DRIVER};SERVER=159.75.175.212;TCP_PORT=5236;UID=SYSDBA;PWD=Dayu@1234;"
+# table = "HTTP_REQUEST_LOGS_COPY"
+# columns = ["sip", "timestamp", "http/request", "status", "create_time", "id", "update_time"]
+# batch_size = 100
+# query_timeout_secs = 15
+
+[sink_group]
+name = "testcase"
+rule = ["/*"]
+[[sink_group.sinks]]
+name = "file_proto_sink"
+connect = "file_proto_sink"
+[sink_group.sinks.params]
+file = "events.parsed.prototext"
+[sink_group.sinks.expect]
+ratio = 0.50
+tol   = 0.01
