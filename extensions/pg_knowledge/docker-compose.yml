@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    ports:
+      - "55432:5432"
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: knowdb_demo
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d knowdb_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - postgres16-data:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  postgres16-data:

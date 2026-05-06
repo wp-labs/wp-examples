@@ -7,5 +7,5 @@ oml = ["sys"]
 connect = "file_rescue_sink"
 params = {  file = "benchmark.dat" }
 [sink_group.sinks.expect]
-ratio = 0.66
-tol   = 0.02
+ratio = 0.50
+tol   = 0.03

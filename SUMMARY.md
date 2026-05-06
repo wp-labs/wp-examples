@@ -20,6 +20,7 @@
 - [extension connector](extensions/README.md)
   - [doris 使用说明](extensions/doris/README.md)
   - [Kafka](extensions/kafka/README.md)
+  - [PostgreSQL Knowledge Enrichment](extensions/pg_knowledge/README.md)
   - [Readme](extensions/practice/README.md)
   - [MySql](extensions/tcp_mysql/README.md)
   - [wp-extensions/tcp_victorialogs 使用说明](extensions/tcp_victorialogs/README.md)

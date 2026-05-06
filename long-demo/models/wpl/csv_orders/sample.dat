@@ -1,0 +1,15 @@
+order,2026-04-25,tenant_a,shanghai,warp,12,159900,0
+order,2026-04-25,tenant_b,beijing,parse,3,45000,2
+order,2026-04-26,tenant_c,shenzhen,console,7,88000,1
+order,2026-04-26,tenant_a,shanghai,warp,120,1599000,0
+order,2026-04-26,tenant_b,hangzhou,agent,1,9900,3
+order,2026-04-27,tenant_d,guangzhou,storage,44,220000,1
+order,2026-04-27,tenant_e,chengdu,console,5,125000,4
+order,2026-04-28,tenant_a,beijing,parse,80,640000,0
+order,2026-04-28,tenant_f,wuhan,warp,2,19900,5
+order,2026-04-28,tenant_g,nanjing,agent,18,72000,2
+order,2026-04-29,tenant_h,xian,storage,33,330000,1
+order,2026-04-29,tenant_i,suzhou,console,9,99000,3
+order,2026-04-30,tenant_j,tianjin,parse,60,420000,0
+order,2026-04-30,tenant_k,qingdao,warp,4,39900,4
+order,2026-05-01,tenant_l,shanghai,enterprise,1,999900,5

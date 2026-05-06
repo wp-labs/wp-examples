@@ -11,6 +11,7 @@ This directory contains extension connector examples demonstrating WarpParse int
 | **elasticsearch** | File Source -> Elasticsearch pipeline | Elasticsearch sink, index write, credential injection |
 | **http** | File Source -> HTTP endpoint pipeline | HTTP sink, auth request, format output |
 | **kafka** | Kafka Source/Sink integration | Kafka consumer/producer, topic routing |
+| **pg_knowledge** | File Source → PostgreSQL knowledge enrichment | PostgreSQL knowdb provider, OML SQL enrichment, batch validation |
 | **practice** | Real-world multi-source monitoring scenario | Multi-source collection, Fluent-bit, Kafka, VictoriaLogs, Grafana |
 | **syslog_postgres** | Syslog/TCP log -> Postgres pipeline | Postgres sink, structured storage, credential injection |
 | **tcp_count** | TCP input counting and test helper | TCP source, counting, statistics |
@@ -65,6 +66,7 @@ docker compose up -d
 | **elasticsearch** | 文件源 -> Elasticsearch 管道 | Elasticsearch sink、索引写入、安全变量注入 |
 | **http** | 文件源 -> HTTP 端点管道 | HTTP sink、认证请求、格式输出 |
 | **kafka** | Kafka 源/汇集成 | Kafka 消费者/生产者、topic 路由 |
+| **pg_knowledge** | 文件源 → PostgreSQL 知识库富化 | PostgreSQL knowdb provider、OML SQL 富化、批处理校验 |
 | **practice** | 实战多源监控场景 | 多源采集、Fluent-bit、Kafka、VictoriaLogs、Grafana |
 | **syslog_postgres** | Syslog/TCP 日志 -> Postgres 管道 | Postgres sink、结构化入库、安全变量注入 |
 | **tcp_count** | TCP 输入计数与测试辅助 | TCP source、计数、统计 |

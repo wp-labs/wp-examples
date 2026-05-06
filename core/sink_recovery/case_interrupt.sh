@@ -31,4 +31,9 @@ echo "3> rescue data:"
 find ./data/rescue/ -name "*.dat"
 
 wproj data stat
-wproj data validate
+
+# 中断阶段只验证救急文件已生成；此时业务 sink 输出仍是中间态，不做比例校验。
+if ! find ./data/rescue/ -type f -name "*.dat" | grep -q .; then
+    echo "Expected rescue .dat files, but none were generated"
+    exit 1
+fi
