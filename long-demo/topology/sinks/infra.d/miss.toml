@@ -20,4 +20,4 @@ min = 0.0
 name = "victorialogs_output"
 connect = "victorialogs_sink"
 [sink_group.sinks.params]
-endpoint = "http://127.0.0.1:19428"
+endpoint = "http://127.0.0.1:19429"
