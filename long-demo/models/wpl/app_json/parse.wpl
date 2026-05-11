@@ -1,0 +1,16 @@
+package /long_demo/app/ {
+   rule app_event {
+        (
+            symbol(app_event),
+            time:time,
+            chars:service,
+            chars:level,
+            chars:event,
+            chars:request_id,
+            ip:client_ip,
+            digit:latency_ms,
+            digit:status,
+            chars:message
+        )\|\!
+   }
+}

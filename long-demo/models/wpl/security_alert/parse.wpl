@@ -1,0 +1,35 @@
+package /long_demo/security/ {
+   #[tag(data_type: "webids_alert")]
+   rule webids_alert {
+        (
+            symbol(webids_alert),
+            chars:serialno,
+            chars:rule_id,
+            chars:rule_name,
+            time_timestamp:write_date,
+            chars:vuln_type,
+            ip:sip,
+            digit:sport,
+            ip:dip,
+            digit:dport,
+            digit:severity,
+            chars:host,
+            chars:uri,
+            chars:method,
+            chars:vuln_desc,
+            digit:attack_result
+        )\|\!
+   }
+
+   #[tag(data_type: "system_metric")]
+   rule system_metric {
+        (
+            symbol(system_metric),
+            time:updatetime,
+            ip:sip,
+            chars:log_type,
+            digit:cpu_idle,
+            digit:mem_free_kb
+        )\|\!
+   }
+}

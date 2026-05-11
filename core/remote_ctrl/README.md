@@ -1,54 +1,91 @@
-# remote_ctrl
+# remote_ctrl (Dual-Repo Mode)
 
-本用例演示“从远端仓库初始化工程，然后通过管理面触发 reload，并在 reload 时切换到新版本”的场景。
+This case demonstrates dual-repo mode, where models and infra are updated independently through the admin API with version switching.
 
-## 目的
+## Purpose
 
-验证以下能力：
-- 使用 `wproj init --repo` 从远端项目仓库完成首次初始化
-- 使用远端初始化得到的工程启动 `wparse`
-- 通过 `wproj engine` 本地管理面封装访问 admin API
-- 触发一次 runtime reload，并校验 reload 结果已被运行时记录
+Validates the following capabilities:
+- Dual-repo configuration (`[project_remote.models]` + `[project_remote.infra]`)
+- Per-group initialization with `wproj conf update --group`
+- Directory mapping: models group manages `models/`, infra group manages `conf/` + `topology/` + `connectors/`
+- Per-group runtime reload with `wproj engine reload --update --group` (CLI → Admin API)
+- Direct Admin API HTTP calls (curl): per-group update, per-group status response, dual-repo error rejection
 
-## 远端仓库
+## Remote Repositories
 
-- 仓库地址：`https://github.com/wp-labs/editor-monitor-conf.git`
-- 默认初始化版本：`0.1.2`
-- 默认 reload 目标版本：`0.1.3`
+| Group  | Repository                                        | init_version | target |
+|--------|---------------------------------------------------|-------------|--------|
+| models | `https://github.com/wp-labs/wp-rule.git`          | `0.1.0`     | `0.1.1` |
+| infra  | `https://github.com/wp-labs/editor-monitor-conf.git` | `0.1.6`  | `0.1.7` |
 
-## 快速开始
+## Directory Mapping
+
+```
+Project Layout              Source Repository
+────────────                 ────────────────
+models/                      models repo (wp-rule)
+├── wpl/                     - parse rules
+├── oml/                     - model definitions
+└── knowledge/               - knowledge base
+
+conf/       ┐
+topology/   ├── infra repo (editor-monitor-conf)
+connectors/ ┘                - main config, topology, connectors
+```
+
+## Quick Start
 
 ```bash
 cd core/remote_ctrl
 ./run.sh
 ```
 
-可选覆盖参数：
+Optional overrides:
 
 ```bash
-REPO_URL=https://github.com/wp-labs/editor-monitor-conf.git \
-INIT_VERSION=0.1.2 \
-TARGET_VERSION=0.1.3 \
+MODELS_REPO_URL=https://github.com/wp-labs/wp-rule.git \
+INFRA_REPO_URL=https://github.com/wp-labs/editor-monitor-conf.git \
+MODELS_INIT_VERSION=0.1.0 \
+INFRA_INIT_VERSION=0.1.6 \
+MODELS_TARGET_VERSION=0.1.1 \
+INFRA_TARGET_VERSION=0.1.7 \
 WORK_ROOT="$PWD/.tmp-work" \
-RELOAD_TIMEOUT_MS=1000 \
 ./run.sh
 ```
 
-## 脚本流程
+## Script Flow
 
-1. 在 `.tmp-work` 下创建一个干净的工作目录。
-2. 执行 `wproj init --repo ... --version ...` 进行远端初始化。
-3. 在 `${HOME}/.warp_parse/admin_api.token` 下写入 token，直接复用远端项目原始 admin 配置。
-4. 预置一个最小 `data/in_dat/gen.dat` 文件，确保 file source 可以正常启动。
-5. 使用仓库中的固定地址 `127.0.0.1:19090` 启动 `wparse daemon`。
-6. 等待 `wproj engine status --json` 返回 `accepting_commands=true`。
-7. 执行 `wproj engine reload --update --version 0.1.3 --json`。
-8. 校验运行时 `project_version` 已切换到 `0.1.3`，且 `last_reload_result=reload_done`。
+1. Create a clean work directory under `$WORK_ROOT` (default `.tmp-work`)
+2. Write bootstrap config (only the `[project_remote]` section with repo URLs)
+3. `wproj conf update --group infra --version 0.1.6` — initialize infra
+   - Pulls `conf/`, `topology/`, `connectors/` from editor-monitor-conf
+   - Verifies `conf/wparse.toml` is now a full config and directories are populated
+4. `wproj conf update --group models --version 0.1.0` — initialize models
+   - Pulls `models/` from wp-rule
+   - Verifies `models/wpl/` contains `.wpl` files
+5. Verify state file is dual-repo format (contains both `models` and `infra` keys)
+6. Prepare admin token and sample data
+7. Start `wparse daemon`
+8. Poll until admin API reports `accepting_commands = true`
+9. `wproj engine reload --update --group models --version 0.1.1`
+   - Validates response: `accepted=true`, `group=models`, `requested_version=0.1.1`
+10. Verify runtime status: `last_reload_request_id` recorded, `reload_done`
+11. Verify state file models version updated to `0.1.1`
+12. `wproj engine reload --update --group infra --version 0.1.7`
+    - Validates response: `accepted=true`, `group=infra`, `requested_version=0.1.7`
+13. Verify runtime status records infra reload completion
+14. Verify state file infra version updated to `0.1.7`
+15. `curl GET /admin/v1/runtime/status` — verify `project_version` is a per-group object (`models` + `infra` keys)
+16. `curl POST /admin/v1/reloads/model` with `{"update":true,"group":"models",...}` — direct HTTP API models update
+17. `curl POST /admin/v1/reloads/model` with `{"update":true,"group":"infra",...}` — direct HTTP API infra update
+18. `curl POST /admin/v1/reloads/model` with `{"update":true}` (no group) — verify 400 rejection in dual-repo mode
 
-## 说明
+## Notes
 
-- 本用例依赖网络访问，因为初始化阶段会访问远端 Git 仓库。
-- 初始化得到的工程会保留在 `.tmp-work` 下，便于失败后排查。
-- reload 通过 `wproj engine reload` 触发，本质上走的是本地 admin API。
-- 本用例保留远端仓库原始的 `${HOME}` token 路径，并在 `${HOME}/.warp_parse/admin_api.token` 下准备对应 token 文件。
-- 管理面地址保持仓库默认的 `127.0.0.1:19090`；如果本机该端口被占用，用例会直接失败报错。
+- The case directory contains only `run.sh` and `README.md`; all project files are provided by the two remote repositories via sync
+- In dual-repo mode, infra must be synced first (to write the full `conf/wparse.toml`), then models
+- The infra repo's own `conf/wparse.toml` already contains the dual-repo config (`[project_remote.models]` + `[project_remote.infra]`), so no manual config patching is needed after infra sync
+- `--group` is required in dual-repo mode; models and infra are updated independently
+- The work directory is preserved under `$WORK_ROOT` for post-mortem debugging
+- Reload is triggered via `wproj engine reload`, which communicates with the local admin API
+- The admin bind address defaults to `127.0.0.1:19090`; a port conflict will cause the case to fail

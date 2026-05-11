@@ -1,0 +1,12 @@
+app_event|!2026-04-25 09:30:01|!checkout|!info|!request_finished|!req-20260425-001|!10.10.1.8|!37|!200|!payment callback accepted
+app_event|!2026-04-25 09:31:18|!catalog|!warn|!request_failed|!req-20260425-002|!10.10.1.9|!1500|!504|!upstream timeout
+app_event|!2026-04-25 09:31:30|!catalog|!info|!request_finished|!req-20260425-003|!10.10.1.10|!12|!200|!list products ok
+app_event|!2026-04-25 09:32:02|!checkout|!info|!request_finished|!req-20260425-004|!10.10.1.11|!84|!201|!order created
+app_event|!2026-04-25 09:32:37|!payment|!error|!request_failed|!req-20260425-005|!10.10.1.12|!320|!402|!card gateway rejected
+app_event|!2026-04-25 09:33:00|!auth|!warn|!request_failed|!req-20260425-006|!203.0.113.90|!18|!401|!bad password
+app_event|!2026-04-25 09:33:08|!auth|!warn|!request_failed|!req-20260425-007|!203.0.113.91|!22|!403|!permission denied
+app_event|!2026-04-25 09:34:11|!report|!info|!request_finished|!req-20260425-008|!10.10.1.13|!980|!202|!large export started
+app_event|!2026-04-25 09:35:29|!recommend|!error|!request_failed|!req-20260425-009|!10.10.1.14|!76|!500|!panic recovered
+app_event|!2026-04-25 09:36:01|!static|!info|!request_finished|!req-20260425-010|!198.51.100.10|!3|!304|!cache hit
+app_event|!2026-04-25 09:37:45|!checkout|!info|!request_finished|!req-20260425-011|!10.10.1.15|!143|!202|!refund submitted
+app_event|!2026-04-25 09:38:09|!catalog|!error|!request_failed|!req-20260425-012|!10.10.1.16|!2500|!503|!database unavailable

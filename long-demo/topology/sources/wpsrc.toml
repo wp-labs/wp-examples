@@ -1,0 +1,22 @@
+# 文件 Source（备选：若不需要 TCP 可切换回此 Source）
+#[[sources]]
+#key = "file_1"
+#enable = true
+#connect = "file_src"
+#tags = []
+#
+#[sources.params]
+#encode = "text"
+#file = "gen*.dat"
+
+# TCP Source：接收 wpgen 通过 tcp_sink 发送的波动数据
+[[sources]]
+key = "syslog_1"
+enable = true
+connect = "syslog_tcp_src"
+tags = []
+
+[sources.params]
+addr = "0.0.0.0"
+port = 1514
+protocol = "tcp"

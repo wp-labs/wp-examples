@@ -1,0 +1,12 @@
+username:admin|!serialno:214585853|!module:system|!detail:login success|!updatetime:2026-04-25 09:20:14|!ip:10.91.130.33|!log_type:audit|!sub_type:3
+username:operator|!serialno:214585854|!module:policy|!detail:update routing rule|!updatetime:2026-04-25 09:22:40|!ip:10.91.130.34|!log_type:audit|!sub_type:7
+username:auditor|!serialno:214585855|!module:report|!detail:export daily monitor|!updatetime:2026-04-25 09:25:00|!ip:10.91.130.35|!log_type:audit|!sub_type:2
+username:admin|!serialno:214585856|!module:user|!detail:create user tenant_a_ops|!updatetime:2026-04-25 09:27:31|!ip:10.91.130.33|!log_type:audit|!sub_type:8
+username:guest|!serialno:214585857|!module:auth|!detail:login denied|!updatetime:2026-04-25 09:29:12|!ip:203.0.113.44|!log_type:security|!sub_type:9
+username:operator|!serialno:214585858|!module:sink|!detail:pause file sink|!updatetime:2026-04-25 09:32:43|!ip:10.91.130.34|!log_type:audit|!sub_type:6
+username:system|!serialno:214585859|!module:project|!detail:auto reload version v42|!updatetime:2026-04-25 09:35:00|!ip:127.0.0.1|!log_type:ops|!sub_type:1
+username:admin|!serialno:214585860|!module:source|!detail:change tcp rate limit|!updatetime:2026-04-25 09:37:18|!ip:10.91.130.33|!log_type:audit|!sub_type:5
+username:secops|!serialno:214585861|!module:policy|!detail:block ip 203.0.113.90|!updatetime:2026-04-25 09:39:57|!ip:10.91.130.40|!log_type:security|!sub_type:10
+username:operator|!serialno:214585862|!module:engine|!detail:restart worker 2|!updatetime:2026-04-25 09:42:05|!ip:10.91.130.34|!log_type:ops|!sub_type:4
+username:auditor|!serialno:214585863|!module:knowledge|!detail:update semantic dictionary|!updatetime:2026-04-25 09:45:33|!ip:10.91.130.35|!log_type:audit|!sub_type:11
+username:unknown|!serialno:214585864|!module:auth|!detail:token expired|!updatetime:2026-04-25 09:48:21|!ip:198.51.100.88|!log_type:security|!sub_type:12

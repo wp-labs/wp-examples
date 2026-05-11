@@ -1,0 +1,15 @@
+webids_alert|!V3ee8315f|!268435612|!dedecms XSS|!1521017081|!XSS|!192.168.42.41|!62594|!192.168.138.180|!80|!6|!demo.example.com|!/include/dialog/config.php?adminDirHand=test|!GET|!dedecms xss probe|!1
+system_metric|!2026-04-25 09:40:00|!10.48.95.78|!metric|!87|!102432896
+webids_alert|!V3ee8316f|!268435613|!SQL Injection Probe|!1521017181|!SQLI|!203.0.113.90|!51012|!192.168.138.181|!443|!9|!api.example.com|!/api/search?q='or'1'='1|!GET|!sqli scanner blocked|!1
+webids_alert|!V3ee8317f|!268435614|!Path Traversal|!1521017281|!LFI|!203.0.113.91|!51013|!192.168.138.182|!8080|!8|!admin.example.com|!/download?file=../../etc/passwd|!GET|!path traversal attempt|!1
+system_metric|!2026-04-25 09:41:00|!10.48.95.79|!metric|!41|!52428800
+webids_alert|!V3ee8318f|!268435615|!Command Injection|!1521017381|!RCE|!198.51.100.44|!51014|!192.168.138.183|!80|!10|!ops.example.com|!/ping?host=127.0.0.1;id|!POST|!command injection payload|!1
+webids_alert|!V3ee8319f|!268435616|!Weak Password Spray|!1521017481|!AUTH|!198.51.100.45|!51015|!192.168.138.184|!443|!7|!login.example.com|!/login|!POST|!password spray detected|!0
+system_metric|!2026-04-25 09:42:00|!10.48.95.80|!metric|!12|!10485760
+webids_alert|!V3ee8320f|!268435617|!Admin Forbidden|!1521017581|!ACL|!203.0.113.92|!51016|!192.168.138.185|!443|!4|!admin.example.com|!/admin|!GET|!forbidden admin access|!1
+webids_alert|!V3ee8321f|!268435618|!Upload Webshell|!1521017681|!WEBSHELL|!198.51.100.46|!51017|!192.168.138.186|!80|!10|!cms.example.com|!/upload/shell.php|!POST|!webshell upload blocked|!1
+webids_alert|!V3ee8322f|!268435619|!Crawler Burst|!1521017781|!BOT|!198.51.100.47|!51018|!192.168.138.187|!80|!3|!shop.example.com|!/products?page=999|!GET|!crawler burst throttled|!0
+system_metric|!2026-04-25 09:43:00|!10.48.95.81|!metric|!68|!209715200
+webids_alert|!V3ee8323f|!268435620|!JWT Tamper|!1521017881|!AUTH|!203.0.113.93|!51019|!192.168.138.188|!443|!8|!api.example.com|!/api/profile|!GET|!invalid jwt signature|!1
+webids_alert|!V3ee8324f|!268435621|!SSRF Attempt|!1521017981|!SSRF|!203.0.113.94|!51020|!192.168.138.189|!443|!9|!api.example.com|!/fetch?url=http://169.254.169.254|!POST|!metadata endpoint access blocked|!1
+system_metric|!2026-04-25 09:44:00|!10.48.95.82|!metric|!25|!33554432

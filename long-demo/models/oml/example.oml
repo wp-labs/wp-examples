@@ -1,0 +1,4 @@
+name : long_demo
+rule : *
+---
+* : auto = take() ;

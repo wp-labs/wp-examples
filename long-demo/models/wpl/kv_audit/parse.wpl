@@ -1,0 +1,14 @@
+package /long_demo/audit/ {
+   rule kv_audit {
+        (
+            kv(chars@username),
+            kv(chars@serialno),
+            kv(chars@module),
+            kv(chars@detail),
+            kv(time@updatetime),
+            kv(ip@ip),
+            kv(chars@log_type),
+            kv(digit@sub_type)
+        )\|\!
+   }
+}

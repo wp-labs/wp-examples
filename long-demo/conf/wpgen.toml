@@ -1,0 +1,32 @@
+version = "1.0"
+
+[generator]
+count = 1000000000
+speed = 1000
+parallel = 1
+
+# 动态速率：阶梯型峰谷，便于 monitor 明显看到吞吐波动。
+[generator.speed_profile]
+type = "stepped"
+steps = [
+  [8.0, 5000],
+  [6.0, 80000],
+  [5.0, 12000],
+  [4.0, 160000],
+  [7.0, 7000],
+]
+loop_forever = true
+
+# TCP 输出：直连 wparse syslog_tcp_src 端口
+[output]
+connect = "tcp_sink"
+
+[output.params]
+addr = "127.0.0.1"
+port = 1514
+framing = "line"
+
+[logging]
+level = "debug"
+output = "file"
+file_path = "./data/logs"
