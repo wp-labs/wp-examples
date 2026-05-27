@@ -1,0 +1,16 @@
+version = "2.0"
+
+[sink_group]
+name = "default"
+oml = []
+
+[[sink_group.sinks]]
+name = "default_output"
+connect = "blackhole_sink"
+
+#connect = "file_raw_sink"
+#params = {  file = "default.dat" }
+
+[sink_group.sinks.expect]
+ratio = 1.00
+tol = 0.02
