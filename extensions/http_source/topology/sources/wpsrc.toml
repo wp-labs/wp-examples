@@ -1,0 +1,27 @@
+[[sources]]
+enable = true
+key = "http_src_1"
+connect = "http_src"
+# tags = ["type:tcp", "purpose:benchmark"]
+params = { port=8000, path="/" }
+
+# [[sources]]
+# enable = true
+# key = "http_src_err"
+# connect = "http_src"
+# # tags = ["type:tcp", "purpose:benchmark"]
+# params = { port=8000, path="/" }
+
+[[sources]]
+enable = true
+key = "http_src_2"
+connect = "http_src"
+# tags = ["type:tcp", "purpose:benchmark"]
+params = { port=8000, path="/insert" }
+
+[[sources]]
+enable = true
+key = "http_src_3"
+connect = "http_src"
+# tags = ["type:tcp", "purpose:benchmark"]
+params = { port=8001, path="/insert" }
