@@ -12,3 +12,8 @@ Content-Type 映射规则：
     - `application/ndjson` => `ndjson`
 #### 压缩选择
 支持请求以gzip格式压缩或none(不压缩)，通过请求参数 `compression` 或者请求头`Content-Encoding`指定压缩方式。
+```
+curl -X POST "http://127.0.0.1:8000/ingest?fmt=json" \
+  -H "Content-Type: application/x-ndjson" \
+  --data '{"http/request":"GET /nginx-logo.png HTTP/1.1","http/status":500}'
+```

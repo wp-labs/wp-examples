@@ -15,6 +15,13 @@ file = "monitor.dat"
 max = 1.0
 
 # To export monitor metrics to VictoriaMetrics, uncomment and tune the sink below.
+# [[sink_group.sinks]]
+# name = "victoriametrics"
+# connect = "victoriametrics_sink"
+
 [[sink_group.sinks]]
-name = "victoriametrics"
+name = "metrics_vmetrics_sink"
 connect = "victoriametrics_sink"
+[sink_group.sinks.params]
+endpoint = "http://localhost:18429"
+api_path = "/api/v1/import/prometheus"

@@ -1,0 +1,15 @@
+version = "2.0"
+
+[sink_group]
+name = "error"
+oml = []
+
+[[sink_group.sinks]]
+name = "error_output"
+connect = "file_raw_sink"
+params = {  file = "error.dat" }
+tags = ["sink:error", "format:raw"]
+
+[sink_group.sinks.expect]
+ratio = 0.01
+tol = 0.02
