@@ -6,11 +6,14 @@ rule = ["*"]
 batch_timeout_ms=5000
 parallel = 4
 
+[[sink_group.sinks]]
+name = "all_sink"
+connect = "file_json_sink"
 
 # Null sink 用于性能基准测试
-# [[sink_group.sinks]]
-# name = "blackhole"
-# connect = "blackhole_sink"
+[[sink_group.sinks]]
+name = "blackhole"
+connect = "blackhole_sink"
 
 [[sink_group.sinks]]
 name = "doris_stream_load"
@@ -18,7 +21,7 @@ connect = "doris_sink"
 [sink_group.sinks.params]
 endpoint = "http://localhost:8040"  # BE 的 HTTP 端口（推荐使用 8040 而非 FE 的 8030）
 database = "test_db"
-table = "wp_nginx"
+table = "#{log_type}"
 user = "${SEC_SINK_USERNAME}"
 password = "${SEC_SINK_PASSWORD}"
 timeout_secs = 30
@@ -29,4 +32,4 @@ batch_size = 10_0000
 [sink_group.sinks.params.headers]
 strip_outer_array = "false"
 max_filter_ratio = "0.1"
-columns="wp_event_id,wp_src_key,sip,timestamp,`http/request`,size,referer,`http/agent`"
+# columns="wp_event_id,wp_src_key,sip,timestamp,`http/request`,size,referer"
