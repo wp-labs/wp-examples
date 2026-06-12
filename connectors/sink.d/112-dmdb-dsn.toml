@@ -1,0 +1,14 @@
+[[connectors]]
+id = "dmdb_dsn_sink"
+type = "dmdb"
+allow_override = ["dsn", "username", "password", "connection_string", "schema","table","columns","batch_size", "query_timeout_secs"]
+[connectors.params]
+dsn = "DM_DSN"
+username = "SYSDBA"
+password = "SYSDBA"
+schema = "WP_DATA"
+table = "EVENTS"
+columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
+batch_size = 512
+connect_timeout_secs = 8
+query_timeout_secs = 15

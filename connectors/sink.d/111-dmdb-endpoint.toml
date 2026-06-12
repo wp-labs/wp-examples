@@ -1,0 +1,13 @@
+[[connectors]]
+id = "dmdb_endpoint_sink"
+type = "dmdb"
+allow_override = ["endpoint","driver", "username", "password", "connection_string", "schema","table","columns","batch_size", "query_timeout_secs"]
+[connectors.params]
+endpoint = "127.0.0.1:5236"
+driver = "DM8 ODBC DRIVER"
+username = "SYSDBA"
+password = "SYSDBA"
+table = "nginx_logs"
+columns = ["sip", "timestamp", "http/request", "status", "size", "referer", "http/agent"]
+batch_size = 512
+query_timeout_secs = 15

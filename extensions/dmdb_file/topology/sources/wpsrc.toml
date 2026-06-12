@@ -1,0 +1,26 @@
+[[sources]]
+enable = true
+key = "dmdb_connect_string_src"
+connect = "dmdb_connect_string_src"
+
+[[sources]]
+enable = false
+key = "tcp_1"
+connect = "tcp_src"
+params = { prefer_newline = true, port = 19001 }
+
+[[sources]]
+enable = false
+key = "tcp_2"
+connect = "tcp_src"
+params = { prefer_newline = true, port = 19002 }
+
+
+[[sources]]
+key = "file_1"
+enable = false
+connect = "file_src"
+
+[sources.params]
+encode = "text"
+file = "gen*.dat"
