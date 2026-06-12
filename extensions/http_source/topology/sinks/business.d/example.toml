@@ -1,0 +1,15 @@
+version = "2.0"
+
+[sink_group]
+name = "http"
+rule = ["*"]
+batch_timeout_ms=100
+parallel = 1
+
+[[sink_group.sinks]]
+connect = "file_json_sink"
+params = { file = "data.dat" }
+
+[sink_group.sinks.expect]
+ratio = 0.50
+tol   = 0.02

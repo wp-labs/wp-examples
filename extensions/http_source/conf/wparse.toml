@@ -17,8 +17,7 @@ path = "./data/rescue"
 
 
 [log_conf]
-level = "warn,ctrl=warn,data=info"
-#level = "error,ctrl=error"
+level = "warn,ctrl=warn,metrics=info,data=info"
 output = "File"
 [log_conf.file]
 path = "./data/logs/"
