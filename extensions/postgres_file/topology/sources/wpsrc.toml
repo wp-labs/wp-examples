@@ -1,0 +1,5 @@
+[[sources]]
+enable = true
+key = "postgres_nginx_log_src"
+connect = "postgres_src"
+params = { endpoint = "127.0.0.1:5432", username = "postgres", password = "123456", database = "wparse", schema = "public", table = "nginx_logs", cursor_column = "wp_event_id",cursor_type = "int", batch = 100 }

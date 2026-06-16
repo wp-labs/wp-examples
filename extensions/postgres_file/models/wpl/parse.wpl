@@ -1,0 +1,8 @@
+#[copy_raw(name:"raw_msg")]
+package postgres {
+    rule postgres_nginx_log {
+        (json(
+            
+            ))
+    }
+}

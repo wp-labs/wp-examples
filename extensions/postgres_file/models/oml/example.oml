@@ -1,0 +1,4 @@
+name : postgres_nginx_log
+rule : postgres/*
+---
+* : auto = take() ;
