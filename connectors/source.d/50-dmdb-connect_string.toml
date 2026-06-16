@@ -1,0 +1,16 @@
+[[connectors]]
+id = "dmdb_connect_string_src"
+type = "dmdb"
+allow_override = ["endpoint", "dsn", "connection_string", "driver", "username", "password", "schema", "table", "batch", "cursor_column", "cursor_type", "start_from", "start_from_format", "poll_interval_ms", "error_backoff_ms", "connect_timeout_secs", "query_timeout_secs"]
+
+[connectors.params]
+connection_string = "Driver={DM8 ODBC DRIVER};SERVER=127.0.0.1;TCP_PORT=5236;UID=SYSDBA;PWD=SYSDBA;"
+table = "HTTP_REQUEST_LOGS"
+cursor_column = "id"
+cursor_type = "int"
+start_from = "0"
+batch = 512
+poll_interval_ms = 1000
+error_backoff_ms = 2000
+connect_timeout_secs = 8
+query_timeout_secs = 15

@@ -1,0 +1,5 @@
+[[sources]]
+enable = true
+key = "dmdb_connect_string_src"
+connect = "dmdb_connect_string_src"
+params = { connection_string = "Driver={DM8 ODBC DRIVER};SERVER=127.0.0.1;TCP_PORT=15236;UID=SYSDBA;PWD=SYSDBA001;",schema = "WPARSE", table="FIRED_ALERTS", cursor_column = "CREATE_TIME", cursor_type="int", batch = 100 }

@@ -1,0 +1,19 @@
+[[connectors]]
+id = "dmdb_dsn_src"
+type = "dmdb"
+allow_override = ["endpoint", "dsn", "connection_string", "driver", "username", "password", "schema", "table", "batch", "cursor_column", "cursor_type", "start_from", "start_from_format", "poll_interval_ms", "error_backoff_ms", "connect_timeout_secs", "query_timeout_secs"]
+
+[connectors.params]
+dsn = "DM_DSN"
+username = "SYSDBA"
+password = "SYSDBA"
+schema = "WP_DATA"
+table = "EVENTS"
+cursor_column = "ID"
+cursor_type = "int"
+start_from = "0"
+batch = 512
+poll_interval_ms = 1000
+error_backoff_ms = 2000
+connect_timeout_secs = 8
+query_timeout_secs = 15
