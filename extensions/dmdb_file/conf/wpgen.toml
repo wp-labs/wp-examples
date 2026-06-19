@@ -1,0 +1,18 @@
+version = "1.0"
+
+[generator]
+count = 1000
+speed = 1000
+parallel = 1
+
+[output]
+name = "gen_out"
+connect = "tcp_sink"
+params = { port= 19001   }
+
+[logging]
+level = "info,ctrl=info"
+output = "file"
+file_path = "./data/logs/"
+
+[presets]
