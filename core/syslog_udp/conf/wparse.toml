@@ -10,8 +10,7 @@ sources = "./topology/sources"
 sinks = "./topology/sinks"
 
 [performance]
-#rate_limit_rps = 200000
-rate_limit_rps = 0
+rate_limit_rps = 40000
 parse_workers = 4
 
 [rescue]
