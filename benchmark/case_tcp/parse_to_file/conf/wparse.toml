@@ -9,7 +9,7 @@ sinks = "../../sinks/parse_to_file"
 
 [performance]
 parse_workers = 2
-rate_limit_rps = 0
+rate_limit_rps = ${RATE_LIMIT_RPS:0}
 
 [rescue]
 path = "./data/rescue"
