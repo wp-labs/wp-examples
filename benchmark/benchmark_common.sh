@@ -111,7 +111,9 @@ benchmark_init_env() {
   cd "$original_pwd"
 
   export RATE_LIMIT_RPS
+  export WORK_CNT="${WORKER_CNT:-6}"
   echo "Using RATE_LIMIT_RPS=$RATE_LIMIT_RPS"
+  echo "Using WORK_CNT=$WORK_CNT"
 }
 
 # 设置 LINE_CNT 并显示信息
