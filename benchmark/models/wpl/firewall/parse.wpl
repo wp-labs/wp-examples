@@ -1,0 +1,9 @@
+package /firewall/{
+  rule firewall{
+    (
+      time:timestamp,
+      3*_,
+      kvarr_raw\|
+    )
+  }
+}

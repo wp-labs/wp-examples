@@ -16,17 +16,18 @@ benchmark_usage() {
   echo "  -c cnt  : 指定数据条数 (与 -m 互斥，优先级更高)"
   echo "  -w cnt  : 指定 wparse worker 数（daemon 默认 6，batch/blackhole 默认 10）"
   echo "  wpl_dir : nginx | sysmon | <other-dir> (default: nginx)"
-  echo "  speed   : 生成限速（每秒行数），0 表示不限速（default: 0)"
+  echo "  speed   : 生成限速（每秒行数），同时作为默认 RATE_LIMIT_RPS；0 表示自动限速（default: 0)"
 }
 
 # 解析通用参数
 # 支持的参数: -m, -f, wpl_dir, speed
-# 设置全局变量: MEDIUM_MODE, FORCE_REGEN, WPL_DIR, SPEED_MAX, ARGS
+# 设置全局变量: MEDIUM_MODE, FORCE_REGEN, WPL_DIR, SPEED_MAX, RATE_LIMIT_RPS, ARGS
 benchmark_parse_args() {
   MEDIUM_MODE=0
   FORCE_REGEN=0
   WPL_DIR=""
   SPEED_MAX="0"
+  RATE_LIMIT_RPS="${RATE_LIMIT_RPS:-}"
   WORKER_CNT=""
   CUSTOM_LINE_CNT=""
   ARGS=()
@@ -80,6 +81,10 @@ benchmark_parse_args() {
     WPL_DIR="${ARGS[0]}"
     SPEED_MAX="0"
   fi
+
+  if [[ -z "$RATE_LIMIT_RPS" ]]; then
+    RATE_LIMIT_RPS="$SPEED_MAX"
+  fi
 }
 
 # 初始化基准测试环境
@@ -104,6 +109,11 @@ benchmark_init_env() {
 
   # 恢复原始工作目录
   cd "$original_pwd"
+
+  export RATE_LIMIT_RPS
+  export WORK_CNT="${WORKER_CNT:-6}"
+  echo "Using RATE_LIMIT_RPS=$RATE_LIMIT_RPS"
+  echo "Using WORK_CNT=$WORK_CNT"
 }
 
 # 设置 LINE_CNT 并显示信息
@@ -331,6 +341,7 @@ benchmark_show_config() {
   echo "  WPL_DIR: $WPL_DIR"
   echo "  WPL_PATH: ${WPL_PATH:-未设置}"
   echo "  SPEED_MAX: $SPEED_MAX"
+  echo "  RATE_LIMIT_RPS: ${RATE_LIMIT_RPS:-0}"
   echo "  MEDIUM_MODE: $MEDIUM_MODE"
   echo "  FORCE_REGEN: $FORCE_REGEN"
   echo "  LINE_CNT: ${LINE_CNT:-未设置}"
