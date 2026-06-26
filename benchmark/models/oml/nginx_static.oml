@@ -19,4 +19,4 @@ match_chars = match read(wp_src_ip) {
     ip(127.0.0.1) => localhost ;
     !ip(127.0.0.1) => attack_ip ;
 };
-//* : auto = read();
+* : auto = take();
