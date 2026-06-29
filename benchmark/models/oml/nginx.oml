@@ -1,6 +1,6 @@
 name : /oml/normal/nginx
 rule : /nginx/*
-enable : false
+enable : true
 ---
 size : digit = take(size);
 status : digit = take(status);
@@ -12,4 +12,4 @@ match_chars = match read(option:[wp_src_ip]) {
     ip(127.0.0.1) => chars(localhost);
     !ip(127.0.0.1) => chars(attack_ip);
 };
-* : auto = take();
+* : auto = read();
