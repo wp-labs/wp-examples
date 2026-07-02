@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2026-06-19]
+
+### Fixed
+
+- **core/syslog_udp/run.sh**: 修复脚本多个问题
+  - `wparse deamon` 拼写错误 → `wparse daemon`
+  - 固定 `sleep 3` 改为 `lsof` 轮询 UDP 端口（1524+1525），解决 wparse 端口未就绪时 wpgen 的 `udp send error`
+  - 两个 wpgen 后台运行，使用 PID 特指 `wait $WP1 $WP2`，避免 `wait` 无参时卡在 wparse 守护进程上导致脚本不退出
+  - `kill` 改为 `kill -9` + `kill -0` 循环确认进程死透
+  - `cat | xargs kill` 简化为 `kill $(cat ...)`
+
 ## [2026-01-12]
 
 ### Added

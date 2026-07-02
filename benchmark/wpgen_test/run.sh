@@ -37,22 +37,18 @@ shift $((OPTIND-1))
 init_script_dir
 parse_profile "${1:-release}"
 build_and_setup_path
-verify_commands wparse wpgen wproj
+verify_commands wparse wpgen
 
 if [ -n "$WORKER_ARG" ]; then
   echo "[INFO] -w 参数对当前脚本无效（仅生成数据），已忽略。" >&2
 fi
 
-wproj data clean
 wpgen data clean
 
-LINE_CNT=8000000
-SPEED_MAX=2000000
+LINE_CNT=80000000
+SPEED_MAX=3000000
 echo "gen $SPEED_MAX"
 wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p  --wpl ../models/wpl/nginx
-
-
-wpgen sample -n $LINE_CNT -s $SPEED_MAX --stat   2 -p  --wpl ../models/wpl/benchmark
 
 
 
