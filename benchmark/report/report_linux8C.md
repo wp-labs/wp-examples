@@ -43,7 +43,7 @@
 
   #### 平台信息（Platform）
 
-  - **操作系统**：Ubuntu 24.04 LTS
+  - **操作系统**：Ubuntu Server 24.04 LTS 64位
   - **系统架构**：x86_64
   - 网络环境：本机回环（127.0.0.1，Loopback）
 
@@ -51,6 +51,17 @@
 
   - **CPU**：8 vCPU
   - **内存**：16 GiB
+  - **GPU**：0
+
+  #### 云主机实例信息（CVM）
+
+  - **实例类型 / 规格**：标准型SA9 / SA9.2XLARGE16
+  - **镜像 ID**：img-mmytdhbn
+  - **系统盘**：CLOUD_HSSD，50 GiB
+  - **公网带宽**：5 Mbps
+  - **网络类型**：Default-VPC
+
+  说明：本 benchmark 的数据拓扑为 `TCP -> BlackHole`，测试链路使用本机回环地址（127.0.0.1），公网带宽不参与吞吐测量。
 
   ### 2.2 测试范畴 (Scope)
 
