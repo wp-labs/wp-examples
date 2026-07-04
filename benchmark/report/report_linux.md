@@ -85,7 +85,7 @@
   *   **CPU (Avg/Peak)**: 测试进程 CPU 使用率的平均值与峰值。
   *   **MEM (Avg/Peak)**: 测试进程内存占用的平均值与峰值。
   *   **Rule Size**: 规则配置文件体积，评估分发与维护成本。
-  *   **性能倍数**: 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 为 1.0x 进行归一化。
+  *   **性能倍数**: 在同一日志类型 + 同一拓扑下，以对应 Vector-VRL/Vector 基准行的 EPS 为 1.0x 进行归一化。
 
   说明：
 
@@ -175,17 +175,19 @@
 
   表 3.1.1-1：Nginx Access Log（Parse Only；TCP -> BlackHole）
 
-| 引擎          | EPS           | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :------------ | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | **2,260,000** | 515.12 | 1419% / 1433%  | 156 MB / 190 MB | 1.93x    |
-| Vector-VRL    | 1,172,100     | 267.15 | 693% / 713%    | 321 MB / 330 MB | 1.00x    |
-| Vector-Fixed  | 804,500       | 183.37 | 868% / 899%    | 300 MB / 309 MB | 0.69x    |
+| 引擎          | EPS           | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :------------ | :----- | :------------- | :---------------- | :------- |
+| **WarpParse** | **2,260,000** | 515.12 | 1419% / 1433%  | 156 MB / 190 MB   | 1.93x    |
+| Vector-VRL    | 1,172,100     | 267.15 | 693% / 713%    | 321 MB / 330 MB   | 1.00x    |
+| Vector-Fixed  | 804,500       | 183.37 | 868% / 899%    | 300 MB / 309 MB   | 0.69x    |
+| Logstash      | 625,000       | 142.46 | 884% / 1131%   | 1452 MB / 1482 MB | 0.53x    |
 
   > 解析规则大小：
   >
   > - WarpParse：174B
   > - Vector-VRL：217B
   > - Vector-Fixed：86B
+  > - Logstash：248B
   >
   > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
@@ -193,17 +195,19 @@
 
   表 3.1.2-1：AWS ELB Log（Parse Only；TCP -> BlackHole）
 
-| 引擎          | EPS           | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :------------ | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | **1,165,000** | 455.52 | 1337% / 1454%  | 288 MB / 452 MB | 3.81x    |
-| Vector-VRL    | 305,600       | 119.49 | 517% / 569%    | 316 MB / 326 MB | 1.00x    |
-| Vector-Fixed  | 357,900       | 139.94 | 426% / 506%    | 330 MB / 340 MB | 1.17x    |
+| 引擎          | EPS           | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :------------ | :----- | :------------- | :---------------- | :------- |
+| **WarpParse** | **1,165,000** | 455.52 | 1337% / 1454%  | 288 MB / 452 MB   | 3.81x    |
+| Vector-VRL    | 305,600       | 119.49 | 517% / 569%    | 316 MB / 326 MB   | 1.00x    |
+| Vector-Fixed  | 357,900       | 139.94 | 426% / 506%    | 330 MB / 340 MB   | 1.17x    |
+| Logstash      | 441,176       | 172.50 | 1197% / 1356%  | 1550 MB / 1595 MB | 1.44x    |
 
   > 解析规则大小：
   >
   > - WarpParse：1153B
   > - Vector-VRL：921B
   > - Vector-Fixed：64B
+  > - Logstash：876B
   >
   > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
@@ -211,15 +215,17 @@
 
   表 3.1.3-1： Firewall Log（Parse Only；TCP -> BlackHole）
 
-| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :---------- | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | **688,500** | 736.71 | 1259% / 1275%  | 473 MB / 700 MB | 4.09x    |
-| Vector        | 168,200     | 179.98 | 911% / 1011%   | 435 MB / 448 MB | 1.00x    |
+| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :---------- | :----- | :------------- | :---------------- | :------- |
+| **WarpParse** | **688,500** | 736.71 | 1259% / 1275%  | 473 MB / 700 MB   | 4.09x    |
+| Vector        | 168,200     | 179.98 | 911% / 1011%   | 435 MB / 448 MB   | 1.00x    |
+| Logstash      | 59,523      | 63.69  | 1424% / 1483%  | 1509 MB / 1550 MB | 0.35x    |
 
   > 解析规则大小：
   >
   > - WarpParse：1552B
   > - Vector-Fixed：1852B
+  > - Logstash：527B
   >
   > 在同一日志类型 + 同一拓扑下，以 Vector 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
@@ -227,15 +233,17 @@
 
   表 3.1.4-1：APT Threat Log（Parse Only；TCP -> BlackHole）
 
-| 引擎          | EPS         | MPS     | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :---------- | :------ | :------------- | :-------------- | :------- |
-| **WarpParse** | **500,100** | 1691.20 | 1303% / 1328%  | 182 MB / 200 MB | 6.16x    |
-| Vector        | 81,200      | 274.60  | 1532% / 1588%  | 436 MB / 459 MB | 1.00x    |
+| 引擎          | EPS         | MPS     | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :---------- | :------ | :------------- | :---------------- | :------- |
+| **WarpParse** | **500,100** | 1691.20 | 1303% / 1328%  | 182 MB / 200 MB   | 6.16x    |
+| Vector        | 81,200      | 274.60  | 1532% / 1588%  | 436 MB / 459 MB   | 1.00x    |
+| Logstash      | 27,397      | 92.65   | 1445% / 1521%  | 1798 MB / 1919 MB | 0.34x    |
 
   > 解析规则大小：
   >
   > - WarpParse：985B
   > - Vector：873B
+  > - Logstash：1027B
   >
   > 在同一日志类型 + 同一拓扑下，以 Vector 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
@@ -243,17 +251,19 @@
 
   表 3.1.5-1：Mixed Log（Parse Only；TCP -> BlackHole）
 
-| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :---------- | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | **721,500** | 867.09 | 1376% / 1409%  | 639 MB / 808 MB | 3.09x    |
-| Vector-VRL    | 233,600     | 280.74 | 1377% / 1425%  | 439 MB / 454 MB | 1.00x    |
-| Vector-Fixed  | 228,400     | 274.49 | 1359% / 1386%  | 416 MB / 454 MB | 0.98x    |
+| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :---------- | :----- | :------------- | :---------------- | :------- |
+| **WarpParse** | **721,500** | 867.09 | 1376% / 1409%  | 639 MB / 808 MB   | 3.09x    |
+| Vector-VRL    | 233,600     | 280.74 | 1377% / 1425%  | 439 MB / 454 MB   | 1.00x    |
+| Vector-Fixed  | 228,400     | 274.49 | 1359% / 1386%  | 416 MB / 454 MB   | 0.98x    |
+| Logstash      | 68,493      | 82.30  | 1433% / 1530%  | 1729 MB / 1787 MB | 0.29x    |
 
   > 解析规则大小：
   >
   > - WarpParse：3864B
   > - Vector-VRL：3960B
   > - Vector-Fixed：4725B
+  > - Logstash：3984B
   >
   > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
   >
@@ -262,6 +272,20 @@
   > 混合日志规则：
   >
   > - 4类日志按照1:1:3:1混合
+
+#### 3.1.6 Mixed Log (平均日志大小：1260B)
+
+表 3.1.6-1：Mixed Log（Parse Only； TCP -> BlackHole ）
+
+| 引擎          | 拓扑             | CPU (Avg/Peak) | MEM (Avg/Peak)    |
+| ------------- | ---------------- | -------------- | ----------------- |
+| **WarpParse** | TCP -> BlackHole | 29% / 31%      | 96 MB / 100 MB    |
+| Vector-VRL    | TCP -> BlackHole | 115% / 119%    | 213 MB / 220 MB   |
+| Vector-Fixed  | TCP -> BlackHole | 115% / 121%    | 201 MB / 208 MB   |
+| Logstash      | TCP -> BlackHole | 432% / 1357%   | 1601 MB / 1690 MB |
+
+> - **20000EPS**下的资源消耗情况
+> - logstash在warmup后采集
 
 
   ### 3.2 解析 + 转换能力 (Parse + Transform)
@@ -272,17 +296,19 @@
 
   表 3.2.1-1：Nginx Access Log（Parse + Transform；TCP -> BlackHole）
 
-| 引擎          | EPS           | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :------------ | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | **1,508,200** | 343.76 | 1401% / 1419%  | 126 MB / 306 MB | 1.69x    |
-| Vector-VRL    | 889,900       | 202.83 | 662% / 675%    | 344 MB / 351 MB | 1.00x    |
-| Vector-Fixed  | 582,600       | 132.79 | 777% / 815%    | 305 MB / 320 MB | 0.65x    |
+| 引擎          | EPS           | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :------------ | :----- | :------------- | :---------------- | :------- |
+| **WarpParse** | **1,508,200** | 343.76 | 1401% / 1419%  | 126 MB / 306 MB   | 1.69x    |
+| Vector-VRL    | 889,900       | 202.83 | 662% / 675%    | 344 MB / 351 MB   | 1.00x    |
+| Vector-Fixed  | 582,600       | 132.79 | 777% / 815%    | 305 MB / 320 MB   | 0.65x    |
+| Logstash      | 465,116       | 106.01 | 1057% / 1327%  | 1487 MB / 1525 MB | 0.52x    |
 
   > 解析+转换规则大小：
   >
   > - WarpParse：521B
   > - Vector-VRL：519B
   > - Vector-Fixed：500B
+  > - Logstash：712B
   >
   > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
@@ -290,17 +316,19 @@
 
   表 3.2.2-1：AWS ELB Log（Parse + Transform；TCP -> BlackHole）
 
-| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :---------- | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | **768,000** | 300.29 | 1545% / 1564%  | 262 MB / 576 MB | 2.75x    |
-| Vector-VRL    | 279,700     | 109.36 | 554% / 588%    | 354 MB / 361 MB | 1.00x    |
-| Vector-Fixed  | 308,200     | 120.51 | 500% / 513%    | 358 MB / 368 MB | 1.10x    |
+| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :---------- | :----- | :------------- | :---------------- | :------- |
+| **WarpParse** | **768,000** | 300.29 | 1545% / 1564%  | 262 MB / 576 MB   | 2.75x    |
+| Vector-VRL    | 279,700     | 109.36 | 554% / 588%    | 354 MB / 361 MB   | 1.00x    |
+| Vector-Fixed  | 308,200     | 120.51 | 500% / 513%    | 358 MB / 368 MB   | 1.10x    |
+| Logstash      | 256,410     | 100.26 | 1426% / 1542%  | 1601 MB / 1690 MB | 0.92x    |
 
   > 解析+转换规则大小：
   >
   > - WarpParse：1694B
   > - Vector-VRL：1259B
   > - Vector-Fixed：570B
+  > - Logstash：2019B
   >
   > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
@@ -308,49 +336,55 @@
 
   表 3.2.3-1：Firewall Log（Parse + Transform；TCP -> BlackHole）
 
-| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)   | 性能倍数 |
-| :------------ | :---------- | :----- | :------------- | :--------------- | :------- |
-| **WarpParse** | **492,100** | 526.56 | 1515% / 1546%  | 535 MB / 1018 MB | 3.43x    |
-| Vector        | 143,500     | 153.55 | 838% / 872%    | 514 MB / 533 MB  | 1.00x    |
+| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :---------- | :----- | :------------- | :---------------- | :------- |
+| **WarpParse** | **492,100** | 526.56 | 1515% / 1546%  | 535 MB / 1018 MB  | 3.43x    |
+| Vector        | 143,500     | 153.55 | 838% / 872%    | 514 MB / 533 MB   | 1.00x    |
+| Logstash      | 50,000      | 53.50  | 1391% / 1501%  | 1538 MB / 1587 MB | 0.35x    |
 
   > 解析+转换规则大小：
   >
   > - WarpParse：2249B
   > - Vector：2344B
+  > - Logstash：3453B
   >
-  > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
+  > 在同一日志类型 + 同一拓扑下，以 Vector 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
   #### 3.2.4 APT Threat Log (3546B)
 
   表 3.2.4-1：APT Threat Log（Parse + Transform；TCP -> BlackHole）
 
-| 引擎          | EPS         | MPS     | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :---------- | :------ | :------------- | :-------------- | :------- |
-| **WarpParse** | **392,100** | 1325.98 | 1435% / 1461%  | 229 MB / 356 MB | 4.85x    |
-| Vector        | 80,800      | 273.24  | 1531% / 1592%  | 457 MB / 503 MB | 1.00x    |
+| 引擎          | EPS         | MPS     | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :---------- | :------ | :------------- | :---------------- | :------- |
+| **WarpParse** | **392,100** | 1325.98 | 1435% / 1461%  | 229 MB / 356 MB   | 4.85x    |
+| Vector        | 80,800      | 273.24  | 1531% / 1592%  | 457 MB / 503 MB   | 1.00x    |
+| Logstash      | 24,691      | 83.50   | 1451% / 1538%  | 1977 MB / 2082 MB | 0.31x    |
 
   > 解析+转换规则大小：
   >
   > - WarpParse：1638B
   > - Vector：1382B
+  > - Logstash：2041B
   >
-  > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
+  > 在同一日志类型 + 同一拓扑下，以 Vector 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
 
   #### 3.2.5 Mixed Log (平均日志大小：1260B)
 
   表 3.2.5-1：Mixed Log（Parse + Transform；TCP -> BlackHole）
 
-| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)  | 性能倍数 |
-| :------------ | :---------- | :----- | :------------- | :-------------- | :------- |
-| **WarpParse** | **502,900** | 604.38 | 1522% / 1532%  | 177 MB / 232 MB | 2.48x    |
-| Vector-VRL    | 202,700     | 243.60 | 1264% / 1298%  | 435 MB / 459 MB | 1.00x    |
-| Vector-Fixed  | 198,400     | 238.43 | 1258% / 1294%  | 424 MB / 438 MB | 0.98x    |
+| 引擎          | EPS         | MPS    | CPU (Avg/Peak) | MEM (Avg/Peak)    | 性能倍数 |
+| :------------ | :---------- | :----- | :------------- | :---------------- | :------- |
+| **WarpParse** | **502,900** | 604.38 | 1522% / 1532%  | 177 MB / 232 MB   | 2.48x    |
+| Vector-VRL    | 202,700     | 243.60 | 1264% / 1298%  | 435 MB / 459 MB   | 1.00x    |
+| Vector-Fixed  | 198,400     | 238.43 | 1258% / 1294%  | 424 MB / 438 MB   | 0.98x    |
+| Logstash      | 60,240      | 72.39  | 1457% / 1553%  | 1672 MB / 1727 MB | 0.30x    |
 
   > 解析+转换规则大小：
   >
   > - WarpParse：3864B
   > - Vector-VRL：4723B
   > - Vector-Fixed：1733B
+  > - Logstash：3984B
   >
   > 在同一日志类型 + 同一拓扑下，以 Vector-VRL 的 EPS 作为统一基准（1.0x），对所有引擎进行归一化对比。
   >
@@ -360,6 +394,20 @@
   >
   > - 4类日志按照1:1:3:1混合
 
+#### 3.2.6 Mixed Log (平均日志大小：1260B)
+
+表 3.1.6-1：Mixed Log（Parse Only； TCP -> BlackHole ）
+
+| 引擎          | 拓扑             | CPU (Avg/Peak) | MEM (Avg/Peak)    |
+| ------------- | ---------------- | -------------- | ----------------- |
+| **WarpParse** | TCP -> BlackHole | 42% / 46%      | 77 MB / 88 MB     |
+| Vector-VRL    | TCP -> BlackHole | 121% / 126%    | 232 MB / 237 MB   |
+| Vector-Fixed  | TCP -> BlackHole | 123% / 128%    | 208 MB / 216 MB   |
+| Logstash      | TCP -> BlackHole | 517% / 1544%   | 1594 MB / 1646 MB |
+
+> - **20000EPS**下的资源消耗情况
+> - logstash在warmup后采集
+
 
   ## 5. 结果解读
 
@@ -367,11 +415,11 @@
 
   **结果摘要**:
 
-    1.  在 Linux 平台 `TCP -> BlackHole` 测试中，WarpParse 在所有日志类型和能力场景中均取得最高 EPS。相对 Vector-VRL/Vector 的 EPS 倍数范围为：解析 **1.93x - 6.16x**，解析+转换 **1.69x - 4.85x**。
-    2.  吞吐优势在大日志场景中更明显。APT Threat Log (3546B) 是本次测试的最高数据吞吐场景，WarpParse 在 Parse Only 下达到 **1691.20 MiB/s**，在 Parse + Transform 下达到 **1325.98 MiB/s**。
-    3.  纯解析场景中，WarpParse 的 MPS 从 Nginx 的 **515.12 MiB/s** 提升到 APT 的 **1691.20 MiB/s**；解析+转换场景中，MPS 从 Nginx 的 **343.76 MiB/s** 提升到 APT 的 **1325.98 MiB/s**。这说明大体积日志下，EPS 下降但单条日志体积带来的数据吞吐仍显著上升。
-    4.  CPU 表现需要结合吞吐一起看。Nginx、AWS、Firewall 的部分场景中，WarpParse CPU 使用率高于 Vector；但在 APT 与 Mixed 等复杂或混合场景中，WarpParse 在更高 EPS/MPS 下 CPU 使用率并不总是更高。例如 APT Parse Only 中 WarpParse 为 **1303% / 1328%**，Vector 为 **1532% / 1588%**。
-    5.  内存方面，WarpParse 在 Nginx、APT、Mixed 等场景通常低于 Vector；Firewall 场景内存压力最高，Parse + Transform 下 WarpParse 峰值达到 **1018 MB**，需要在大字段 JSON 或复杂转换场景中纳入容量规划。
+1. 在 Linux 平台 `TCP -> BlackHole` 测试中，WarpParse 在所有日志类型和能力场景中均取得最高 EPS。相对 Vector-VRL/Vector 的 EPS 倍数范围为：解析 **1.93x - 6.16x**，解析+转换 **1.69x - 4.85x**。
+2. 吞吐优势在大日志场景中更明显。APT Threat Log (3546B) 是本次测试的最高数据吞吐场景，WarpParse 在 Parse Only 下达到 **1691.20 MiB/s**，在 Parse + Transform 下达到 **1325.98 MiB/s**。
+3. 纯解析场景中，WarpParse 的 MPS 从 Nginx 的 **515.12 MiB/s** 提升到 APT 的 **1691.20 MiB/s**；解析+转换场景中，MPS 从 Nginx 的 **343.76 MiB/s** 提升到 APT 的 **1325.98 MiB/s**。这说明大体积日志下，EPS 下降但单条日志体积带来的数据吞吐仍显著上升。
+4. CPU 表现需要结合吞吐一起看。Nginx、AWS、Firewall 的部分场景中，WarpParse CPU 使用率高于 Vector；但在 APT 与 Mixed 等复杂或混合场景中，WarpParse 在更高 EPS/MPS 下 CPU 使用率并不总是更高。例如 APT Parse Only 中 WarpParse 为 **1303% / 1328%**，Vector 为 **1532% / 1588%**。
+5. 内存方面，WarpParse 在 Nginx、APT、Mixed 等场景通常低于 Vector；Firewall 场景内存压力最高，Parse + Transform 下 WarpParse 峰值达到 **1018 MB**，需要在大字段 JSON 或复杂转换场景中纳入容量规划。
 
   ### 5.2 规则与表达能力要点
 
