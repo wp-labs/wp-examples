@@ -257,6 +257,20 @@
 > - 4类日志按照1:1:3:1混合
 > - 平均日志大小：(239 + 410 + 1122 × 3 + 3546) / 6 = 1260.17B
 
+#### 3.1.6 Mixed Log (平均日志大小：1260B)
+
+表 3.1.6-1：Mixed Log（Parse Only； TCP -> BlackHole ）
+
+| 引擎          | 拓扑             | CPU (Avg/Peak) | MEM (Avg/Peak)    |
+| ------------- | ---------------- | -------------- | ----------------- |
+| **WarpParse** | TCP -> BlackHole | 74% / 88%      | 96 MB / 100 MB    |
+| Vector-VRL    | TCP -> BlackHole | 155% / 186%    | 135 MB / 142 MB   |
+| Vector-Fixed  | TCP -> BlackHole | 153% / 180%    | 135 MB / 139 MB   |
+| Logstash      | TCP -> BlackHole | 159% / 192%    | 1119 MB / 1191 MB |
+
+> - **20000EPS**下的资源消耗情况
+> - logstash在warmup后采集
+
 ### 3.2 解析 + 转换能力 (Parse + Transform)
 
 本节给出解析 + 转换场景的测试结果。
@@ -363,6 +377,20 @@
 >
 > - 4类日志按照1:1:3:1混合
 > - 平均日志大小：(239 + 410 + 1122 × 3 + 3546) / 6 = 1260.17B
+
+#### 3.2.6 Mixed Log (平均日志大小：1260B)
+
+表 3.1.6-1：Mixed Log（Parse Only； TCP -> BlackHole ）
+
+| 引擎          | 拓扑             | CPU (Avg/Peak) | MEM (Avg/Peak)    |
+| ------------- | ---------------- | -------------- | ----------------- |
+| **WarpParse** | TCP -> BlackHole | 98% / 114%     | 92 MB / 96 MB     |
+| Vector-VRL    | TCP -> BlackHole | 142% / 168%    | 148 MB / 158 MB   |
+| Vector-Fixed  | TCP -> BlackHole | 139% / 165%    | 138 MB / 150 MB   |
+| Logstash      | TCP -> BlackHole | 159% / 192%    | 1119 MB / 1191 MB |
+
+> - **20000EPS**下的资源消耗情况
+> - logstash在warmup后采集
 
 
 ## 4. 结果解读
