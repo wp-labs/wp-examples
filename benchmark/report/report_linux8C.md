@@ -50,12 +50,16 @@
   #### 计算资源（Compute）
 
   - **CPU**：8 vCPU
+  - **CPU 型号**：AMD EPYC 9K65 192-Core Processor
+  - **CPU 厂商**：AuthenticAMD
+  - **vCPU 拓扑**：1 Socket × 4 Core/Socket × 2 Thread/Core
+  - **虚拟化**：KVM
   - **内存**：16 GiB
   - **GPU**：0
 
   #### 云主机实例信息（CVM）
 
-  - **实例类型 / 规格**：标准型SA9 / SA9.2XLARGE16
+  - **机器型号（云主机规格）**：标准型SA9 / SA9.2XLARGE16
   - **镜像 ID**：img-mmytdhbn
   - **系统盘**：CLOUD_HSSD，50 GiB
   - **公网带宽**：5 Mbps
