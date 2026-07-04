@@ -40,14 +40,29 @@
 
   #### 平台信息（Platform）
 
-  - **操作系统**：Ubuntu 24.04 LTS
+  - **操作系统**：Ubuntu Server 24.04 LTS 64位
   - **系统架构**：x86_64
   - 网络环境：本机回环（127.0.0.1，Loopback）
 
   #### 计算资源（Compute）
 
   - **CPU**：16 vCPU
+  - **CPU 型号**：AMD EPYC 9K65 192-Core Processor
+  - **CPU 厂商**：AuthenticAMD
+  - **vCPU 拓扑**：1 Socket × 8 Core/Socket × 2 Thread/Core
+  - **虚拟化**：KVM
   - **内存**：32 GiB
+  - **GPU**：0
+
+  #### 云主机实例信息（CVM）
+
+  - **机器型号（云主机规格）**：标准型SA9 / SA9.4XLARGE32
+  - **镜像 ID**：img-mmytdhbn
+  - **系统盘**：CLOUD_HSSD，50 GiB
+  - **公网带宽**：10 Mbps
+  - **网络类型**：Default-VPC
+
+  说明：本 benchmark 的数据拓扑为 `TCP -> BlackHole`，测试链路使用本机回环地址（127.0.0.1），公网带宽不参与吞吐测量。
 
   ### 2.2 测试范畴 (Scope)
 
