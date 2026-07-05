@@ -9,7 +9,7 @@ LINE_CNT=${LINE_CNT:-3000}
 STAT_SEC=${STAT_SEC:-3}
 
 # 验证必要的命令存在
-for cmd in wproj wprescue; do
+for cmd in wpadm wprescue; do
     if ! command -v "$cmd" >/dev/null; then
         echo "Error: $cmd not found in PATH"
         exit 1
@@ -40,7 +40,7 @@ echo "[recovery] finished runs=$RUN_CNT (max=$MAX_RUNS)"
 echo "rescue data:"
 find ./data/rescue/ -name "*.dat"
 
-wproj data stat
+wpadm data stat
 
 # 恢复阶段关注救急文件被消费且目标输出已产生，不再校验中断前后的固定比例。
 if find ./data/rescue/ -type f -name "*.dat" | grep -q .; then

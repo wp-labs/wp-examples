@@ -72,11 +72,11 @@ cd extensions/tcp_postgres
 ```
 
 脚本主要步骤：
-1) `wproj check` 进行配置自检，清理数据目录
+1) `wpadm check` 进行配置自检，清理数据目录
 2) 后台启动 `wparse daemon`（监听 TCP 19001 端口）
 3) 执行 `wpgen sample` 生成样例数据并通过 TCP 发送
 4) 等待数据入库，停止 `wparse`
-5) 执行 `wproj data stat` 与 `wproj data validate` 进行校验
+5) 执行 `wpadm data stat` 与 `wpadm data validate` 进行校验
 
 ## 运行参数
 
@@ -158,8 +158,8 @@ postgres -h 127.0.0.1 -u root -p wparse < preparatory_work.sql
 postgres -h 127.0.0.1 -u root -p your_database -e "SELECT COUNT(*) FROM nginx_logs; SELECT * FROM nginx_logs LIMIT 100;"
 ```
 
-- 数据统计：`wproj data stat` 会输出各阶段处理统计
-- 数据校验：`wproj data validate` 会校验输入输出数据一致性
+- 数据统计：`wpadm data stat` 会输出各阶段处理统计
+- 数据校验：`wpadm data validate` 会校验输入输出数据一致性
 
 ## 常见问题排查
 

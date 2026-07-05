@@ -14,7 +14,7 @@ REQUEST_ID="${REQUEST_ID:-core-remote-ctrl}"
 RELOAD_TIMEOUT_MS="${RELOAD_TIMEOUT_MS:-1000}"
 ADMIN_BIND="${ADMIN_BIND:-127.0.0.1:19090}"
 
-for cmd in wparse wproj; do
+for cmd in wparse wpadm; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "Error: command '$cmd' not found in PATH"
     exit 1
@@ -50,7 +50,7 @@ init_version = "${INFRA_INIT_VERSION}"
 EOF
 
 echo "3> sync infra from $INFRA_REPO_URL (brings conf/, topology/, connectors/)"
-wproj conf update --work-root "$WORK_ROOT" --group infra --version "$INFRA_INIT_VERSION"
+wpadm conf update --work-root "$WORK_ROOT" --group infra --version "$INFRA_INIT_VERSION"
 
 # Verify infra directories are populated
 if [[ ! -f "$WORK_ROOT/conf/wparse.toml" ]]; then
@@ -72,7 +72,7 @@ fi
 echo "   infra dirs verified: conf/, topology/, connectors/ present"
 
 echo "4> sync models from $MODELS_REPO_URL (brings models/)"
-wproj conf update --work-root "$WORK_ROOT" --group models --version "$MODELS_INIT_VERSION"
+wpadm conf update --work-root "$WORK_ROOT" --group models --version "$MODELS_INIT_VERSION"
 
 # Verify models directory is populated
 if [[ ! -d "$WORK_ROOT/models/wpl" ]]; then
@@ -124,7 +124,7 @@ WPARSE_PID=$!
 echo "8> wait for admin status"
 STATUS_JSON=""
 for _ in $(seq 1 80); do
-  STATUS_JSON="$(wproj engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
+  STATUS_JSON="$(wpadm engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
   if printf '%s' "$STATUS_JSON" | grep -Eq '"accepting_commands"[[:space:]]*:[[:space:]]*true'; then
     break
   fi
@@ -141,7 +141,7 @@ fi
 echo "$STATUS_JSON"
 
 echo "9> trigger admin reload with models update to $MODELS_TARGET_VERSION"
-RELOAD_JSON="$(wproj engine reload \
+RELOAD_JSON="$(wpadm engine reload \
   --work-root "$WORK_ROOT" \
   --request-id "$REQUEST_ID" \
   --update \
@@ -175,7 +175,7 @@ fi
 echo "10> verify runtime status after models reload"
 STATUS_AFTER=""
 for _ in $(seq 1 60); do
-  STATUS_AFTER="$(wproj engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
+  STATUS_AFTER="$(wpadm engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
   if printf '%s' "$STATUS_AFTER" | grep -Eq "\"last_reload_request_id\"[[:space:]]*:[[:space:]]*\"$REQUEST_ID\"" \
     && printf '%s' "$STATUS_AFTER" | grep -Eq '"reloading"[[:space:]]*:[[:space:]]*false'; then
     break
@@ -203,7 +203,7 @@ echo "   models version updated to $MODELS_TARGET_VERSION"
 
 echo "12> trigger admin reload with infra update to $INFRA_TARGET_VERSION"
 INFRA_REQUEST_ID="${REQUEST_ID}-infra"
-RELOAD_JSON="$(wproj engine reload \
+RELOAD_JSON="$(wpadm engine reload \
   --work-root "$WORK_ROOT" \
   --request-id "$INFRA_REQUEST_ID" \
   --update \
@@ -229,7 +229,7 @@ fi
 echo "13> verify runtime status after infra reload"
 STATUS_AFTER=""
 for _ in $(seq 1 60); do
-  STATUS_AFTER="$(wproj engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
+  STATUS_AFTER="$(wpadm engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
   if printf '%s' "$STATUS_AFTER" | grep -Eq "\"last_reload_request_id\"[[:space:]]*:[[:space:]]*\"$INFRA_REQUEST_ID\"" \
     && printf '%s' "$STATUS_AFTER" | grep -Eq '"reloading"[[:space:]]*:[[:space:]]*false'; then
     break
@@ -300,7 +300,7 @@ fi
 
 # Poll until the reload completes
 for _ in $(seq 1 60); do
-  STATUS_CHECK="$(wproj engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
+  STATUS_CHECK="$(wpadm engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
   if printf '%s' "$STATUS_CHECK" | grep -Eq "\"last_reload_request_id\"[[:space:]]*:[[:space:]]*\"$MODELS_CURL_REQ\"" \
     && printf '%s' "$STATUS_CHECK" | grep -Eq '"reloading"[[:space:]]*:[[:space:]]*false'; then
     break
@@ -338,7 +338,7 @@ fi
 
 # Poll until the reload completes
 for _ in $(seq 1 60); do
-  STATUS_CHECK="$(wproj engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
+  STATUS_CHECK="$(wpadm engine status --work-root "$WORK_ROOT" --json 2>/dev/null || true)"
   if printf '%s' "$STATUS_CHECK" | grep -Eq "\"last_reload_request_id\"[[:space:]]*:[[:space:]]*\"$INFRA_CURL_REQ\"" \
     && printf '%s' "$STATUS_CHECK" | grep -Eq '"reloading"[[:space:]]*:[[:space:]]*false'; then
     break

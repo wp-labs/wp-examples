@@ -120,8 +120,8 @@ cd core/wpl_missing
 ### 手动执行
 ```bash
 # 初始化配置
-wproj check
-wproj data clean
+wpadm check
+wpadm data clean
 wpgen data clean
 
 # 生成样本数据
@@ -131,8 +131,8 @@ wpgen sample -n 1000
 wparse batch --stat 2 -p
 
 # 校验输出
-wproj data stat
-wproj data validate
+wpadm data stat
+wpadm data validate
 ```
 
 ## 可调参数

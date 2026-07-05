@@ -251,7 +251,7 @@ file = "default.dat"          # 输出文件名
 
 1. **输出文件统计**
 ```
-wproj data stat 
+wpadm data stat 
 ```
 ```
 == Sources ==
@@ -284,10 +284,10 @@ infras     | residue/[0]               | ././data/out_dat/residue.dat           
 3. **验证数据完整性**
 
 ```
-wproj data  validate
+wpadm data  validate
 ```
 ```
-wproj data validate
+wpadm data validate
 validate: PASS
 Total input: 3000 (source=override)
 

@@ -123,8 +123,8 @@ cd core/error_reporting
 ### 手动执行
 ```bash
 # 初始化配置
-wproj check
-wproj data clean
+wpadm check
+wpadm data clean
 wpgen data clean
 
 # 生成样本数据
@@ -134,8 +134,8 @@ wpgen sample -n 3000 --stat 3
 wparse batch --stat 3 -p -n 3000
 
 # 校验输出
-wproj data stat
-wproj data validate
+wpadm data stat
+wpadm data validate
 ```
 
 ## 可调参数

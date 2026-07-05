@@ -22,8 +22,8 @@ benchmark_init_env
 benchmark_validate_wpl_path "$WPL_DIR"
 
 # 初始化配置
-wproj check
-#wproj data clean
+wpadm check
+#wpadm data clean
 
 # 设置数据规模
 benchmark_set_line_cnt

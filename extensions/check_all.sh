@@ -23,7 +23,7 @@ done
 
 init_script_dir
 build_and_setup_path
-verify_commands wproj || true
+verify_commands wpadm || true
 
 # Discover all run.sh files (2-level depth: extension_name/run.sh)
 CASES=()
@@ -43,10 +43,10 @@ for run_sh in "${CASES[@]}"; do
   case_dir="$(dirname "$run_sh")"
   case_name="${case_dir#./}"
   echo
-  echo "====> [$TOTAL/$TOTAL_CASES] wproj check: $case_name"
+  echo "====> [$TOTAL/$TOTAL_CASES] wpadm check: $case_name"
 
   set +e
-  wproj check --work-root "$case_dir" 2>&1
+  wpadm check --work-root "$case_dir" 2>&1
   rc=$?
   set -e
 

@@ -129,7 +129,7 @@ Script execution flow:
 docker-compose up -d
 
 # 2. Initialize configuration
-wproj data clean
+wpadm data clean
 
 # 3. Start parsing service (background)
 wparse daemon --stat 2 -p &
@@ -150,8 +150,8 @@ curl -s 'http://localhost:8428/api/v1/query?query=wparse_input_total'
 kill $(cat ./.run/wparse.pid)
 
 # 8. Validate output
-wproj data stat
-wproj data validate --input-cnt 1000
+wpadm data stat
+wpadm data validate --input-cnt 1000
 ```
 
 ## Parameters
@@ -350,7 +350,7 @@ cd extensions/victoriametrics
 docker-compose up -d
 
 # 2. 初始化配置
-wproj data clean
+wpadm data clean
 
 # 3. 启动解析服务（后台）
 wparse daemon --stat 2 -p &amp;
@@ -371,8 +371,8 @@ curl -s 'http://localhost:8428/api/v1/query?query=wparse_input_total'
 kill $(cat ./.run/wparse.pid)
 
 # 8. 校验输出
-wproj data stat
-wproj data validate --input-cnt 1000
+wpadm data stat
+wpadm data validate --input-cnt 1000
 ```
 
 ## 可调参数

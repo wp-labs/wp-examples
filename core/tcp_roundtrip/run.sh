@@ -5,15 +5,15 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Verify commands exist
-for cmd in wparse wpgen wproj lsof; do
+for cmd in wparse wpgen wpadm lsof; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "Error: Command '$cmd' not found in PATH"
     exit 1
   fi
 done
 
-wproj check
-wproj data clean
+wpadm check
+wpadm data clean
 wpgen data clean
 
 # 预清理：释放默认 syslog TCP 端口（防止上次遗留进程占用 1514）
@@ -41,5 +41,5 @@ sleep 3
 cat ./.run/wparse.pid | xargs kill || true
 
 sleep 3
-wproj data stat
-wproj data validate --input-cnt "$LINE_CNT"
+wpadm data stat
+wpadm data validate --input-cnt "$LINE_CNT"

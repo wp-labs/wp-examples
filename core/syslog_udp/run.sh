@@ -5,15 +5,15 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Verify commands exist
-for cmd in wparse wpgen wproj lsof; do
+for cmd in wparse wpgen wpadm lsof; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "Error: Command '$cmd' not found in PATH"
     exit 1
   fi
 done
 
-wproj check
-wproj data clean
+wpadm check
+wpadm data clean
 wpgen data clean
 
 
@@ -56,5 +56,5 @@ for i in {1..20}; do
   sleep 0.3
 done
 sleep 1
-wproj data stat
-wproj data validate --input-cnt "$TOTAL_CNT"
+wpadm data stat
+wpadm data validate --input-cnt "$TOTAL_CNT"

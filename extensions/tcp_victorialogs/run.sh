@@ -4,8 +4,8 @@ set -euo pipefail
 # 进入脚本所在目录
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wproj check
-wproj data clean
+wpadm check
+wpadm data clean
 
 echo "start work (no print_stat)"
 wparse deamon --stat 5 -w 8 -p &
@@ -27,5 +27,5 @@ if [ -f ./.run/wparse.pid ]; then
 fi
 sleep 3
 
-wproj data stat
-wproj data validate
+wpadm data stat
+wpadm data validate

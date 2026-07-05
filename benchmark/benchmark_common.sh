@@ -105,7 +105,7 @@ benchmark_init_env() {
   # 初始化与构建（这可能会改变工作目录）
   parse_profile "release"
   build_and_setup_path
-  verify_commands wparse wpgen wproj
+  verify_commands wparse wpgen wpadm
 
   # 恢复原始工作目录
   cd "$original_pwd"
@@ -251,7 +251,7 @@ benchmark_run_batch() {
   fi
 
   sleep 1
-  wproj data stat
+  wpadm data stat
 }
 
 # 执行 daemon 模式的基准测试
@@ -302,7 +302,7 @@ benchmark_run_daemon() {
   cat ./.run/wparse.pid | xargs kill || true
 
   sleep 1
-  wproj  data stat
+  wpadm  data stat
 }
 
 # 执行 blackhole 模式的基准测试（类似 daemon，但不生成数据）
@@ -332,7 +332,7 @@ benchmark_run_blackhole() {
   cat ./.run/wparse.pid | xargs kill || true
 
   sleep 2
-  wproj  data stat
+  wpadm  data stat
 }
 
 # 显示配置信息

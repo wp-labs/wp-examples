@@ -24,7 +24,7 @@ done
 # Init env and build once
 init_script_dir
 build_and_setup_path
-verify_commands wproj || true
+verify_commands wpadm || true
 
 # Collect case directories (same discovery as run_all.sh)
 CASES=()
@@ -57,10 +57,10 @@ for case_sh in "${ORDERED[@]}"; do
   case_dir="$(dirname "$case_sh")"
   case_name="${case_dir#./}"
   echo
-  echo "====> [$TOTAL/$TOTAL_CASES] wproj check: $case_name"
+  echo "====> [$TOTAL/$TOTAL_CASES] wpadm check: $case_name"
 
   set +e
-  wproj check --work-root "$case_dir" 2>&1
+  wpadm check --work-root "$case_dir" 2>&1
   rc=$?
   set -e
 

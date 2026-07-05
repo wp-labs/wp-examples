@@ -9,16 +9,16 @@ LINE_CNT=${LINE_CNT:-3000}
 STAT_SEC=${STAT_SEC:-3}
 
 # 验证必要的命令存在
-for cmd in wparse wpgen wproj; do
+for cmd in wparse wpgen wpadm; do
     if ! command -v "$cmd" >/dev/null; then
         echo "Error: $cmd not found in PATH"
         exit 1
     fi
 done
 
-wproj check
-wproj init --mode data
-wproj data clean
+wpadm check
+wpadm init --mode data
+wpadm data clean
 wpgen data clean
 
 echo "1> gen sample data"
@@ -30,7 +30,7 @@ wparse batch --stat 10 --print_stat
 echo "3> rescue data:"
 find ./data/rescue/ -name "*.dat"
 
-wproj data stat
+wpadm data stat
 
 # 中断阶段只验证救急文件已生成；此时业务 sink 输出仍是中间态，不做比例校验。
 if ! find ./data/rescue/ -type f -name "*.dat" | grep -q .; then

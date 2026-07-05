@@ -28,7 +28,7 @@ done
 # Init env and build once
 init_script_dir
 build_and_setup_path
-verify_commands wparse wpgen wproj || true
+verify_commands wparse wpgen wpadm || true
 
 # Ensure subcases reuse the compiled binaries (no rebuild)
 export SKIP_BUILD=1

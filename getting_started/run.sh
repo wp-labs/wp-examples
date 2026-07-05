@@ -9,7 +9,7 @@ LINE_CNT=${LINE_CNT:-3000}
 STAT_SEC=${STAT_SEC:-3}
 
 # 验证必要的命令存在
-for cmd in wparse wpgen wproj; do
+for cmd in wparse wpgen wpadm; do
     if ! command -v "$cmd" >/dev/null; then
         echo "Error: $cmd not found in PATH"
         exit 1
@@ -22,8 +22,8 @@ rm -rf connectors conf models topology data || true
 
 echo "1> init conf & data"
 # 初始化配置与数据目录
-wproj init -m full
-wproj data clean
+wpadm init -m full
+wpadm data clean
 wpgen conf clean || true
 wpgen conf init
 wpgen data clean || true
@@ -44,5 +44,5 @@ fi
 
 echo "5> validate sinks"
 # 使用 --input-cnt 显式指定总输入条数（便于 total_input 口径场景），组级为 group_input 时会自动回退到组内口径
-wproj data stat
-wproj data validate
+wpadm data stat
+wpadm data validate

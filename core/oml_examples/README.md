@@ -130,7 +130,7 @@ cd core/oml_examples
    - 初始化知识库数据
 
 2. **服务检查**
-   - 使用 `wproj check` 验证配置和模型
+   - 使用 `wpadm check` 验证配置和模型
    - 确保所有依赖项正常
 
 3. **数据清理**
@@ -384,12 +384,12 @@ deviation = 0.01         # 允许 1% 的偏差
 
 1. **输出文件统计**
    ```bash
-   wproj data stat
+   wpadm data stat
    ```
 
 2. **验证数据完整性**
    ```bash
-   wproj data validate
+   wpadm data validate
    ```
 
 3. **查看输出样例**

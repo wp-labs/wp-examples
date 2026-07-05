@@ -23,7 +23,7 @@
 
 - 启动本地 PostgreSQL
 - 等待数据库健康检查通过
-- 清理旧输出并执行 `wproj check`
+- 清理旧输出并执行 `wpadm check`
 - 启动 `wparse deamon`
 - 使用 `wpgen sample` 通过 TCP 发送原始 nginx 输入数据
 - 校验 `asset_name` / `asset_env` / `asset_owner` 富化字段与输出总行数
@@ -50,7 +50,7 @@ docker compose up -d
 然后检查并运行：
 
 ```bash
-wproj check --work-root "$(pwd)"
+wpadm check --work-root "$(pwd)"
 wparse deamon --work-root "$(pwd)" --stat 5 &
 wpgen sample --work-root "$(pwd)" -n 100000 -s 20000
 ```

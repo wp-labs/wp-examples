@@ -25,12 +25,12 @@ git clone https://github.com/wp-labs/wp-examples.git
 ## 目标1: 让WarpParse 运行起来
 
 ### 初始化项目
-#### wproj init
+#### wpadm init
 ```
 mkdir ${HOME}/wp-space ;
 cd  ${HOME}/wp-space;
 
-wproj init -m full
+wpadm init -m full
 ```
 
 * 项目的结构
@@ -87,7 +87,7 @@ wparse batch --stat 2 -p
 ### 数据统计
 
 ```
-wproj data stat
+wpadm data stat
 ```
 * 输出
 ```

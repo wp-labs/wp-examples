@@ -81,11 +81,11 @@ cd extensions/tcp_victorialogs
 
 Main script steps:
 
-1) `wproj check` for config self-check, clean data directory
+1) `wpadm check` for config self-check, clean data directory
 2) Start `wparse daemon` in background (listening on TCP port 19001)
 3) Run `wpgen sample` to generate sample data and send via TCP
 4) Wait for data ingestion, stop `wparse`
-5) Run `wproj data stat` and `wproj data validate` for verification
+5) Run `wpadm data stat` and `wpadm data validate` for verification
 
 ## Parameters
 
@@ -165,8 +165,8 @@ params = { file = "all.dat" }
 curl 'http://127.0.0.1:9428/api/ui/query?query={_any="*"}&limit=10'
 ```
 
-- Data statistics: `wproj data stat` outputs processing statistics for each stage
-- Data validation: `wproj data validate` verifies input/output data consistency
+- Data statistics: `wpadm data stat` outputs processing statistics for each stage
+- Data validation: `wpadm data validate` verifies input/output data consistency
 - File backup: `all.dat` file saves the original parsed data
 
 ## VictoriaLogs Query Examples
@@ -278,11 +278,11 @@ cd extensions/tcp_victorialogs
 
 脚本主要步骤：
 
-1) `wproj check` 进行配置自检，清理数据目录
+1) `wpadm check` 进行配置自检，清理数据目录
 2) 后台启动 `wparse daemon`（监听 TCP 19001 端口）
 3) 执行 `wpgen sample` 生成样例数据并通过 TCP 发送
 4) 等待数据入库，停止 `wparse`
-5) 执行 `wproj data stat` 与 `wproj data validate` 进行校验
+5) 执行 `wpadm data stat` 与 `wpadm data validate` 进行校验
 
 ## 运行参数
 
@@ -362,8 +362,8 @@ params = { file = "all.dat" }
 curl 'http://127.0.0.1:9428/api/ui/query?query={_any="*"}&limit=10'
 ```
 
-- 数据统计：`wproj data stat` 会输出各阶段处理统计
-- 数据校验：`wproj data validate` 会校验输入输出数据一致性
+- 数据统计：`wpadm data stat` 会输出各阶段处理统计
+- 数据校验：`wpadm data validate` 会校验输入输出数据一致性
 - 文件备份：`all.dat` 文件会保存原始解析后的数据
 
 ## VictoriaLogs 查询示例

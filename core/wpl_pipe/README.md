@@ -132,8 +132,8 @@ cd core/wpl_pipe
 ### 手动执行
 ```bash
 # 初始化配置
-wproj check
-wproj data clean
+wpadm check
+wpadm data clean
 wpgen data clean
 
 # 生成样本数据（Base64+引号转义 JSON）
@@ -143,8 +143,8 @@ wpgen sample -n 1000 --stat 2
 wparse batch --stat 2 -S 1 -p -n 1000
 
 # 校验输出
-wproj data stat
-wproj data validate
+wpadm data stat
+wpadm data validate
 ```
 
 ## 可调参数

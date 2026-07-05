@@ -70,10 +70,10 @@ for run_sh in "${FILTERED[@]}"; do
   case_dir="$(dirname "$run_sh")"
   case_name="${case_dir#./}"
   echo
-  echo "====> [$TOTAL/$TOTAL_CASES] wproj check: $case_name"
+  echo "====> [$TOTAL/$TOTAL_CASES] wpadm check: $case_name"
 
   set +e
-  wproj check --work-root "$case_dir" 2>&1
+  wpadm check --work-root "$case_dir" 2>&1
   rc=$?
   set -e
 

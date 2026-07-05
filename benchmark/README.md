@@ -4,7 +4,7 @@ The benchmark directory contains performance test cases based on `benchmark/benc
 
 ## Prerequisites
 
-1. All scripts run in release profile by default and depend on `wparse`/`wpgen`/`wproj` being in PATH.
+1. All scripts run in release profile by default and depend on `wparse`/`wpgen`/`wpadm` being in PATH.
 2. Run scripts from the benchmark directory or specific test directory.
 
 ## Directory Structure
@@ -108,7 +108,7 @@ benchmark 目录收录了基于 `benchmark/benchmark_common.sh` 的性能测试�
 
 ## 前置准备
 
-1. 所有脚本默认在 release profile 下运行，并依赖 `wparse`/`wpgen`/`wproj`，确保它们位于 PATH 中。
+1. 所有脚本默认在 release profile 下运行，并依赖 `wparse`/`wpgen`/`wpadm`，确保它们位于 PATH 中。
 2. 从 benchmark 目录或具体测试目录运行脚本。
 
 ## 目录结构

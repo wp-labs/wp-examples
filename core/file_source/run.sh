@@ -10,7 +10,7 @@ STAT_SEC=${STAT_SEC:-1}
 
 
 # 验证必要的命令存在
-for cmd in wparse wpgen wproj; do
+for cmd in wparse wpgen wpadm; do
     if ! command -v "$cmd" >/dev/null; then
         echo "Error: $cmd not found in PATH"
         exit 1
@@ -18,8 +18,8 @@ for cmd in wparse wpgen wproj; do
 done
 
 echo "1> init conf & data"
-wproj check || true
-wproj data clean || true
+wpadm check || true
+wpadm data clean || true
 wpgen data clean || true
 
 echo "2> gen sample data"
@@ -34,5 +34,5 @@ if ! wparse batch --stat "$STAT_SEC" -p ; then
 fi
 
 echo "4> validate sinks"
-wproj data stat
-wproj data validate
+wpadm data stat
+wpadm data validate

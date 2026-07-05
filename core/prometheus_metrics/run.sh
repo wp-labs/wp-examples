@@ -9,7 +9,7 @@ LINE_CNT=${LINE_CNT:-1000}
 STAT_SEC=${STAT_SEC:-2}
 
 # 验证必要的命令存在
-for cmd in wparse wpgen wproj curl; do
+for cmd in wparse wpgen wpadm curl; do
     if ! command -v "$cmd" >/dev/null; then
         echo "Error: $cmd not found in PATH"
         exit 1
@@ -17,7 +17,7 @@ for cmd in wparse wpgen wproj curl; do
 done
 
 echo "1> init conf & data"
-wproj data clean || true
+wpadm data clean || true
 rm -f prometheus_monitor.dat
 
 echo "2> start wparse daemon (syslog receiver)"
@@ -36,5 +36,5 @@ if [ -f ./.run/wparse.pid ]; then
 fi
 sleep 5
 
-wproj data stat
-wproj data validate --input-cnt "$LINE_CNT"
+wpadm data stat
+wpadm data validate --input-cnt "$LINE_CNT"

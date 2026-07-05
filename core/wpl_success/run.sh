@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Verify commands exist
-for cmd in wparse wpgen wproj; do
+for cmd in wparse wpgen wpadm; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "Error: Command '$cmd' not found in PATH"
     exit 1
@@ -18,10 +18,10 @@ STAT_SEC=${STAT_SEC:-3}
 
 echo "1> init wparse service"
 # Force refresh configuration (only remove wparse.toml, regenerate via wproj) to avoid validation failures from old keys
-wproj check || true
+wpadm check || true
 
 # Initialize configuration and data directories
-wproj data clean || true
+wpadm data clean || true
 wpgen data clean || true
 
 echo "2> gen sample data"
@@ -37,5 +37,5 @@ if ! wparse batch --stat "$STAT_SEC" -p -n "$LINE_CNT"; then
 fi
 
 echo "5> validate sinks by expect"
-wproj data stat
-wproj data validate
+wpadm data stat
+wpadm data validate

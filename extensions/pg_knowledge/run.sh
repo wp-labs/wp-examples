@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-for cmd in docker wpgen wproj wparse grep wc; do
+for cmd in docker wpgen wpadm wparse grep wc; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
         echo "Error: $cmd not found in PATH"
         exit 1
@@ -43,7 +43,7 @@ if ! "${compose[@]}" exec -T postgres pg_isready -U demo -d knowdb_demo >/dev/nu
 fi
 
 echo "3> check project"
-wproj check --work-root "$(pwd)"
+wpadm check --work-root "$(pwd)"
 
 echo "4> clean runtime artifacts"
 rm -rf ./.run ./data/out_dat ./data/logs
@@ -107,7 +107,7 @@ if [ "$output_lines" != "$line_cnt" ]; then
 fi
 
 echo "9> show data stat"
-wproj data stat --work-root "$(pwd)"
-wproj data validate --work-root "$(pwd)" --input-cnt "$line_cnt"
+wpadm data stat --work-root "$(pwd)"
+wpadm data validate --work-root "$(pwd)" --input-cnt "$line_cnt"
 
 echo "OK: PostgreSQL knowledge enrichment example passed (lines=$line_cnt speed=$gen_speed)"

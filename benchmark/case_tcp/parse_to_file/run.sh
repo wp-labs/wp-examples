@@ -22,9 +22,9 @@ benchmark_init_env
 benchmark_validate_wpl_path "$WPL_DIR"
 
 # 初始化配置
-wproj check
+wpadm check
 
-wproj data clean
+wpadm data clean
 wpgen data clean
 
 # 设置数据规模

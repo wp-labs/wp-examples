@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # 验证必要的命令存在
-for cmd in wparse wpgen wproj; do
+for cmd in wparse wpgen wpadm; do
     if ! command -v "$cmd" >/dev/null; then
         echo "Error: $cmd not found in PATH"
         exit 1
@@ -20,8 +20,8 @@ STAT_SEC=${STAT_SEC:-2}
 GEN_SPEED=${GEN_SPEED:-200}   # 适度限速，降低 UDP 丢包概率
 
 # 配置准备
-wproj check || true
-wproj data clean
+wpadm check || true
+wpadm data clean
 wpgen conf check
 wpgen data clean
 
@@ -39,5 +39,5 @@ if [ -f ./.run/wparse.pid ]; then
 fi
 sleep 3   # 等待数据排空
 
-wproj data stat
-wproj data validate --input-cnt $LINE_CNT
+wpadm data stat
+wpadm data validate --input-cnt $LINE_CNT

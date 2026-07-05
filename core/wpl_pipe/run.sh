@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Verify commands exist
-for cmd in wparse wpgen wproj; do
+for cmd in wparse wpgen wpadm; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "Error: Command '$cmd' not found in PATH"
     exit 1
@@ -17,8 +17,8 @@ LINE_CNT=${LINE_CNT:-1000}
 STAT_SEC=${STAT_SEC:-2}
 
 # Prepare configuration and data
-wproj check || true
-wproj data clean || true
+wpadm check || true
+wpadm data clean || true
 wpgen data clean || true
 
 echo "1> gen sample data (base64+quoted JSON; quoted+escaped JSON)"
@@ -32,5 +32,5 @@ if ! wparse batch --stat "$STAT_SEC" -S 1 -p -n "$LINE_CNT"; then
 fi
 
 echo "3> validate outputs"
-wproj data stat
-wproj data validate
+wpadm data stat
+wpadm data validate

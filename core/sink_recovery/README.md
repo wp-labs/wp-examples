@@ -38,8 +38,8 @@ cd core/sink_recovery
 ./case_recovery.sh
 
 # Validate
-wproj data stat
-wproj validate sink-file -v
+wpadm data stat
+wpadm validate sink-file -v
 ```
 
 ---
@@ -72,7 +72,7 @@ wproj validate sink-file -v
   - 预构建并初始化配置；
   - 通过 `wpgen sample` 生成 10000 行样本到 `./data/in_dat/gen.dat`；
   - 启动 `wparse daemon`；`benchmark` 组使用 `test_rescue` 后端，周期性中断触发救急写入；
-  - 结束时打印 `rescue/` 下的 `.dat` 文件及 `wproj stat file` 汇总。
+  - 结束时打印 `rescue/` 下的 `.dat` 文件及 `wpadm stat file` 汇总。
 - 期望：`rescue/` 目录出现至少一个 `benchmark_file_sink-*.dat` 文件。
 
 2) 恢复阶段（回放救急文件）
@@ -83,7 +83,7 @@ wproj validate sink-file -v
 - 该脚本会：
   - 启动 `wprescue daemon --stat 100` 进入恢复模式；
   - 等待片刻并发送 USR1 信号优雅结束；
-  - 列出 `rescue/`、输出 `wproj stat file` 和一致性校验 `wproj validate sink-file -v`。
+  - 列出 `rescue/`、输出 `wpadm stat file` 和一致性校验 `wpadm validate sink-file -v`。
 - 期望：
   - `rescue/` 中的 `.dat` 文件被消费并删除；
   - sinks v2 下对应文件计数增加（例如 `data/out_dat/benchmark.dat`、`data/out_dat/default.dat` 等）。
@@ -132,8 +132,8 @@ recover end
   - `usecase/core/sink_recovery/case_recovery.sh`
 - 核心日志：`usecase/core/sink_recovery/logs/wprescue.log`
 - 校验工具：
-  - `wproj stat file` 统计 sinks 输出行数
-  - `wproj validate sink-file -v` 校验期望配置/占比
+  - `wpadm stat file` 统计 sinks 输出行数
+  - `wpadm validate sink-file -v` 校验期望配置/占比
 
 ## 测试完整性与健壮性建议
 
@@ -158,7 +158,7 @@ recover end
   - 目标 sink 短暂不可用：在恢复过程中手动切断写入（如文件权限只读/目录不可写），确认：失败记账、重试、最终回退策略符合鲁棒性策略（Throw/Tolerant/FixRetry 等）。
 
 - 期望校验（expect）
-- 在 `sink/defaults.toml` 的 `[defaults.expect]` 设置 `min_samples/sum_tol/others_max` 等参数，`wproj validate sink-file -v` 观察是否给出清晰证据（denom/ratio/lines）。
+- 在 `sink/defaults.toml` 的 `[defaults.expect]` 设置 `min_samples/sum_tol/others_max` 等参数，`wpadm validate sink-file -v` 观察是否给出清晰证据（denom/ratio/lines）。
   - 在业务 `sink.toml` 对单个 sink 配置 `[[sinks]].expect`（如 `ratio/tol`），校验实际占比是否在容差内。
 
 - 观测与日志
@@ -172,4 +172,4 @@ recover end
 - 后续改进点（建议）
   - `to_tdc`（数据库类后端的 TDC 转换）当前为 TODO，补齐实现后应新增单元/集成测试验证 SQL/批量写入逻辑。
   - 将 `test_rescue` 的阶段时长暴露为环境变量，便于在 CI 中构造确定性时序。
-  - 在 CI 中串行执行 `case_interrupt.sh` → `case_recovery.sh`，并收集 `wprescue.log`、`wproj validate` 结果作为工件。
+  - 在 CI 中串行执行 `case_interrupt.sh` → `case_recovery.sh`，并收集 `wprescue.log`、`wpadm validate` 结果作为工件。

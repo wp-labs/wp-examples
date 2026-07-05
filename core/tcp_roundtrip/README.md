@@ -40,8 +40,8 @@ wpgen sample -n 10000 --stat 5
 
 3. Stop and validate
 ```bash
-wproj stat sink-file
-wproj validate sink-file -v --input-cnt 10000
+wpadm stat sink-file
+wpadm validate sink-file -v --input-cnt 10000
 ```
 
 ---
@@ -64,8 +64,8 @@ wpgen sample -n 10000 --stat 5
 ```
 3) 停止解析器并校验
 ```
-wproj stat sink-file
-wproj validate sink-file -v --input-cnt 10000
+wpadm stat sink-file
+wpadm validate sink-file -v --input-cnt 10000
 ```
 
 关键文件

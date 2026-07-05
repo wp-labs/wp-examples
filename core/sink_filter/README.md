@@ -37,7 +37,7 @@ cd core/sink_filter
 ./run.sh
 
 # Validate output ratios
-wproj validate sink-file -v
+wpadm validate sink-file -v
 ```
 
 ---
@@ -93,12 +93,12 @@ cargo build --workspace --all-features
 ```bash
 cd usecase/core/sink_filter
 # 统计源与 sink（文本/JSON）
-../../../target/debug/wproj stat file
-../../../target/debug/wproj stat file --json
+../../../target/debug/wpadm stat file
+../../../target/debug/wpadm stat file --json
 
 # 离线校验（文本/JSON）
-../../../target/debug/wproj validate sink-file
-../../../target/debug/wproj validate sink-file --json
+../../../target/debug/wpadm validate sink-file
+../../../target/debug/wpadm validate sink-file --json
 ```
 
 ## 校验提示策略（WARN）
@@ -112,7 +112,7 @@ cd usecase/core/sink_filter
 ./case_verify.sh
 ```
 
-脚本会执行构建、生成样本、启动服务与校验。若你只需要离线校验与统计，可以直接使用 `wproj stat/validate`。
+脚本会执行构建、生成样本、启动服务与校验。若你只需要离线校验与统计，可以直接使用 `wpadm stat/validate`。
 
 ---
 建议：新增业务组时，统一在 `sink/defaults.toml` 维护 `[defaults.expect]`，各组仅在确需与默认不同的场景下覆盖组级 expect；对单个 sink 的比例约束，请放在 `[group.sinks.expect]` 下设置。

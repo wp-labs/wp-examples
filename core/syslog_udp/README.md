@@ -39,8 +39,8 @@ wpgen sample -n 10000 --stat 5
 
 3. Stop and validate
 ```bash
-wproj data stat
-wproj validate sink-file -v --input-cnt 10000
+wpadm data stat
+wpadm validate sink-file -v --input-cnt 10000
 ```
 
 ## Key Files

@@ -114,7 +114,7 @@ cd core/prometheus_metrics
 ### 手动执行
 ```bash
 # 初始化配置
-wproj data clean
+wpadm data clean
 
 # 启动解析服务（后台）
 wparse daemon --stat 2 -p &
@@ -132,8 +132,8 @@ curl -s http://localhost:35666/metrics
 kill $(cat ./.run/wparse.pid)
 
 # 校验输出
-wproj data stat
-wproj data validate --input-cnt 1000
+wpadm data stat
+wpadm data validate --input-cnt 1000
 ```
 
 ## 可调参数
