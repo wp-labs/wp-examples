@@ -1,0 +1,9 @@
+key = "syslog_1"
+enable = false
+connect = "syslog_tcp_src"
+tags = []
+
+[params]
+addr = "0.0.0.0"
+port = 1514
+protocol = "tcp"
