@@ -27,6 +27,9 @@
 
 
 - [Benchmark 用例指南](benchmark/README.md)
+  - [Linux en report ](benchmark/report/report_linux_en.md)
+  - [Mac en report](benchmark/report/report_mac_en.md)
+  - [Mac 性能测试报告](benchmark/report/report_mac.md)
   - [Linux性能测试报告](benchmark/report/report_linux.md)
   - [Mac 性能测试报告](benchmark/report/report_mac.md)
   - [Rule Definitions](benchmark/report/test_rule.md)

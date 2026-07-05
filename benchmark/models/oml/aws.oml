@@ -1,6 +1,6 @@
 name : /oml/normal/aws
 rule : /aws/*
-enable : false
+enable : true
 ---
 sent_bytes:digit = take(sent_bytes) ;
 target_status_code:digit = take(target_status_code) ;
@@ -17,4 +17,4 @@ str_elb_status = match read(option:[elb_status_code]) {
     digit(200) => chars(ok);
     digit(404) => chars(error);
 };
-//* : auto = read();
+* : auto = read();
