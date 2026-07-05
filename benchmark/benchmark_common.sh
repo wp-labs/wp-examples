@@ -282,10 +282,10 @@ benchmark_run_daemon() {
 
   echo "2> Starting daemon mode (no print_stat)"
   if [ $# -gt 0 ]; then
-    wparse deamon --wpl "$wpl_path" --stat 1 -w "$work_cnt" -p "$@" & \
+    wparse daemon --wpl "$wpl_path" --stat 1 -w "$work_cnt" -p "$@" & \
       wait_for_pid_file ./.run/wparse.pid || true
   else
-    wparse deamon --wpl "$wpl_path" --stat 1 -w "$work_cnt" -p & \
+    wparse daemon --wpl "$wpl_path" --stat 1 -w "$work_cnt" -p & \
       wait_for_pid_file ./.run/wparse.pid || true
   fi
   sleep 1
@@ -317,10 +317,10 @@ benchmark_run_blackhole() {
 
   echo "2> Starting blackhole mode (duration: ${duration}s)"
   if [ $# -gt 0 ]; then
-    wparse deamon --wpl "$wpl_path" --stat 1 -w "$work_cnt" -p "$@" & \
+    wparse daemon --wpl "$wpl_path" --stat 1 -w "$work_cnt" -p "$@" & \
       wait_for_pid_file ./.run/wparse.pid || true
   else
-    wparse deamon --wpl "$wpl_path" --stat 1 -w "$work_cnt" -p & \
+    wparse daemon --wpl "$wpl_path" --stat 1 -w "$work_cnt" -p & \
       wait_for_pid_file ./.run/wparse.pid || true
   fi
   sleep 2
