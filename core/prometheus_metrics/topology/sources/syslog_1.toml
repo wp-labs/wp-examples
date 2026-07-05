@@ -1,4 +1,3 @@
-[[sources]]
 enable =  true
 key = "syslog_1"
 connect = "syslog_tcp_src"

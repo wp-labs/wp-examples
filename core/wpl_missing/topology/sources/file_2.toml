@@ -1,0 +1,4 @@
+key = "file_2"                 # 第二个文件源（禁用示例）
+enable = false
+connect = "file_src"
+params = { base = "./data/in_dat", file = "gen2.dat", encode = "text" }

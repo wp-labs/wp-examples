@@ -1,4 +1,3 @@
-[[sources]]
 key = "file_raw_sink"
 enable = true
 connect = "file_src"

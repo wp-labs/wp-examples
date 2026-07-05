@@ -1,4 +1,3 @@
-[[sources]]
 key = "syslog_1"
 enable = true
 #connect = "syslog_udp_src"

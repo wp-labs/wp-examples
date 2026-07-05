@@ -1,0 +1,8 @@
+key = "file_1"
+enable = true
+connect = "file_src"
+tags = []
+
+[params]
+encode = "text"
+file = "gen*.dat"
