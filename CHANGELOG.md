@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2026-07-05]
+
+### Changed
+- **CLI**: 所有脚本和文档中的 `wproj` 重命名为 `wpadm`（`verify_commands`、`run.sh`、`benchmark_common.sh` 等）
+- **Sources**: `getting_started` 和 `core/` 下全部示例从 `wpsrc.toml` 单文件格式迁移为目录式 source 格式（每个 source 一个 `.toml` 文件）
+  - `getting_started`: `file_1.toml` + `syslog_1.toml`
+  - `core/`: 18 个目录从 `wpsrc.toml` 转换为独立 `.toml` 文件
+
+### Fixed
+- **benchmark_common.sh**: 修复 `wparse deamon` → `wparse daemon` 拼写错误
+
 ## [2026-06-19]
 
 ### Fixed
