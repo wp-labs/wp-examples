@@ -1,0 +1,6 @@
+package /fun {
+    #[no_match]
+    rule raw_event {
+        (chars\0)
+    }
+}

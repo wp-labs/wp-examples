@@ -7,7 +7,7 @@ package /pipe_demo {
         |unquote/unescape|(json(_@_origin))
    }
 
-   #[copy_raw(name : "_origin")]
+    #[copy_raw(name : "_origin"), copy_event_parse(rule:"/fun/raw_event")]
     rule fmt_from_base64 {
         // Input like: base64("{ \"a\": 2, \"b\": \"bar\" }")
         // 1) base64 decode

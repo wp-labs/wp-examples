@@ -3,6 +3,7 @@ version = "2.0"
 [sink_group]
 name = "/sink/filter"
 oml = ["/oml/sh*"]
+wp_meta_disable = ["wp_oml_name"]
 [[sink_group.sinks]]
 name = "all"
 #connect = "file_proto_sink"

@@ -104,6 +104,52 @@ package /pipe_demo {
 }
 ```
 
+### copy_event_parse 场景（跨包引用）
+
+演示跨规则、跨包注解 `#[copy_event_parse(rule:"pkg/rule")]` 与 `#[no_match]` 的配合。本例中 `/pipe_demo` 包的 `fmt_from_base64` 解析完 base64+quoted JSON 后，把同一 payload 交给 `/fun` 包的 `raw_event` 再解析，产出字段并入同一条 record。
+
+涉及两个文件（均为 `parse*.wpl`，才会被加载器扫到）：
+
+**`models/wpl/pipe_demo/parse.wpl`**（`/pipe_demo` 包）：
+
+```wpl
+package /pipe_demo {
+   #[copy_raw(name : "_origin"), copy_event_parse(rule:"/fun/raw_event")]
+    rule fmt_from_base64 {
+        |decode/base64| strip/bom | unquote/unescape|(json(_@_origin))
+    }
+}
+```
+
+**`models/wpl/pipe_demo/parse_fun.wpl`**（`/fun` 包）：
+
+```wpl
+package /fun {
+    #[no_match]
+    rule raw_event {
+        (chars\0)
+    }
+}
+```
+
+| 规则 | 注解 | 作用 |
+|------|------|------|
+| `fmt_from_base64` (`/pipe_demo`) | `#[copy_event_parse(rule:"/fun/raw_event")]` | base64 解码 + 去引号 + 解析 JSON；同时把同一 payload 交给 `/fun/raw_event` 再解析，产出字段并入同一条 record |
+| `raw_event` (`/fun`) | `#[no_match]` | 仅作 `copy_event_parse` 的显式调用目标，不参与 `parse_event` 自动匹配 |
+
+处理流程：
+
+1. 事件进入 `parse_event`，`fmt_from_base64` 命中（`raw_event` 标了 `#[no_match]`，不在自动匹配集合里）。
+2. `fmt_from_base64` 按管道解码并解析 JSON → 字段 `_origin`。
+3. `copy_event_parse` 把同一 payload 喂给 `/fun/raw_event` 的 parser → 解析 `chars\0` → 产出字段，并入当前 record。
+4. 最终 record 含 `fmt_from_base64` 与 `raw_event` 两边产出的字段。
+
+> **跨包引用约定**：`copy_event_parse` 的 `rule` 用 `pkg/rule` 全路径（如 `/fun/raw_event`）。同包裸名（如 `raw_event`）也可用，引擎会按 `当前包/裸名` 回退解析。引用不存在的 rule 是逻辑错误，引擎拒绝启动。
+>
+> **文件加载约定**：加载器只扫 `parse*.wpl`（见 `WPARSE_RULE_FILE`），一个 `.wpl` 文件声明一个 package。`/fun` 包因此单独放在 `parse_fun.wpl`，而不是和 `/pipe_demo` 挤在 `parse.wpl` 里。
+>
+> `#[no_match]` 是显式声明：标了它的 rule 不会被 `parse_event` 直接匹配，避免它抢在引用方 rule 之前产出残缺 record。其 parser 仍由引擎保留，供 `copy_event_parse` 注入调用。
+
 ### 处理流程
 1. **输入**：`"eyJhIjogMX0="` (Base64 编码的 `{"a": 1}`)
 2. **decode/base64**：`{"a": 1}`
