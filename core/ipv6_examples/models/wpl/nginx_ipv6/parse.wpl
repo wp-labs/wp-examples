@@ -1,0 +1,16 @@
+package nginx_ipv6 {
+  #[copy_raw(name:"raw_msg")]
+  rule access_log {
+    (
+      ip:client_ip,
+      2*_,
+      time/clf:access_time<[,]>,
+      http/request:request",
+      http/status:status,
+      digit:body_bytes_sent,
+      chars:referer",
+      chars:user_agent",
+      chars:x_forwarded_for"
+    )
+  }
+}

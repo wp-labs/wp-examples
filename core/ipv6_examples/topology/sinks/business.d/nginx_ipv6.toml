@@ -1,0 +1,11 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/nginx_ipv6"
+oml = ["nginx_ipv6"]
+[[sink_group.sinks]]
+connect = "file_json_sink"
+params = { file = "nginx_ipv6.json" }
+[sink_group.sinks.expect]
+ratio = 0.545
+tol   = 0.01

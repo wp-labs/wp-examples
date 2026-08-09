@@ -1,0 +1,11 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/fw_ipv6"
+oml = ["fw_ipv6"]
+[[sink_group.sinks]]
+connect = "file_json_sink"
+params = { file = "fw_ipv6.json" }
+[sink_group.sinks.expect]
+ratio = 0.455
+tol   = 0.01

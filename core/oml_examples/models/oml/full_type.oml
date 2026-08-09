@@ -11,6 +11,13 @@ simple_port: digit = read(simple_chars);
 simple_ip: ip = read(simple_ip);
 ip_ip4_to_int = pipe read(simple_ip) | ip4_to_int;
 
+//内网判断（返回 intranet/internet，支持 IPv4/IPv6，网段由 knowdb.toml [intranet_nets] 配置）
+sip_side = pipe read(sip) | intranet_ip;
+simple_ip_side = pipe read(simple_ip) | intranet_ip;
+
+//访问方向（L2L/L2W/W2L/W2W，缺失/非法兜底 unknown）
+direction = access_direct(read(sip), read(simple_ip)) | on_fail('unknown');
+
 //html
 html_unescape = pipe read(html) | html_unescape;
 html_escape = pipe read(html) | html_escape;

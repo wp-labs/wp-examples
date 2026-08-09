@@ -1,0 +1,14 @@
+name : fw_ipv6
+rule : fw_ipv6/*
+---
+vendor    = chars(firewall) ;
+recv_time = Now::time() ;
+
+// 源/目的 IP 的内网公网判断（IPv6 ULA/全局地址）
+src_side = pipe read(src_ip) | intranet_ip ;
+dst_side = pipe read(dst_ip) | intranet_ip ;
+// IPv6 地址转大整数
+src_biguint = pipe read(src_ip) | ip_to_biguint ;
+dst_biguint = pipe read(dst_ip) | ip_to_biguint ;
+// 访问方向（基于源/目的 IP）
+direction = access_direct(read(src_ip), read(dst_ip)) | on_fail('unknown') ;

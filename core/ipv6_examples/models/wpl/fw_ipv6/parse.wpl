@@ -1,0 +1,16 @@
+package fw_ipv6 {
+  #[copy_raw(name:"raw_msg")]
+  rule fw_log {
+    (
+      time_timestamp:recv_time\s,
+      symbol(fw)\s,
+      digit:session_id\s,
+      ip:src_ip\s,
+      ip:dst_ip\s,
+      digit:sport\s,
+      digit:dport\s,
+      chars:proto\s,
+      chars:action
+    )
+  }
+}

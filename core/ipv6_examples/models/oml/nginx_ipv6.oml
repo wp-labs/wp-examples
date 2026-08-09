@@ -1,0 +1,16 @@
+name : nginx_ipv6
+rule : nginx_ipv6/*
+---
+vendor      = chars(nginx) ;
+recv_time   = Now::time() ;
+raw_msg     = pipe take(raw_msg) | json_escape ;
+
+// IPv6 地址的 intranet/公网判断（支持 IPv4/IPv6，网段由 knowdb 配置）
+client_side = pipe read(client_ip) | intranet_ip ;
+// IPv6 转大整数（压缩形式与全形式结果一致）
+client_biguint = pipe read(client_ip) | ip_to_biguint ;
+// 访问方向（L2L/L2W/W2L/W2W，缺失/非法兜底 unknown）
+direction = access_direct(read(client_ip), read(client_ip)) | on_fail('unknown') ;
+
+// ip4_to_int 对 IPv6 返回 Null（仅支持 IPv4）
+client_ip4_int = pipe read(client_ip) | ip4_to_int ;
