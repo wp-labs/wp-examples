@@ -1,0 +1,4 @@
+name : /pg
+rule : /pg/*
+---
+* : auto = take() ;

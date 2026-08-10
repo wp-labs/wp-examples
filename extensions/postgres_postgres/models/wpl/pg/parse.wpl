@@ -1,0 +1,5 @@
+package /nginx {
+   rule nginx {
+        (json())
+   }
+}

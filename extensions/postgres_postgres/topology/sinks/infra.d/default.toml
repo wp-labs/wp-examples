@@ -1,0 +1,11 @@
+version = "2.0"
+
+[sink_group]
+name = "default"
+
+[[sink_group.sinks]]
+connect = "file_proto_sink"
+params = {  file = "default.dat" }
+[sink_group.sinks.expect]
+ratio = 0.01
+tol   = 0.02
