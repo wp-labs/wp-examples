@@ -2,4 +2,5 @@ name : pg_asset_enrich
 rule : /nginx/*
 ---
 * : auto = take() ;
-asset_name, asset_env, asset_owner = select asset_name, asset_env, asset_owner from asset_inventory where ip = read(sip) ;
+asset_name, asset_env, asset_owner = select asset_name, asset_env, asset_owner from asset.public.asset_inventory where ip = read(sip) ;
+country, city = select country, city from geo.public.ip_geo_city where ip = read(sip) ;

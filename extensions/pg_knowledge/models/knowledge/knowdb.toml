@@ -5,7 +5,17 @@ enabled = true
 capacity = 1024
 ttl_ms = 30000
 
-[provider]
+# 两个 PostgreSQL 数据库：相同地址、不同 database。
+# - asset：资产表 asset_inventory
+# - geo：IP 归属地表 ip_geo_city
+[[provider.sqldb]]
+name = "asset"
 kind = "postgres"
-connection_uri = "postgres://demo:${SEC_PWD}@127.0.0.1:55432/knowdb_demo"
+connection_uri = "postgres://demo:${SEC_PWD}@127.0.0.1:55433/knowdb_demo"
+pool_size = 8
+
+[[provider.sqldb]]
+name = "geo"
+kind = "postgres"
+connection_uri = "postgres://demo:${SEC_PWD}@127.0.0.1:55433/ip_geo_db"
 pool_size = 8

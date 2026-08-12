@@ -99,6 +99,11 @@ grep -q '"asset_owner":"secops"' "$output_file"
 grep -q '"asset_name":"internal-api-01"' "$output_file"
 grep -q '"asset_env":"staging"' "$output_file"
 grep -q '"asset_owner":"platform"' "$output_file"
+# geo 库（ip_geo_db）富化字段
+grep -q '"country":"CN"' "$output_file"
+grep -q '"city":"Beijing"' "$output_file"
+grep -q '"country":"US"' "$output_file"
+grep -q '"city":"Los Angeles"' "$output_file"
 
 output_lines=$(wc -l < "$output_file" | tr -d '[:space:]')
 if [ "$output_lines" != "$line_cnt" ]; then
