@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2026-08-12]
+
+### Added
+- **extensions/pg_knowledge 双 PostgreSQL 数据库示例**: 从单库升级为两个 `[[provider.sqldb]]`——`asset` → `knowdb_demo`、`geo` → `ip_geo_db`（同地址、不同 database）。新增 `docker/initdb/02_ip_geo.sql`（建 `ip_geo_db` + `ip_geo_city` 表并灌入演示数据）；OML 模型通过 `from <provider>.public.<table>` 前缀路由分别查询资产表与归属地表；`run.sh` 校验新增 `country` / `city` 富化字段。
+
+### Changed
+- **extensions/pg_knowledge**: `knowdb.toml` 从旧版 `[provider]` 格式迁移到新版 `[[provider.sqldb]]`；端口 `55432` → `55433`（`55432` 被本机其他项目占用）。
+
+### Fixed
+- **extensions/pg_knowledge**: 修复旧版 `[provider]` 配置在当前 wp-knowledge 下回退本地 authority、无法查询真实 PostgreSQL 的问题。
+
 ## [2026-07-05]
 
 ### Changed
