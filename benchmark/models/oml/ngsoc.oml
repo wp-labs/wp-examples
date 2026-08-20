@@ -1,0 +1,249 @@
+name : /oml/ngsoc_alert_info
+rule : ngsoc/ngsoc_alert_info
+---
+
+tenant_id = chars(tenant01);
+log_id = read(wp_event_id);
+stream_tag = chars(ngsoc);
+event_id = read(wp_event_id);
+occur_time = pipe read(timestamp) | Time::to_ts_zone(8,ms);
+__parse_time_tmp = Now::time();
+parse_time = pipe @__parse_time_tmp | Time::to_ts_ms;
+
+schema_version = digit(1);
+mapping_id = chars(qax.ngsoc.ngsoc_alert_info);
+mapping_revision = chars(1);
+projection_version = chars(hybrid-v1);
+quality_status = chars(partial);
+data_src_vendor = chars(qax);
+data_src_product = chars(ngsoc);
+data_src_category = chars(security_analytics);
+log_type = read(log_type);
+log_level = match read(syslog_pri) {
+    digit(14) => chars(info);
+};
+log_name = read(log_desc);
+source_original_event_id = read(uuid);
+record_kind = chars(finding);
+event_domain = match read(ruleCategoryName) {
+    chars(弱口令) => chars(identity);
+    _ => chars(threat);
+};
+event_type = match read(name) {
+    chars(AsyncRAT远控木马活动事件) => chars(network_dns);
+    chars(Injecto远控木马活动事件) => chars(network_dns);
+    chars(Virtob) => chars(network_dns);
+    chars(Apache Shiro RememberMe反序列化漏洞) => chars(network_http);
+    chars(MSSQL Waitfor语句SQL注入攻击) => chars(network_http);
+    chars(SQL注入攻击) => chars(network_http);
+    chars(SQL注入攻击_SLEEP休眠函数注入) => chars(network_http);
+    chars(SQL注入攻击_注入点探测) => chars(network_http);
+    chars(SQL注入攻击_注释字符绕过) => chars(network_http);
+    chars(SQL注入攻击_选择语句) => chars(network_http);
+    chars(敏感信息泄露_Java报错信息) => chars(network_http);
+    chars(敏感信息泄露_Java源码泄露) => chars(network_http);
+    chars(目录列表泄露) => chars(network_http);
+    chars(目录遍历攻击(通用)) => chars(network_http);
+    chars(弱口令登录) => chars(user_login);
+    chars(定制-VPN12小时内不同物理地址登录成功(mac版)) => chars(user_login);
+    chars(定制-绕过堡垒机登录服务器) => chars(user_login);
+    chars(端口扫描) => chars(scan_network);
+    chars(预置-网络探针检测到内部主机对外慢速传输大量数据) => chars(network_connection);
+    chars(预置-网络探针检测到内部主机对外高速传输大量数据) => chars(network_connection);
+    chars(代码执行攻击) => chars(network_uncategorized);
+    chars(MongoDB未授权访问) => chars(network_uncategorized);
+    chars(MySQL 读取数据库列表) => chars(network_uncategorized);
+    _ => chars(generic_event);
+};
+
+source_ip = pipe read(srcIp) | nth(0);
+source_port = pipe read(sport) | nth(0);
+target_ip = pipe read(dstIp) | nth(0);
+target_port = pipe read(dport) | nth(0);
+target_domain = match read(protocol) {
+    chars(DNS) => read(domain);
+};
+target_host = read(hostName);
+observer_vendor = chars(qax);
+observer_product = chars(ngsoc);
+device_ip = read(devIp);
+source_finding_title = read(name);
+source_finding_severity = read(severity);
+__source_severity = read(severity);
+severity = match read(severity) {
+    chars(1) => chars(notice);
+    chars(2) => chars(warning);
+    chars(3) => chars(error);
+    chars(4) => chars(crit);
+    chars(低危) => chars(notice);
+    chars(中危) => chars(warning);
+    chars(高危) => chars(error);
+    chars(危急) => chars(crit);
+};
+source_finding_category = read(ruleCategoryName);
+source_finding_signature_id = pipe read(ruleId) | nth(0);
+source_finding_original_id = read(option:[uuid, eventId, seq]);
+
+__attack_result = match read(attackResult) {
+    chars(0) => chars(not_applicable);
+    chars(1) => chars(success);
+    chars(2) => chars(attempted);
+    chars(3) => chars(failed);
+    chars(不涉及) => chars(not_applicable);
+    chars(成功) => chars(success);
+    chars(企图) => chars(attempted);
+    chars(失败) => chars(failed);
+    _ => chars(unknown);
+};
+
+__compromise_status = match read(compromiseState) {
+    chars(false) => chars(not_compromised);
+    chars(true) => chars(compromised);
+    chars(不涉及) => chars(not_compromised);
+    chars(已失陷) => chars(compromised);
+};
+
+__killchain = match read(killchain) {
+    chars(0) => chars(not_applicable);
+    chars(1) => chars(reconnaissance);
+    chars(2) => chars(weaponization);
+    chars(3) => chars(delivery);
+    chars(4) => chars(exploitation);
+    chars(5) => chars(installation);
+    chars(6) => chars(command_and_control);
+    chars(7) => chars(actions_on_objectives);
+    chars(8) => chars(automated_collection);
+    chars(不涉及) => chars(not_applicable);
+    chars(侦查跟踪) => chars(reconnaissance);
+    chars(武器构建) => chars(weaponization);
+    chars(载荷投递) => chars(delivery);
+    chars(突防利用) => chars(exploitation);
+    chars(安装植入) => chars(installation);
+    chars(通信控制) => chars(command_and_control);
+    chars(达成目标) => chars(actions_on_objectives);
+    chars(自动获取) => chars(automated_collection);
+};
+
+__confidence = match read(confidence) {
+    chars(1) => chars(low);
+    chars(2) => chars(medium);
+    chars(3) => chars(high);
+    chars(低) => chars(low);
+    chars(中) => chars(medium);
+    chars(高) => chars(high);
+    _ => chars(unknown);
+};
+
+__alert_src_name = match read(source) {
+    chars(0) => chars(关联规则);
+    chars(1) => chars(用户导入);
+    chars(2) => chars(上传);
+    chars(3) => chars(上级规则下发);
+    chars(关联规则) => chars(关联规则);
+    chars(用户导入) => chars(用户导入);
+    chars(上传) => chars(上传);
+    chars(上级规则下发) => chars(上级规则下发);
+};
+
+__sip: ip = pipe read(srcIp) | nth(0);
+__dip: ip = pipe read(dstIp) | nth(0);
+__attacker_ip: ip = pipe read(attackerContent) | nth(0);
+__victim_ip: ip = pipe read(victimContent) | nth(0);
+__sport = pipe read(sport) | nth(0);
+__dport = pipe read(dport) | nth(0);
+__target_domain = match read(protocol) {
+    chars(DNS) => read(domain);
+};
+
+
+__comm_direction = access_direct(@__sip, @__dip) | on_fail('unknown');
+__attack_direction = access_direct(@__attacker_ip, @__victim_ip) | on_fail('unknown');
+
+
+__sip_net_type = match read(__comm_direction) {
+    chars(L2L) => chars(Intranet);
+    chars(L2W) => chars(Intranet);
+    chars(W2L) => chars(Internet);
+    chars(W2W) => chars(Internet);
+};
+__dip_net_type = match read(__comm_direction) {
+    chars(L2L) => chars(Intranet);
+    chars(L2W) => chars(Internet);
+    chars(W2L) => chars(Intranet);
+    chars(W2W) => chars(Internet);
+};
+__attacker_ip_net_type = match read(__attack_direction) {
+    chars(L2L) => chars(Intranet);
+    chars(L2W) => chars(Intranet);
+    chars(W2L) => chars(Internet);
+    chars(W2W) => chars(Internet);
+};
+__victim_ip_net_type = match read(__attack_direction) {
+    chars(L2L) => chars(Intranet);
+    chars(L2W) => chars(Internet);
+    chars(W2L) => chars(Intranet);
+    chars(W2W) => chars(Internet);
+};
+
+network_direction = read(__comm_direction);
+application_name = read(appName);
+
+roles_obj = object {
+    carriers = array {};
+    related = array {};
+    source = object {
+        endpoint = object {
+            ip = read(__sip);
+            ipv4 = read(__sip);
+            port = read(__sport);
+        };
+        geo = object {
+            continent = object { name = read(__sip_continent_name); };
+            country = object { code = read(__sip_country_code); name = read(__sip_country_name); };
+            region = object { name = read(__sip_province_name); };
+            city = object { name = read(__sip_city_name); };
+            coordinates = object { latitude = read(__sip_latitude); longitude = read(__sip_longitude); };
+        };
+        resource = object {
+            id = read(__sip_asset_id);
+            name = read(__sip_asset_name);
+            type = read(__sip_asset_type);
+            system = object { id = read(__sip_system_id); name = read(__sip_system_name); };
+            organization = object { name = read(__sip_company_name); };
+        };
+    };
+    target = object {
+        endpoint = object {
+            ip = read(__dip);
+            ipv4 = read(__dip);
+            port = read(__dport);
+        };
+        domain = object { name = read(__target_domain); };
+        geo = object {
+            continent = object { name = read(__dip_continent_name); };
+            country = object { code = read(__dip_country_code); name = read(__dip_country_name); };
+            region = object { name = read(__dip_province_name); };
+            city = object { name = read(__dip_city_name); };
+            coordinates = object { latitude = read(__dip_latitude); longitude = read(__dip_longitude); };
+        };
+        resource = object {
+            id = read(__dip_asset_id);
+            name = read(__dip_asset_name);
+            type = read(__dip_asset_type);
+            system = object { id = read(__dip_system_id); name = read(__dip_system_name); };
+            organization = object { name = read(__dip_company_name); };
+        };
+    };
+    observer = object {
+        product = object { name = chars(ngsoc); };
+        device = object {
+            vendor = chars(qax);
+            ip = read(devIp);
+            ipv4 = read(devIp);
+            ip_addresses = array {
+                object { address = read(devIp); };
+            };
+        };
+    };
+};
+
