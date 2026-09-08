@@ -12,6 +12,16 @@ by_header = [
 [tables.expected_rows]
 min = 1
 
+[intranet_nets]
+# 内网网段知识配置：扩展或替换系统内置网段（RFC1918 + IPv4/IPv6 loopback + IPv6 ULA）
+#   enabled：外部配置开关（默认 true）
+#   mode："add" 添加到内置网段（推荐）/ "replace" 完全替换
+#   nets：内网网段列表（CIDR 写法，支持 IPv4 / IPv6）
+#         示例：nets = ["172.32.0.0/16"]（企业专有/资产网段）
+enabled = true
+mode = "add"
+nets = []
+
 # PostgreSQL provider example:
 # Uncomment this block to query an external PostgreSQL database instead of
 # loading CSV files into the local authority SQLite.
