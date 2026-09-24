@@ -1,0 +1,31 @@
+version = "1.0"
+
+[generator]
+count = 1000
+speed = 0
+parallel = 4
+
+[output]
+# 仅当存在 connect 时，其他 output 字段和旧式 [output.*] 子块将被忽略
+name = "gen_out"
+# 覆写允许的参数（参考 connectors/sink.d 中对应连接器 allow_override）
+connect = "tcp_sink"
+
+[output.params]
+port = 19001
+
+[output.params.tls]
+enabled = true
+# 自签证书跳过校验（基准测试常用，等同 curl -k，仍走完整 TLS 握手与加密）
+insecure = true
+# 校验模式二选一（不要和 insecure=true 同时用）：
+# 1) 验自签证书（服务端自签证书充当 CA）：
+#    ca = "certs/server.pem"
+#    server_name = "localhost"
+# 2) 公网/公共 CA 证书：不填 ca（回落到系统信任库），只填 server_name：
+#    server_name = "wparse.example.com"
+
+[logging]
+level = "info,ctrl=info"
+output = "file"
+file_path = "./data/logs/"

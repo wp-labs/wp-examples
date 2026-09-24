@@ -1,0 +1,16 @@
+[[sources]]
+enable = true
+key = "tcp_tls_1"
+connect = "tcp_src"
+tags = ["type:tcp", "purpose:benchmark", "tls:on"]
+
+[sources.params]
+addr = "0.0.0.0"
+port = 19001
+framing = "line"
+instances = 2
+
+[sources.params.tls]
+enabled = true
+cert = "certs/server.pem"
+key = "certs/server.key"
