@@ -1,0 +1,22 @@
+[[sources]]
+enable = true
+key = "tcp_gm_1"
+connect = "tcp_src"
+tags = ["type:tcp", "purpose:benchmark", "gm:sm4", "compression:zstd"]
+
+[sources.params]
+addr = "0.0.0.0"
+port = 19001
+framing = "line"
+instances = 2
+
+# 解码：与 wpgen 侧对称 —— 先 SM4-GCM 解密、再 zstd 解压（source 侧 build_decoder）
+[sources.params.compression]
+enabled = true
+algo = "zstd"
+level = 3
+
+[sources.params.encryption]
+enabled = true
+algo = "sm4-gcm"
+key = "000102030405060708090a0b0c0d0e0f"

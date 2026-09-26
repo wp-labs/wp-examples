@@ -1,0 +1,25 @@
+version = "2.0"
+
+[sink_group]
+name = "all"
+rule = ["/*"]
+parallel =  ${WORK_CNT:6}
+
+[[sink_group.sinks]]
+name = "debug_output"
+connect = "file_json_sink"
+
+[sink_group.sinks.params]
+base = "./out"
+file = "all.gm4"
+
+# 落盘加密：先 zstd 压缩、再 SM4-GCM 加密（与 tcp 链路对称，输出为二进制帧流）
+[sink_group.sinks.params.compression]
+enabled = true
+algo = "zstd"
+level = 3
+
+[sink_group.sinks.params.encryption]
+enabled = true
+algo = "sm4-gcm"
+key = "000102030405060708090a0b0c0d0e0f"
