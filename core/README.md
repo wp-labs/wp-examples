@@ -11,12 +11,14 @@ This directory contains core end-to-end examples and scenario-based configuratio
 | **file_source** | File-based data source ingestion | File source, batch processing |
 | **knowdb_case** | Knowledge database queries and data association | SQL-like OML queries, CSV knowledge bases, dynamic lookup |
 | **oml_examples** | Comprehensive OML transformation | Conditional matching, range matching, tuple matching, knowledge base queries |
+| **privacy_examples** | Inline OML desensitization | `mask` / `hash` / `tokenize` / `remove`, IP pool mapping, object inner pipe, batch target pipe |
 | **prometheus_metrics** | Prometheus metrics export | HTTP `/metrics` endpoint, counters, gauges, histograms |
 | **remote_ctrl** | Remote bootstrap then reload updates to a target version | `wpadm init --repo`, remote project bootstrap, versioned admin reload |
 | **sink_filter** | Sink-level filtering and data splitting | Filter rules, multi-path routing, expectation validation |
 | **sink_recovery** | Sink failure handling and data recovery | Rescue files, interruption/recovery cycle, replay pipeline |
 | **syslog_udp** | UDP Syslog source integration | UDP syslog reception, parsing, routing |
 | **tcp_roundtrip** | TCP input/output end-to-end link | TCP source/sink, data flow validation |
+| **wpl_late** | `#[late]` rule tiering | Deferred catch-all matching, tier isolation, hit-rate ordering isolation |
 | **wpl_missing** | WPL field missing and fault tolerance | Optional fields, miss group handling, data completeness |
 | **wpl_pipe** | WPL pipeline preprocessing | Base64 decoding, unquote/unescape, trim operations |
 | **wpl_success** | Successful full-chain WPL parsing | Multi-rule parsing, data_type tags, routing validation |
@@ -87,12 +89,14 @@ wpadm data validate
 | **file_source** | 基于文件的数据源输入 | 文件源、批处理 |
 | **knowdb_case** | 知识库查询与数据关联 | SQL 风格 OML 查询、CSV 知识库、动态查找 |
 | **oml_examples** | 综合 OML 转换示例 | 条件匹配、范围匹配、元组匹配、知识库查询 |
+| **privacy_examples** | OML 内联脱敏 | `mask` / `hash` / `tokenize` / `remove`、IP 保留池映射、object 内 pipe、批量目标 pipe |
 | **prometheus_metrics** | Prometheus 指标导出 | HTTP `/metrics` 端点、计数器、仪表、直方图 |
 | **remote_ctrl** | 远端初始化后通过管理面切换到目标版本 | `wpadm init --repo`、远端工程引导、带版本参数的 admin reload |
 | **sink_filter** | Sink 级过滤与数据分流 | 过滤规则、多路径路由、期望值校验 |
 | **sink_recovery** | Sink 故障处理与数据恢复 | 救急文件、中断/恢复流程、回放管道 |
 | **syslog_udp** | UDP Syslog 源集成 | UDP syslog 接收、解析、路由 |
 | **tcp_roundtrip** | TCP 输入/输出端到端链路 | TCP 源/汇、数据流验证 |
+| **wpl_late** | `#[late]` 规则分层 | 兜底规则优后匹配、层级隔离、不被命中率排序提升 |
 | **wpl_missing** | WPL 字段缺失与容错 | 可选字段、miss 组处理、数据完整性 |
 | **wpl_pipe** | WPL 管道预处理 | Base64 解码、unquote/unescape、trim 操作 |
 | **wpl_success** | WPL 成功解析全链路 | 多规则解析、data_type 标签、路由验证 |

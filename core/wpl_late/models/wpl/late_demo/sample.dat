@@ -1,0 +1,5 @@
+1001,2002,3003
+k1=v1,k2=v2,k3=v3
+{"a": 1, "b": "x"}
+plain text that no structured rule can parse
+another free-form line with words only

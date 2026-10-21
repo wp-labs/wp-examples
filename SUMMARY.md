@@ -13,6 +13,7 @@
   - [sink_filter](core/sink_filter/README.md)
   - [中断与恢复](core/sink_recovery/README.md)
   - [TCP Roundtrip](core/tcp_roundtrip/README.md)
+  - [wpl_late](core/wpl_late/README.md)
   - [wpl_missing](core/wpl_missing/README.md)
   - [wpl_pipe](core/wpl_pipe/README.md)
   - [wpl_success](core/wpl_success/README.md)

@@ -1,0 +1,22 @@
+version = "1.0"
+
+[generator]
+# sample.dat 里 5 行一轮：3 条结构化 + 2 条自由文本。
+# 2000 行 = 400 轮，比例刚好是 20% / 20% / 20% / 40%。
+count = 2000
+# 纯回放，无需限速
+speed = 1000000
+parallel = 1
+
+# 仅当存在 connect 时，其他 output 字段和旧式 [output.*] 子块将被忽略
+[output]
+connect = "file_raw_sink"
+name = "gen_out"
+params = { base = "./data/in_dat", file = "gen.dat" }
+
+[logging]
+level = "warn"
+output = "file"
+file_path = "./data/logs/"
+
+[presets]

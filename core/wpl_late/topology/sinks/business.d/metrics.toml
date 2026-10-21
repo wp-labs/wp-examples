@@ -1,0 +1,12 @@
+version = "2.0"
+
+[sink_group]
+name = "metrics_sink"
+rule = ["/late_demo/metrics_csv"]
+[[sink_group.sinks]]
+name = "metrics"
+connect = "file_proto_sink"
+params = { file = "metrics.dat" }
+[sink_group.sinks.expect]
+ratio = 0.2
+tol   = 0.02
