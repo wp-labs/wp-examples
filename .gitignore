@@ -15,6 +15,7 @@ record.md
 **/data/
 **/logs/
 **/recover.lock
+**/wparse.local.toml
 *.html
 *.py
 book
