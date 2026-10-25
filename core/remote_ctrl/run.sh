@@ -6,9 +6,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 MODELS_REPO_URL="${MODELS_REPO_URL:-https://github.com/wp-labs/wp-rule.git}"
 INFRA_REPO_URL="${INFRA_REPO_URL:-https://github.com/wp-labs/editor-monitor-conf.git}"
 MODELS_INIT_VERSION="${MODELS_INIT_VERSION:-0.1.0}"
-INFRA_INIT_VERSION="${INFRA_INIT_VERSION:-0.1.6}"
+INFRA_INIT_VERSION="${INFRA_INIT_VERSION:-0.1.8}"
 MODELS_TARGET_VERSION="${MODELS_TARGET_VERSION:-0.1.1}"
-INFRA_TARGET_VERSION="${INFRA_TARGET_VERSION:-0.1.7}"
+INFRA_TARGET_VERSION="${INFRA_TARGET_VERSION:-0.1.8}"
 WORK_ROOT="${WORK_ROOT:-$PWD/.tmp-work}"
 REQUEST_ID="${REQUEST_ID:-core-remote-ctrl}"
 RELOAD_TIMEOUT_MS="${RELOAD_TIMEOUT_MS:-1000}"
@@ -70,6 +70,16 @@ if [[ ! -d "$WORK_ROOT/connectors" ]]; then
   exit 1
 fi
 echo "   infra dirs verified: conf/, topology/, connectors/ present"
+
+echo "3b> enable admin API in the site overlay (infra >= 0.1.8 no longer ships [admin_api])"
+cat > "$WORK_ROOT/wparse.local.toml" <<EOF
+[admin_api]
+enabled = true
+bind = "${ADMIN_BIND}"
+
+[admin_api.auth]
+token_file = "\${HOME}/.warp_parse/admin_api.token"
+EOF
 
 echo "4> sync models from $MODELS_REPO_URL (brings models/)"
 wpadm conf update --work-root "$WORK_ROOT" --group models --version "$MODELS_INIT_VERSION"
