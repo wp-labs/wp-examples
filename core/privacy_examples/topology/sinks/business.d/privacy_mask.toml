@@ -1,0 +1,11 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/privacy_mask"
+oml = ["privacy_mask"]
+[[sink_group.sinks]]
+connect = "file_json_sink"
+params = { file = "privacy_mask.json" }
+[sink_group.sinks.expect]
+ratio = 1.0
+tol   = 0.01

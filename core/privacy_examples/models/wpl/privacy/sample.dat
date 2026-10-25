@@ -1,0 +1,5 @@
+privacy,203.0.113.5,198.51.100.9,13800138000,110101199003071234,alice@example.com,api.example.com,张三,user-1001,secret-note,bob@example.org
+privacy,2001:db8:1::abcd,2001:db8:2::1,13900139000,110101199003071235,bob@example.org,mail.example.org,李四,user-1002,internal-note,tom@example.net
+privacy,10.0.0.8,10.0.0.9,13700137000,110101199003071236,carol@example.com,shop.example.com,Alice,user-1003,debug-context,dave@example.com
+privacy,198.18.0.10,198.18.0.11,13600136000,110101199003071237,dave@example.com,www.example.com,王五,user-1004,do-not-export,erin@example.org
+privacy,203.0.113.20,203.0.113.21,13500135000,110101199003071238,erin@example.org,static.example.com,赵六,user-1005,internal,tom@example.net

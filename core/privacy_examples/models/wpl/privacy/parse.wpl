@@ -1,0 +1,17 @@
+package privacy {
+  rule access_log {
+    (
+      symbol(privacy),
+      ip:src_ip,
+      ip:dst_ip,
+      chars:mobile,
+      chars:id_card,
+      chars:mail,
+      chars:domain,
+      chars:name,
+      chars:user_id,
+      chars:notes,
+      chars:backup_mail
+    )\,
+  }
+}

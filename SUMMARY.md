@@ -9,6 +9,7 @@
   - [FileSource](core/file_source/README.md)
   - [knowdb_case](core/knowdb_case/README.md)
   - [oml_examples](core/oml_examples/README.md)
+  - [privacy_examples](core/privacy_examples/README.md)
   - [prometheus_metrics](core/prometheus_metrics/README.md)
   - [sink_filter](core/sink_filter/README.md)
   - [中断与恢复](core/sink_recovery/README.md)

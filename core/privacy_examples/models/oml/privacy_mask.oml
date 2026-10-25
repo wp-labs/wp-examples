@@ -1,0 +1,33 @@
+name : privacy_mask
+rule : privacy/*
+---
+// 密钥零配置：mask(ip) / hash 默认用 sec_key.toml 的 sec_pii_salt，tokenize() 默认用 sec_pii_key。
+// 密钥固定：mask(ip) / hash 用 sec_pii_salt，tokenize() 用 sec_pii_key；OML 无 salt: / key: 参数。
+// IP 脱敏：HMAC 映射到保留地址池，输出仍是合法 IP，可继续 join/group by
+s_ip : ip = read(src_ip) | mask(ip) ;
+d_ip : ip = read(dst_ip) | mask(ip) ;
+
+// 文本类脱敏
+mobile   : chars = read(mobile)   | mask(mobile) ;
+id_card  : chars = read(id_card)  | mask(id_card) ;
+mail     : chars = read(mail)     | mask(mail) ;
+domain   : chars = read(domain)   | mask(domain) ;
+name     : chars = read(name)     | mask(name, style:head) ;
+
+// 不可逆关联哈希：同盐同值同结果
+uid_hash : chars = read(user_id) | hash(sha256) ;
+
+// 可逆令牌：还原由独立工具完成，OML 只负责生成令牌
+uid_token : chars = read(user_id) | tokenize() ;
+
+// 删除不允许外发的字段
+notes : chars = read(notes) | remove ;
+
+// object 内部就地脱敏
+summary : obj = object {
+  s_ip : ip    = read(src_ip) | mask(ip) ;
+  mail : chars = read(mail)   | mask(mail) ;
+};
+
+// 批量脱敏：匹配所有 *_mail 字段
+*_mail : chars = read() | mask(mail) ;

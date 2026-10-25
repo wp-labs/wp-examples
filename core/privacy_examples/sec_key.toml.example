@@ -1,0 +1,14 @@
+# OML 脱敏密钥（固定两个键，无需在 wparse.toml 里配置）
+#
+#   mask(ip) / hash(...)  -> sec_pii_salt
+#   tokenize()            -> sec_pii_key
+#
+# 生成 32 字节随机密钥：
+#   openssl rand -base64 32
+#
+# 使用方法：
+#   mkdir -p .warp_parse
+#   cp sec_key.toml.example .warp_parse/sec_key.toml
+#   然后把下面两个占位符替换为真实值；不要提交真实密钥。
+sec_pii_salt = "<base64-encoded-32-bytes>"
+sec_pii_key  = "<base64-encoded-32-bytes>"
