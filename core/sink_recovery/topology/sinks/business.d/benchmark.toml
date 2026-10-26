@@ -7,5 +7,6 @@ oml = ["sys"]
 connect = "file_rescue_sink"
 params = {  file = "benchmark.dat" }
 [sink_group.sinks.expect]
-ratio = 0.50
-tol   = 0.03
+# /sink/benchmark 收 /sys/* 两类记录（benchmark_1 + benchmark_2），占输入 2/3
+ratio = 0.667
+tol   = 0.02

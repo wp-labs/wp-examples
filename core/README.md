@@ -16,6 +16,7 @@ This directory contains core end-to-end examples and scenario-based configuratio
 | **remote_ctrl** | Remote bootstrap then reload updates to a target version | `wpadm init --repo`, remote project bootstrap, versioned admin reload |
 | **sink_filter** | Sink-level filtering and data splitting | Filter rules, multi-path routing, expectation validation |
 | **sink_recovery** | Sink failure handling and data recovery | Rescue files, interruption/recovery cycle, replay pipeline |
+| **sink_drop_when_error** | Per-sink drop policy on write failure | `drop_when_error`, breaker suppression, drop accounting and auto-recovery |
 | **syslog_udp** | UDP Syslog source integration | UDP syslog reception, parsing, routing |
 | **tcp_roundtrip** | TCP input/output end-to-end link | TCP source/sink, data flow validation |
 | **wpl_late** | `#[late]` rule tiering | Deferred catch-all matching, tier isolation, hit-rate ordering isolation |
@@ -94,6 +95,7 @@ wpadm data validate
 | **remote_ctrl** | 远端初始化后通过管理面切换到目标版本 | `wpadm init --repo`、远端工程引导、带版本参数的 admin reload |
 | **sink_filter** | Sink 级过滤与数据分流 | 过滤规则、多路径路由、期望值校验 |
 | **sink_recovery** | Sink 故障处理与数据恢复 | 救急文件、中断/恢复流程、回放管道 |
+| **sink_drop_when_error** | sink 写失败时的丢弃策略 | `drop_when_error`、熔断跳发、丢弃记账与自动恢复 |
 | **syslog_udp** | UDP Syslog 源集成 | UDP syslog 接收、解析、路由 |
 | **tcp_roundtrip** | TCP 输入/输出端到端链路 | TCP 源/汇、数据流验证 |
 | **wpl_late** | `#[late]` 规则分层 | 兜底规则优后匹配、层级隔离、不被命中率排序提升 |

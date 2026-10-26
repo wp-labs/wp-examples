@@ -1,0 +1,4 @@
+name : example
+rule : /example/*
+---
+* : auto = take() ;

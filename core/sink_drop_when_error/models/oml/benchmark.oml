@@ -1,0 +1,4 @@
+name : sys
+rule : /sys/*
+---
+* : auto = take() ;

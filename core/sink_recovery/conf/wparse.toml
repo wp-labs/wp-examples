@@ -10,13 +10,13 @@ sinks = "./topology/sinks"
 
 [performance]
 parse_workers = 2
-rate_limit_rps = 2000
+rate_limit_rps = 1000
 
 [rescue]
 path = "./data/rescue"
 
 [log_conf]
-level = "warn,ctrl=info,launch=info,recover=info"
+level = "warn,ctrl=info,launch=info,dfx=info"
 output = "File"
 [log_conf.file]
 path = "./data/logs"

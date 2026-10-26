@@ -1,0 +1,13 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/benchmark"
+oml = ["sys"]
+[[sink_group.sinks]]
+connect = "file_rescue_sink"
+params = {  file = "benchmark.dat" }
+# 本用例的核心开关：sink 写失败时直接丢弃，不写救援文件、不切换备份 sink。
+drop_when_error = true
+
+# 刻意不配 expect：本用例就是要丢数据，固定比例必然不成立；
+# "输入 = 落盘 + 丢弃" 的守恒由 run.sh 单独校验。
