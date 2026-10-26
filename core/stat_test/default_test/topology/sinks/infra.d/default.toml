@@ -6,6 +6,7 @@ oml = []
 [[sink_group.sinks]]
 connect = "file_proto_sink"
 params = {  file = "default.dat" }
+# 未命中任何 OML 的记录（benchmark 系）都进 default 组，与 /example/ 各占一半
 [sink_group.sinks.expect]
-ratio = 0.0
+ratio = 0.50
 tol   = 0.02

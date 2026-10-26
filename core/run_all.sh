@@ -33,17 +33,26 @@ verify_commands wparse wpgen wpadm || true
 # Ensure subcases reuse the compiled binaries (no rebuild)
 export SKIP_BUILD=1
 
-# Discover all case scripts
-# Collect case scripts (compatible with older macOS bash without mapfile)
+# Discover all case scripts.
+# 递归收集 */*/run.sh（用例可以再嵌套一层，例如 stat_test/default_test），
+# 但若某个祖级目录自身也有 run.sh，说明它统一驱动子用例，跳过子目录避免重复执行。
+# 这里不用 mapfile/readarray，兼容 macOS 自带的 bash 3.2。
 CASES=()
-# Prefer shallow search; if not supported (BSD find), fall back to full search
-CASES_STR="$(find . -maxdepth 2 -mindepth 1 -type f -name run.sh 2>/dev/null || true)"
-if [ -z "$CASES_STR" ]; then
-  CASES_STR="$(find . -type f -name run.sh)"
-fi
-while IFS= read -r line; do
-  [ -n "$line" ] && CASES+=("$line")
-done <<< "$(printf '%s\n' "$CASES_STR" | sort)"
+while IFS= read -r case_sh; do
+  [ -n "$case_sh" ] || continue
+  case_dir_only="$(dirname "$case_sh")"
+  case_skip=0
+  case_parent="$(dirname "$case_dir_only")"
+  while [ "$case_parent" != "." ] && [ "$case_parent" != "/" ]; do
+    if [ -f "$case_parent/run.sh" ]; then
+      case_skip=1
+      break
+    fi
+    case_parent="$(dirname "$case_parent")"
+  done
+  [ "$case_skip" -eq 1 ] && continue
+  CASES+=("$case_sh")
+done <<< "$(find . -mindepth 2 -type f -name run.sh | sort)"
 
 # Move getting_started (if exists) to the front to seed initial artifacts
 ORDERED=()

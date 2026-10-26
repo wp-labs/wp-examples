@@ -23,7 +23,7 @@ This directory contains core end-to-end examples and scenario-based configuratio
 | **wpl_missing** | WPL field missing and fault tolerance | Optional fields, miss group handling, data completeness |
 | **wpl_pipe** | WPL pipeline preprocessing | Base64 decoding, unquote/unescape, trim operations |
 | **wpl_success** | Successful full-chain WPL parsing | Multi-rule parsing, data_type tags, routing validation |
-| **stat_test** | Statistical testing | Statistics validation, test scenarios |
+| **stat_test** | Per-scenario statistics validation | `default_test` / `miss_test` sub-cases, per-sink expect ratios |
 
 ## Common Directory Structure
 
@@ -102,7 +102,7 @@ wpadm data validate
 | **wpl_missing** | WPL 字段缺失与容错 | 可选字段、miss 组处理、数据完整性 |
 | **wpl_pipe** | WPL 管道预处理 | Base64 解码、unquote/unescape、trim 操作 |
 | **wpl_success** | WPL 成功解析全链路 | 多规则解析、data_type 标签、路由验证 |
-| **stat_test** | 统计测试 | 统计验证、测试场景 |
+| **stat_test** | 分场景统计校验 | `default_test` / `miss_test` 两个子用例、按 expect 比例校验 |
 
 ## 通用目录结构
 

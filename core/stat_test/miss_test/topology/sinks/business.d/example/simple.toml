@@ -8,6 +8,7 @@ name = "proto"
 connect = "file_proto_sink"
 [sink_group.sinks.params]
 file = "simple.dat"
+# 本用例只加载 nginx 规则，输入全是 benchmark 形状 -> 业务 sink 收不到数据
 [sink_group.sinks.expect]
-ratio = 0.33
+ratio = 0.0
 tol   = 0.02

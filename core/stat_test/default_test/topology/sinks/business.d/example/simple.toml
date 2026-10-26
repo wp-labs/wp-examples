@@ -8,6 +8,7 @@ name = "proto"
 connect = "file_proto_sink"
 [sink_group.sinks.params]
 file = "simple.dat"
+# nginx 规则命中 -> /example//proto；benchmark 系记录没有对应 OML，落到 default 组
 [sink_group.sinks.expect]
-ratio = 0.33
+ratio = 0.50
 tol   = 0.02

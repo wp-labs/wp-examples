@@ -6,6 +6,8 @@ oml = []
 [[sink_group.sinks]]
 connect = "file_raw_sink"
 params = {  file = "miss.dat" }
+# miss.json 落的是多行诊断块（src_key / data / target wpl / Error / info + 空行），
+# 行数口径约 6 行/条，与 wpl_missing 的 ratio 口径一致
 [sink_group.sinks.expect]
-max = 0.1
-min = 0.0
+ratio = 6.0
+tol   = 0.2
