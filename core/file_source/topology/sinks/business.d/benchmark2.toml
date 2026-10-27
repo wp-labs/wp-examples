@@ -6,6 +6,8 @@ oml = ["example2"]
 [[sink_group.sinks]]
 connect = "file_kv_sink"
 params = {  file = "benchmark_kv2.dat" }
+# tenant_id 与 WP_GLOBAL_TAGS 同名：验证全局 tag 优先；env 为不冲突的 sink tag
+tags = ["tenant_id: from-sink", "env: dev"]
 
 [sink_group.sinks.expect]
 ratio = 0.50

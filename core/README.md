@@ -8,7 +8,7 @@ This directory contains core end-to-end examples and scenario-based configuratio
 |------|---------|-------------------|
 | **confvars_case** | Configuration variables usage | Variable substitution, environment overrides |
 | **error_reporting** | Error data reporting with multi-format output | Error routing, JSON/KV output, OML transformation |
-| **file_source** | File-based data source ingestion | File source, batch processing |
+| **file_source** | File-based data source ingestion | File source, batch processing, global tags (`WP_GLOBAL_TAGS`) |
 | **knowdb_case** | Knowledge database queries and data association | SQL-like OML queries, CSV knowledge bases, dynamic lookup |
 | **oml_examples** | Comprehensive OML transformation | Conditional matching, range matching, tuple matching, knowledge base queries |
 | **privacy_examples** | Inline OML desensitization | `mask` / `hash` / `tokenize` / `remove`, IP pool mapping, object inner pipe, batch target pipe |
@@ -87,7 +87,7 @@ wpadm data validate
 |------|------|----------|
 | **confvars_case** | 配置变量使用 | 变量替换、环境变量覆盖 |
 | **error_reporting** | 错误数据报表与多格式输出 | 错误路由、JSON/KV 输出、OML 转换 |
-| **file_source** | 基于文件的数据源输入 | 文件源、批处理 |
+| **file_source** | 基于文件的数据源输入 | 文件源、批处理、全局 tag（`WP_GLOBAL_TAGS`） |
 | **knowdb_case** | 知识库查询与数据关联 | SQL 风格 OML 查询、CSV 知识库、动态查找 |
 | **oml_examples** | 综合 OML 转换示例 | 条件匹配、范围匹配、元组匹配、知识库查询 |
 | **privacy_examples** | OML 内联脱敏 | `mask` / `hash` / `tokenize` / `remove`、IP 保留池映射、object 内 pipe、批量目标 pipe |
