@@ -13,6 +13,7 @@
   - [prometheus_metrics](core/prometheus_metrics/README.md)
   - [sink_filter](core/sink_filter/README.md)
   - [中断与恢复](core/sink_recovery/README.md)
+  - [文件滚动与归档](core/sink_file_roll/README.md)
   - [TCP Roundtrip](core/tcp_roundtrip/README.md)
   - [wpl_late](core/wpl_late/README.md)
   - [wpl_missing](core/wpl_missing/README.md)
