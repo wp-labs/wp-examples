@@ -1,0 +1,25 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/roll"
+oml = ["example1", "example2"]
+batch_size = 16
+batch_timeout_ms = 100
+
+# 1) zip 归档：max_rolls 足够大，保证一条记录都不丢（断言总量守恒）
+[[sink_group.sinks]]
+name = "zip"
+connect = "file_json_sink"
+params = { file = "roll_zip.dat", max_size = "16KB", max_rolls = 100, roll_compress = "zip" }
+
+# 2) gzip 归档：max_rolls = 2，断言只保留 .1/.2 且最旧数据被删除
+[[sink_group.sinks]]
+name = "gzip"
+connect = "file_json_sink"
+params = { file = "roll_gz.dat", max_size = "16KB", max_rolls = 2, roll_compress = "gzip" }
+
+# 3) 对照组：不配 max_size 时永不滚动
+[[sink_group.sinks]]
+name = "flat"
+connect = "file_json_sink"
+params = { file = "roll_flat.dat" }

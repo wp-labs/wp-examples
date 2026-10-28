@@ -1,0 +1,8 @@
+[defaults]
+tags = ["sn:sink_file_roll"]
+
+# DefaultsBody.expect 是必填项（无 serde default），这里给与其它 core 用例一致的默认值。
+[defaults.expect]
+basis = "total_input"
+min_samples = 100
+mode = "error"

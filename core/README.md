@@ -15,6 +15,7 @@ This directory contains core end-to-end examples and scenario-based configuratio
 | **prometheus_metrics** | Prometheus metrics export | HTTP `/metrics` endpoint, counters, gauges, histograms |
 | **remote_ctrl** | Remote bootstrap then reload updates to a target version | `wpadm init --repo`, remote project bootstrap, versioned admin reload |
 | **sink_filter** | Sink-level filtering and data splitting | Filter rules, multi-path routing, expectation validation |
+| **sink_file_roll** | File sink size-based rolling and archive compression | `max_size` / `max_rolls` / `roll_compress`, gzip/zip archives, retention bounds |
 | **sink_recovery** | Sink failure handling and data recovery | Rescue files, interruption/recovery cycle, replay pipeline |
 | **sink_drop_when_error** | Per-sink drop policy on write failure | `drop_when_error`, breaker suppression, drop accounting and auto-recovery |
 | **syslog_udp** | UDP Syslog source integration | UDP syslog reception, parsing, routing |

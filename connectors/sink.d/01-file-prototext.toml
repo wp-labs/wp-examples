@@ -1,7 +1,7 @@
 [[connectors]]
 id = "file_proto_sink"
 type = "file"
-allow_override = ["base","file","sync"]
+allow_override = ["base","file","sync","max_size","max_rolls","roll_compress"]
 [connectors.params]
 fmt  = "proto-text"
 base = "./data/out_dat"
