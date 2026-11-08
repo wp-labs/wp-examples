@@ -1,0 +1,12 @@
+version = "2.0"
+
+[sink_group]
+name = "xml_alert_sink"
+rule = ["/xml_demo/xml_alert"]
+[[sink_group.sinks]]
+name = "xml_alert"
+connect = "file_proto_sink"
+params = { file = "xml_alert.dat" }
+[sink_group.sinks.expect]
+ratio = 0.5
+tol   = 0.02

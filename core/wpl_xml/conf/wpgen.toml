@@ -1,0 +1,20 @@
+version = "1.0"
+
+[generator]
+# sample.dat 里 4 行一轮：1 条 JSON 内嵌 XML + 1 条 JSON（元素乱序/缺字段）
+# + 2 条原始 XML 文档。2000 行 = 500 轮，两个规则各 50%。
+count = 2000
+speed = 1000000
+parallel = 1
+
+[output]
+connect = "file_raw_sink"
+name = "gen_out"
+params = { base = "./data/in_dat", file = "gen.dat" }
+
+[logging]
+level = "warn"
+output = "file"
+file_path = "./data/logs/"
+
+[presets]

@@ -1,0 +1,4 @@
+{"logtype":"ips","src_ip":"172.16.1.2","result":"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<root>\n  <url>172.16.8.248/****/aa.php?anp=***</url>\n  <user_agent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)</user_agent>\n  <status_code>302</status_code>\n  <vxlan_vni_1>0</vxlan_vni_1>\n</root>\n"}
+{"logtype":"ips","src_ip":"10.0.0.9","result":"<root>\n  <user_agent>curl/8.0</user_agent>\n  <url>/login.php</url>\n  <vxlan_vni_1>0</vxlan_vni_1>\n</root>"}
+<alert><alert_id>A-1001</alert_id><src_ip>192.168.1.10</src_ip><dst_ip>10.1.2.3</dst_ip><severity>3</severity><rule>webshell_upload</rule></alert>
+<alert><rule>sql_injection</rule><severity>5</severity><dst_ip>10.9.9.9</dst_ip><src_ip>192.168.1.11</src_ip><alert_id>A-1002</alert_id></alert>

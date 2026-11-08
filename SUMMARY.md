@@ -19,6 +19,7 @@
   - [wpl_missing](core/wpl_missing/README.md)
   - [wpl_pipe](core/wpl_pipe/README.md)
   - [wpl_success](core/wpl_success/README.md)
+  - [wpl_xml](core/wpl_xml/README.md)
 
 - [extension connector](extensions/README.md)
   - [doris 使用说明](extensions/doris/README.md)

@@ -1,0 +1,12 @@
+version = "2.0"
+
+[sink_group]
+name = "sangfor_ips_sink"
+rule = ["/xml_demo/sangfor_probe_ips"]
+[[sink_group.sinks]]
+name = "sangfor_ips"
+connect = "file_proto_sink"
+params = { file = "sangfor_ips.dat" }
+[sink_group.sinks.expect]
+ratio = 0.5
+tol   = 0.02

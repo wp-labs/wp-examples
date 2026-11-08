@@ -1,0 +1,7 @@
+key = "file_1"
+enable = true
+connect = "file_src"
+[params]
+base = "./data/in_dat"
+file = "gen.dat"
+encode = "text"

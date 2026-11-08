@@ -1,0 +1,38 @@
+package /xml_demo {
+    // ── 1) JSON 字段里内嵌 XML（深信服探针 result，wp-labs/warp-parse#373）──
+    // `result` 的值是 JSON 转义后的 XML 文本：先 json_unescape() 还原成原始 XML，
+    // 再用分组管道交给 xml(...)，按元素路径取值。
+    #[tag(log_desc: "深信服探针-IPS 告警(result 内嵌 XML)", log_type: "sangfor_probe_ips")]
+    rule sangfor_probe_ips {
+        (
+            json(
+                chars@logtype,
+                ip@src_ip,
+                chars@result | json_unescape() | (
+                    xml(
+                        chars@url:res_url,
+                        chars@user_agent:res_user_agent,
+                        digit@status_code:res_status_code,
+                        // 用不到的元素直接丢掉（未声明的元素默认会按 chars 输出）
+                        _@vxlan_vni_1,
+                    )
+                )
+            ) | f_chars_has(logtype, ips)
+        )
+    }
+
+    // ── 2) 整行就是 XML 文档 ────────────────────────────────────────────
+    // 元素按路径匹配：与先后顺序无关，缺失元素静默跳过。
+    #[tag(log_desc: "原始 XML 告警文档", log_type: "xml_alert")]
+    rule xml_alert {
+        (
+            xml(
+                chars@alert_id:id,
+                ip@src_ip:src,
+                ip@dst_ip:dst,
+                digit@severity,
+                chars@rule:rule_name,
+            )
+        )
+    }
+}
