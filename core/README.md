@@ -18,6 +18,7 @@ This directory contains core end-to-end examples and scenario-based configuratio
 | **sink_file_roll** | File sink size-based rolling and archive compression | `max_size` / `max_rolls` / `roll_compress`, gzip/zip archives, retention bounds |
 | **sink_recovery** | Sink failure handling and data recovery | Rescue files, interruption/recovery cycle, replay pipeline |
 | **sink_drop_when_error** | Per-sink drop policy on write failure | `drop_when_error`, breaker suppression, drop accounting and auto-recovery |
+| **sink_tcp_reconnect** | TCP/TLS sink recovery after the receiver restarts | Auto reconnect/backoff, TLS handshake, keepalive, sender never restarted, drop accounting |
 | **syslog_udp** | UDP Syslog source integration | UDP syslog reception, parsing, routing |
 | **tcp_roundtrip** | TCP input/output end-to-end link | TCP source/sink, data flow validation |
 | **wpl_late** | `#[late]` rule tiering | Deferred catch-all matching, tier isolation, hit-rate ordering isolation |

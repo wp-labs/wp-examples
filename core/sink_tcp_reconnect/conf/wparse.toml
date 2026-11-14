@@ -1,0 +1,45 @@
+version = "1.0"
+
+[models]
+wpl = "./models/wpl"
+oml = "./models/oml"
+
+[topology]
+sources = "./topology/sources"
+sinks = "./topology/sinks"
+
+[performance]
+parse_workers = 2
+rate_limit_rps = 2000
+
+[rescue]
+path = "./data/rescue"
+
+[log_conf]
+# 只保留告警与 connector 的 info 日志：避免 info 级数据日志触发 10MB 轮转，
+# 同时确保 "tcp sink reconnected" 能写进主日志文件。
+level = "warn,wp_core_connectors=info"
+output = "File"
+[log_conf.file]
+path = "./data/logs"
+
+[stat]
+window_sec = 60
+
+[[stat.pick]]
+key = "pick_stat"
+target = "*"
+fields = []
+top_n = 20
+
+[[stat.parse]]
+key = "parse_stat"
+target = "*"
+fields = []
+top_n = 20
+
+[[stat.sink]]
+key = "sink_stat"
+target = "*"
+fields = []
+top_n = 20

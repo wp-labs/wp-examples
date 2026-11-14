@@ -1,0 +1,4 @@
+ rule nginx {
+        (ip:sip,chars[0]<-,>,chars[0]<-,>,time:occur_time<[,]>,
+                http/request",http/status,digit,ip<"http://,/">,http/agent",chars[0]<"-,">")
+ }

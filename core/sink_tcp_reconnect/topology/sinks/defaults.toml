@@ -1,0 +1,6 @@
+[defaults]
+[defaults.expect]
+basis = "total_input"
+min_samples = 100
+mode = "error"
+

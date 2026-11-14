@@ -1,0 +1,10 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/benchmark"
+oml = ["sys"]
+[[sink_group.sinks]]
+connect = "tcp_sink"
+params = { addr = "127.0.0.1", port = 19101, framing = "line", tls = { enabled = true, insecure = true } }
+# 与 tcp 版本一致：接收端重启后由 connector 自身重连。
+drop_when_error = true

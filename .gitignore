@@ -24,3 +24,8 @@ tmp
 .md
 analyse
 *.pid
+
+# sink_tcp_reconnect 的接收端夹具与说明
+!core/sink_tcp_reconnect/receiver.py
+!core/sink_tcp_reconnect/README.md
+__pycache__/

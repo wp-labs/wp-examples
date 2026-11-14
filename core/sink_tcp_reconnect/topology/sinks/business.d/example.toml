@@ -1,0 +1,20 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/example"
+oml = ["example"]
+[[sink_group.sinks]]
+connect = "file_kv_sink"
+params = {  file = "example.dat" }
+[sink_group.sinks.expect]
+# /sink/example 收 /example/* 一类记录，占输入 1/3；两个 sink 是同组副本，各拿全量
+ratio = 0.333
+tol   = 0.02
+
+[[sink_group.sinks]]
+connect = "file_kv_sink"
+params = {  file = "example.bak" }
+[sink_group.sinks.expect]
+# /sink/example 收 /example/* 一类记录，占输入 1/3；两个 sink 是同组副本，各拿全量
+ratio = 0.333
+tol   = 0.02

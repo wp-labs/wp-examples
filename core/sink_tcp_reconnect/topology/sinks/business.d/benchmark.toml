@@ -1,0 +1,11 @@
+version = "2.0"
+
+[sink_group]
+name = "/sink/benchmark"
+oml = ["sys"]
+[[sink_group.sinks]]
+connect = "tcp_sink"
+params = { addr = "127.0.0.1", port = 19100, framing = "line" }
+# 本用例的核心开关：写失败时丢弃当前批次并打开熔断，不切救援文件。
+# 接收端恢复后由 tcp sink 自身重建连接，不需要重启 wparse。
+drop_when_error = true
