@@ -10,7 +10,7 @@
 | 发送端不重启 | 接收端恢复后，同一个 `wparse` 进程继续投递 |
 | 修复前后对比 | 修复前：旧 socket 持续报错，`dropped` 增长，只能重启 `wparse`；修复后：熔断探测批次即可重连成功 |
 | drop 语义不变 | `drop_when_error = true` 下故障窗口内仍丢弃并计数，不产生救援文件 |
-| 记录守恒 | `输入 = 已投递 + 实际丢失`；`dropped` 是批级计数，可能略大于实际丢失 |
+| 记录记账 | `delivered + dropped` 与输入总量的偏差在 `ACCOUNT_TOL`（默认 4096）内 |
 
 ## 用例结构 / Layout
 
@@ -50,7 +50,7 @@ PROTOCOL=tls ./run.sh       # 只跑 TLS（需要 openssl）
    - 接收端第二阶段（恢复后）有数据 —— 这是“无需重启发送端”的直接证据；
    - `wparse.log` 出现 `tcp sink reconnected`（connector 重建链路）与 `recovered from send failures`（熔断复位）；
    - `drop_when_error` 期间有丢弃计数，且 `data/rescue` 为空；
-   - 记录守恒：`输入 = example.dat + 接收端两阶段 + infra + 实际丢失`；`dropped` 是批级计数，可能略大于实际丢失（失败批次里已写入的记录也会被计入）；
+   - 记录记账：`输入 ≈ example.dat + 接收端两阶段 + infra + dropped`。TCP 无应用层 ACK，且 `drop_when_error` 按批记账，两侧都可能有小额上浮/漏计，因此用 `ACCOUNT_TOL`（默认 4096）做容差校验；
    - `wparse` 进程在停机窗口内保持存活（`kill -0` 检查）。
 
 ## 调参 / Tuning
@@ -61,6 +61,7 @@ PROTOCOL=tls ./run.sh       # 只跑 TLS（需要 openssl）
 | `OUTAGE_SECS` | 接收端停机时长，默认 3s |
 | `TCP_PORT` / `TLS_PORT` | 接收端端口，默认 19100 / 19101 |
 | `PROTOCOL` | `tcp` / `tls` / `both` |
+| `ACCOUNT_TOL` | 记账容差（默认 4096 条），吸收 TCP in-flight 丢包与批级 drop 上浮 |
 
 > 停机时长需要覆盖一次真实写失败并小于熔断上限；3s 可在默认 `rate_limit_rps=2000` 下稳定复现"熔断跳过 → 探测重连成功"。
 

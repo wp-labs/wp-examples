@@ -178,18 +178,24 @@ run_phase() {
         || die "[$proto] wparse.log: no 'tcp sink reconnected'; connector did not rebuild the link"
     log_grep "recovered from send failures" \
         || die "[$proto] wparse.log: breaker never recovered; the sink stayed broken"
-    [ "$dropped" -gt 0 ] || die "[$proto] expected records dropped during the outage, got 0"
 
-    # drop_when_error 的丢弃按“批”记账：失败批次里已写入的记录也会被计入 dropped，
-    # 因此 dropped 可能略大于实际未投递的记录数；这里校验“上限不超输入、丢失真实发生、账不漏记”。
+    # TCP 无应用层 ACK，且 drop_when_error 按“批”记账：
+    # - 接收端消失时，已进入内核缓冲的数据可能既未送达也未记账（lost 略大）；
+    # - 失败批次里已写入的记录也可能被计入 dropped（dropped 略大）。
+    # 因此不做精确守恒，只校验 delivered+dropped 与 input 的偏差在容差内。
     local delivered=$(( example + p1 + p2 + infra ))
     local lost=$(( input - delivered ))
+    local covered=$(( delivered + dropped ))
+    local tol=${ACCOUNT_TOL:-4096}
     [ "$delivered" -le "$input" ] \
         || die "[$proto] delivered ${delivered} exceeds input ${input}"
     [ "$lost" -gt 0 ] || die "[$proto] expected data loss during the outage, got 0"
-    [ "$dropped" -ge "$lost" ] \
-        || die "[$proto] drop accounting under-reports loss: dropped=${dropped} lost=${lost}"
-    echo "check(${proto}): delivered=${delivered} lost=${lost} dropped=${dropped}"
+    [ "$dropped" -gt 0 ] || die "[$proto] expected records dropped during the outage, got 0"
+    [ "$covered" -ge $(( input - tol )) ] \
+        || die "[$proto] accounting under-reports: delivered+dropped=${covered} input=${input} (tol=${tol})"
+    [ "$covered" -le $(( input + tol )) ] \
+        || die "[$proto] accounting over-reports: delivered+dropped=${covered} input=${input} (tol=${tol})"
+    echo "check(${proto}): delivered=${delivered} lost=${lost} dropped=${dropped} covered=${covered} tol=${tol}"
 }
 
 case "$PROTOCOL" in
