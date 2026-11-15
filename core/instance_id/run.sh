@@ -43,6 +43,12 @@ extract_ids() {
     grep -o 'wp_event_id: "[0-9]*"' "$OUT_FILE" | grep -o '[0-9]*'
 }
 
+# 取第一条 ID。不能用 `head -1`：它会提前关闭管道，上游 grep 收到 SIGPIPE 后
+# 在 `set -o pipefail` 下会把整条命令判为失败（本地因管道缓冲恰好不触发，CI 上会）。
+first_id() {
+    extract_ids | sed -n '1p'
+}
+
 reset_case() {
     unset WP_INS_ID WP_GLOBAL_TAGS || true
     rm -f "$ENV_FILE"
@@ -105,7 +111,7 @@ if ((${id} / ${LANE_DIV}) % ${LANE_MOD} != ${expected}) bad=bad+1;"
 assert_secs_is_now() { # assert_secs_is_now <label>
     local label=$1 id secs now
     now=$(date +%s)
-    id=$(extract_ids | head -1)
+    id=$(first_id)
     secs=$(echo "$id / ${SECS_DIV}" | bc)
     [ "$secs" -ge $((now - 120)) ] || die "[$label] 秒段过旧: secs=${secs} now=${now}"
     [ "$secs" -le $((now + 10)) ] || die "[$label] 秒段过于超前: secs=${secs} now=${now}"
