@@ -1,0 +1,5 @@
+key = "file_b"
+enable = true
+connect = "file_src"
+tags = ["stage = b"]
+params = { file = "relay.json" }

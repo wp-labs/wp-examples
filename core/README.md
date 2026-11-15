@@ -10,6 +10,7 @@ This directory contains core end-to-end examples and scenario-based configuratio
 | **error_reporting** | Error data reporting with multi-format output | Error routing, JSON/KV output, OML transformation |
 | **file_source** | File-based data source ingestion | File source, batch processing, global tags (`WP_GLOBAL_TAGS`) |
 | **instance_id** | Per-instance id (`WP_INS_ID`) and `wp_event_id` layout | Instance-id lanes, cross-instance uniqueness, `.env` resolution, invalid-id startup failure |
+| **relay_meta** | Chained instances (A → B) and upstream `wp_*` meta | Upstream `wp_event_id` / `wp_src_key` / `wp_event_md5` kept by default, `UPSTREAM_*_KEEP` overrides, no duplicate meta fields |
 | **knowdb_case** | Knowledge database queries and data association | SQL-like OML queries, CSV knowledge bases, dynamic lookup |
 | **oml_examples** | Comprehensive OML transformation | Conditional matching, range matching, tuple matching, knowledge base queries |
 | **privacy_examples** | Inline OML desensitization | `mask` / `hash` / `tokenize` / `remove`, IP pool mapping, object inner pipe, batch target pipe |
@@ -93,6 +94,7 @@ wpadm data validate
 | **error_reporting** | 错误数据报表与多格式输出 | 错误路由、JSON/KV 输出、OML 转换 |
 | **file_source** | 基于文件的数据源输入 | 文件源、批处理、全局 tag（`WP_GLOBAL_TAGS`） |
 | **instance_id** | 实例号（`WP_INS_ID`）与 `wp_event_id` 布局 | 实例号 lane 分段、跨实例唯一性、`.env` 解析、非法实例号启动失败 |
+| **relay_meta** | 两个实例接力（A → B）与上游 `wp_*` meta | 上游 `wp_event_id` / `wp_src_key` / `wp_event_md5` 默认沿用、`UPSTREAM_*_KEEP` 覆盖、不产生重复 meta 字段 |
 | **knowdb_case** | 知识库查询与数据关联 | SQL 风格 OML 查询、CSV 知识库、动态查找 |
 | **oml_examples** | 综合 OML 转换示例 | 条件匹配、范围匹配、元组匹配、知识库查询 |
 | **privacy_examples** | OML 内联脱敏 | `mask` / `hash` / `tokenize` / `remove`、IP 保留池映射、object 内 pipe、批量目标 pipe |

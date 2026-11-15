@@ -1,0 +1,12 @@
+version = "2.0"
+
+# 阶段 B 的产出：proto 文本，便于 grep 断言。
+[sink_group]
+name = "default"
+
+[[sink_group.sinks]]
+connect = "file_proto_sink"
+params = { base = "./out", file = "b.dat" }
+[sink_group.sinks.expect]
+ratio = 1.0
+tol   = 0.02

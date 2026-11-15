@@ -1,0 +1,9 @@
+package /relay {
+    // 阶段 B：把阶段 A 的 JSON 重新解析成记录。
+    // 关键点：规则显式把上游的 wp_* meta 当普通字段提取出来，
+    // 引擎据此判断「上游已有」并按 UPSTREAM_*_KEEP 决定保留还是覆盖。
+    #[tag(data_type: "relay")]
+    rule b_rec {
+        (json(@wp_event_id,@wp_src_key,@wp_event_md5,@data_type))
+    }
+}

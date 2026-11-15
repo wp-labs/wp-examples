@@ -1,0 +1,13 @@
+version = "2.0"
+
+# 阶段 A 的产出：JSON Lines，供阶段 B 重新解析。
+# 每行是一个完整记录，含解析字段 + wp_event_id / wp_src_key / wp_event_md5。
+[sink_group]
+name = "default"
+
+[[sink_group.sinks]]
+connect = "file_json_sink"
+params = { base = "./out", file = "relay.json" }
+[sink_group.sinks.expect]
+ratio = 1.0
+tol   = 0.02
