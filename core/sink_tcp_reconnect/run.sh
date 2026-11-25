@@ -39,17 +39,42 @@ log_grep() {
     return 1
 }
 
+# 丢弃总数：三种日志行各取所需，最后取最大值。
+# - 恢复汇总（每个故障期一条，权威）：
+#     recovered from send failures (drop_when_error): dropped N record(s) since ...
+# - 累计值（每轮统计刷新）：
+#     sink '...' dropped: window=N total=M
+# - 累计值（首次真实失败 / 熔断跳闸时各一条，之后每 60s 一条）：
+#     drop_when_error: dropped N record(s), total M
+#     drop_when_error: breaker open, skipped N record(s), total M
+# 只认恢复汇总时，sink 一直没恢复（例如重连退避超过用例窗口）就恒为 0，
+# 明明丢了上万条也看不出来；累计值在未恢复时依然会刷新。
+# 本用例只有一个 TCP/TLS sink，故取最大值；多 sink 场景需按 sink 名分组求和。
 log_dropped_total() {
-    local total=0 f n
+    local recovered=0 cumulative=0 f v reader
     for f in data/logs/wparse.log*; do
         [ -f "$f" ] || continue
         case "$f" in
-            *.gz) n=$(zgrep -ho 'dropped [0-9]* record(s) since' "$f" 2>/dev/null | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}') ;;
-            *) n=$(grep -ho 'dropped [0-9]* record(s) since' "$f" 2>/dev/null | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}') ;;
+            *.gz) reader=(gzip -dc) ;;
+            *)    reader=(cat) ;;
         esac
-        total=$(( total + ${n:-0} ))
+
+        v=$("${reader[@]}" "$f" 2>/dev/null \
+            | grep -o 'recovered from send failures (drop_when_error): dropped [0-9]* record(s) since' \
+            | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}' || true)
+        recovered=$(( recovered + ${v:-0} ))
+
+        v=$("${reader[@]}" "$f" 2>/dev/null \
+            | grep -oE 'dropped: window=[0-9]+ total=[0-9]+|record\(s\), total [0-9]+' \
+            | grep -oE '[0-9]+$' | sort -n | tail -1 || true)
+        if [ -n "${v:-}" ] && [ "$v" -gt "$cumulative" ]; then
+            cumulative=$v
+        fi
     done
-    echo "$total"
+    if [ "$cumulative" -gt "$recovered" ]; then
+        recovered=$cumulative
+    fi
+    echo "$recovered"
 }
 
 for cmd in wparse wpgen wpadm python3; do
