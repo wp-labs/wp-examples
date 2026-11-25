@@ -13,7 +13,6 @@ STAT_SEC=${STAT_SEC:-3}
 RESCUE_STAGES=${RESCUE_STAGES:-"up:1,down:4"}
 
 RESCUE_DIR="./data/rescue"
-LOG_FILE="./data/logs/wparse.log"
 
 die() {
     echo "FAIL: $*" >&2
@@ -24,6 +23,69 @@ line_count() { if [ -f "$1" ]; then wc -l < "$1" | tr -d ' '; else echo 0; fi; }
 
 rescue_file_count() {
     find "$RESCUE_DIR" -type f \( -name '*.dat' -o -name '*.dat.lock' \) 2>/dev/null | wc -l | tr -d ' '
+}
+
+# 日志可能因体积触发 gzip 轮转（10MB），断言要覆盖全部分片
+log_grep() {
+    local pat=$1 f
+    for f in data/logs/wparse.log*; do
+        [ -f "$f" ] || continue
+        case "$f" in
+            *.gz) zgrep -q "$pat" "$f" 2>/dev/null && return 0 ;;
+            *) grep -q "$pat" "$f" 2>/dev/null && return 0 ;;
+        esac
+    done
+    return 1
+}
+
+# 故障期次数：每个故障期一行 "recovered from send failures ..."
+log_recovery_count() {
+    local n=0 f v reader
+    for f in data/logs/wparse.log*; do
+        [ -f "$f" ] || continue
+        case "$f" in
+            *.gz) reader=(gzip -dc) ;;
+            *)    reader=(cat) ;;
+        esac
+        v=$("${reader[@]}" "$f" 2>/dev/null | grep -c 'recovered from send failures' || true)
+        n=$(( n + ${v:-0} ))
+    done
+    echo "$n"
+}
+
+# 丢弃总数：恢复汇总（每个故障期一条，权威）与累计值取大。
+# - 恢复汇总：recovered from send failures (drop_when_error): dropped N record(s) since ...
+# - 累计值（每轮统计刷新）：sink '...' dropped: window=N total=M
+# - 累计值（首次真实失败 / 熔断跳闸时各一条，之后每 60s 一条）：
+#     drop_when_error: dropped N record(s), total M
+#     drop_when_error: breaker open, skipped N record(s), total M
+# 只认恢复汇总时，sink 一直没恢复就恒为 0，明明丢了上万条也看不出来；
+# 累计值在未恢复时依然会刷新。本用例只有一个 sink，故取最大值。
+log_dropped_total() {
+    local recovered=0 cumulative=0 f v reader
+    for f in data/logs/wparse.log*; do
+        [ -f "$f" ] || continue
+        case "$f" in
+            *.gz) reader=(gzip -dc) ;;
+            *)    reader=(cat) ;;
+        esac
+
+        v=$("${reader[@]}" "$f" 2>/dev/null \
+            | grep -o 'recovered from send failures (drop_when_error): dropped [0-9]* record(s) since' \
+            | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}' || true)
+        recovered=$(( recovered + ${v:-0} ))
+
+        v=$("${reader[@]}" "$f" 2>/dev/null \
+            | grep -oE 'dropped: window=[0-9]+ total=[0-9]+|record\(s\), total [0-9]+' \
+            | grep -oE '[0-9]+$' | sort -n | tail -1 || true)
+        if [ -n "${v:-}" ] && [ "$v" -gt "$cumulative" ]; then
+            cumulative=$v
+        fi
+    done
+    if [ "$cumulative" -gt "$recovered" ]; then
+        recovered=$cumulative
+    fi
+    echo "$recovered"
 }
 
 for cmd in wparse wpgen wpadm; do
@@ -61,19 +123,18 @@ if [ "$RESCUE_FILES" -ne 0 ]; then
 fi
 
 # 2) 坏链路期间必须熔断（跳过下发），而不是每个批次都去撞 sink
-grep -q "breaker open, skipped" "$LOG_FILE" \
+log_grep "breaker open, skipped" \
     || die "wparse.log: no 'breaker open, skipped' line; the sink kept retrying while failing
   hint: 需要 wp-motor >= v1.37.0（该 WARN 每故障期输出一次，旧版本会被 60s 限流吞掉）"
 
-# 3) 链路恢复后必须自动复位。"dropped N" 是本次故障期累计丢弃的记录数
-RECOVERY_LINES=$(grep -c "recovered from send failures" "$LOG_FILE" || true)
+# 3) 链路恢复后必须自动复位
+RECOVERY_LINES=$(log_recovery_count)
 if [ "$RECOVERY_LINES" -eq 0 ]; then
     die "wparse.log: sink never recovered from the outage (no 'recovered from send failures')"
 fi
-# 每个故障期一行 "recovered ... dropped N record(s) since ..."，累加即为总丢弃数
-DROPPED=$(grep -o 'dropped [0-9]* record(s) since' "$LOG_FILE" \
-    | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}') || DROPPED=0
-DROPPED=${DROPPED:-0}
+# 每个故障期一行 "recovered ... dropped N record(s) since ..."，累加即为总丢弃数；
+# 没有恢复汇总时回落到累计值（见 log_dropped_total）。
+DROPPED=$(log_dropped_total)
 
 INPUT=$(line_count ./data/in_dat/gen.dat)
 BENCH=$(line_count ./data/out_dat/benchmark.dat)
