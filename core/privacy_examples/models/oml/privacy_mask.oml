@@ -14,6 +14,11 @@ mail     : chars = read(mail)     | mask(mail) ;
 domain   : chars = read(domain)   | mask(domain) ;
 name     : chars = read(name)     | mask(name, style:head) ;
 
+// 混合文本：只替换识别到的片段，其余原样保留（时间戳、模块名、内网 IP 不动）
+raw_log  : chars = read(raw_log)  | mask_text(pii) ;
+auth_hdr : chars = read(auth_hdr) | mask_text(http_auth) ;
+contact  : chars = read(contact)  | mask_text(mobile) | mask_text(mail) ;
+
 // 不可逆关联哈希：同盐同值同结果
 uid_hash : chars = read(user_id) | hash(sha256) ;
 

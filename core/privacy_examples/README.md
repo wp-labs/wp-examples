@@ -1,6 +1,6 @@
 # Privacy / Desensitization Examples
 
-本用例演示 OML 内联脱敏算子：`mask`、`hash`、`tokenize`、`remove`，以及 object 内部与批量目标的脱敏写法。
+本用例演示 OML 内联脱敏算子：`mask`、`mask_text`、`hash`、`tokenize`、`remove`，以及 object 内部与批量目标的脱敏写法。
 
 ## 目的
 
@@ -8,6 +8,8 @@
 
 - IP 映射脱敏后仍是合法 IP（可继续用于 join / group by）
 - 手机号、身份证、邮箱、域名、姓名的模式掩码
+- 混合文本扫描脱敏（`mask_text`）：只替换识别到的片段，其余原样保留
+- HTTP 凭据头脱敏（`mask_text(http_auth)`，含单行文本里的 `Authorization`）
 - 不可逆关联哈希（同盐同值同结果）
 - 可逆令牌生成（还原由独立工具完成）
 - 字段删除
@@ -72,6 +74,11 @@ mail     : chars = read(mail)     | mask(mail) ;
 domain   : chars = read(domain)   | mask(domain) ;
 name     : chars = read(name)     | mask(name, style:head) ;
 
+// 混合文本：只替换识别到的片段，其余原样保留（时间戳、模块名、内网 IP 不动）
+raw_log  : chars = read(raw_log)  | mask_text(pii) ;
+auth_hdr : chars = read(auth_hdr) | mask_text(http_auth) ;
+contact  : chars = read(contact)  | mask_text(mobile) | mask_text(mail) ;
+
 uid_hash  : chars = read(user_id) | hash(sha256) ;
 uid_token : chars = read(user_id) | tokenize() ;
 
@@ -90,13 +97,13 @@ summary : obj = object {
 WPL 规则 `models/wpl/privacy/parse.wpl` 解析 CSV 行：
 
 ```text
-privacy,src_ip,dst_ip,mobile,id_card,mail,domain,name,user_id,notes,backup_mail
+privacy,src_ip,dst_ip,mobile,id_card,mail,domain,name,user_id,notes,backup_mail,raw_log,auth_hdr,contact
 ```
 
 示例：
 
 ```text
-privacy,203.0.113.5,198.51.100.9,13800138000,110101199003071234,alice@example.com,api.example.com,张三,user-1001,secret-note,bob@example.org
+privacy,203.0.113.5,198.51.100.9,13800138000,110101199003071234,alice@example.com,api.example.com,张三,user-1001,secret-note,bob@example.org,2026-10-20 15:26:46 DEBUG MsgUserContext - login user=huangxingbo password=Dayu@1234 mobile=13800138000 email=zhangsan@example.com from 10.168.0.123,Authorization: Basic YWRtaW46aG9yaXpvbjM=,call 13800138000 or mail alice@example.com
 ```
 
 ## 输出
@@ -114,6 +121,9 @@ privacy,203.0.113.5,198.51.100.9,13800138000,110101199003071234,alice@example.co
 - `notes`：字段不存在
 - `summary.s_ip` / `summary.mail`：已脱敏
 - `backup_mail`：由批量目标 `*_mail` 脱敏
+- `raw_log`：`mask_text(pii)` 后的日志行（密码 / 手机号 / 邮箱被替换，时间戳、模块名、内网 IP 保留）
+- `auth_hdr`：`mask_text(http_auth)` 后的凭据头（保留头名与 `Basic` scheme）
+- `contact`：`mask_text(mobile) | mask_text(mail)` 串联结果
 
 ## 说明
 
@@ -122,3 +132,4 @@ privacy,203.0.113.5,198.51.100.9,13800138000,110101199003071234,alice@example.co
 - `remove` 是终结算子，且会删除已存在的同名目标。
 - 密钥缺失或类型不匹配时 fail-closed：输出占位值或丢弃字段，不会原样透传。
 - `mask(ip)` 未配置盐且未显式 `allow_unsalted:true` 时不会输出原值。
+- `mask_text` 是文本扫描的最佳努力契约：只处理识别到的片段（手机号 / 邮箱 / 身份证 / 凭据 / HTTP 凭据头等），未匹配文本保持不变；`mask` 仍是整值 + fail-closed。

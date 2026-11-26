@@ -11,7 +11,10 @@ package privacy {
       chars:name,
       chars:user_id,
       chars:notes,
-      chars:backup_mail
+      chars:backup_mail,
+      chars:raw_log,
+      chars:auth_hdr,
+      chars:contact
     )\,
   }
 }

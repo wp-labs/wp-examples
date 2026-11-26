@@ -79,6 +79,30 @@ with open(path, encoding="utf-8") as fh:
                 assert first_octet_ok(ip), rec[key]
             else:
                 assert str(ip).startswith("2001:db8:"), rec[key]
+        # mask_text: only recognized fragments are replaced
+        assert "password=[REDACTED]" in rec["raw_log"], rec["raw_log"]
+        assert "mobile=*******" in rec["raw_log"], rec["raw_log"]
+        assert "***@" in rec["raw_log"], rec["raw_log"]
+        assert "from 10.168.0." in rec["raw_log"], rec["raw_log"]
+        assert "[REDACTED]" in rec["auth_hdr"], rec["auth_hdr"]
+        assert "*******" in rec["contact"], rec["contact"]
+        assert "***@" in rec["contact"], rec["contact"]
+        for leaked in (
+            "Dayu@1234",
+            "Hunter2",
+            "Passw0rd",
+            "s3cret",
+            "letmein",
+            "13800138000",
+            "13900139000",
+            "13700137000",
+            "13600136000",
+            "13500135000",
+            "YWRtaW46",
+            "session=abc",
+        ):
+            assert leaked not in rec["raw_log"], (leaked, rec["raw_log"])
+            assert leaked not in rec["auth_hdr"], (leaked, rec["auth_hdr"])
         count += 1
 
 assert count > 0, "no records produced"
